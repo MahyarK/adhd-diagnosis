@@ -14,6 +14,14 @@ class AssessmentTest extends TestCase
             ->assertSee('assessment/score');
     }
 
+    public function test_language_switcher_can_render_persian_rtl(): void
+    {
+        $this->get('/?lang=fa')
+            ->assertOk()
+            ->assertSee('dir="rtl"', false)
+            ->assertSee('غربالگری آرام ADHD');
+    }
+
     public function test_combined_presentation_can_be_scored(): void
     {
         $answers = $this->baseContext();
@@ -46,6 +54,14 @@ class AssessmentTest extends TestCase
         $this->postJson('/assessment/score', ['answers' => $answers])
             ->assertOk()
             ->assertJsonPath('type', 'needs_context');
+    }
+
+    public function test_scoring_response_uses_selected_language(): void
+    {
+        $this->withSession(['locale' => 'fr'])
+            ->postJson('/assessment/score', ['answers' => $this->baseContext()])
+            ->assertOk()
+            ->assertJsonPath('title', 'Le signal TDAH est plus faible dans ce dépistage');
     }
 
     private function baseContext(): array

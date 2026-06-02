@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>ADHD Screening Companion</title>
+    <title>{{ __('assessment.meta.title') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <main class="shell" data-sections='@json($sections)' data-score-url="{{ route('assessment.score') }}">
+    <main class="shell" data-sections='@json($sections)' data-ui='@json($ui)' data-score-url="{{ route('assessment.score') }}">
         <section class="top-bar" aria-labelledby="page-title">
             <div>
-                <p class="eyebrow">Gentle ADHD screening</p>
-                <h1 id="page-title">One calm question at a time.</h1>
-                <p class="lede">DSM-5-informed symptoms, ASRS-style adult wording, and clinical context checks. Screening only, not a diagnosis.</p>
+                <p class="eyebrow">{{ __('assessment.meta.eyebrow') }}</p>
+                <h1 id="page-title">{{ __('assessment.meta.heading') }}</h1>
+                <p class="lede">{{ __('assessment.meta.lede') }}</p>
             </div>
+            <nav class="language-switcher" aria-label="{{ __('assessment.ui.language') }}">
+                @foreach ($locales as $code => $label)
+                    <a href="{{ route('assessment.show', ['lang' => $code]) }}" @class(['active' => $locale === $code])>{{ $label }}</a>
+                @endforeach
+            </nav>
             <div class="score-strip" aria-live="polite">
-                <div><span>Focus points</span><strong id="pointsLabel">0</strong></div>
-                <div><span>Checkpoint</span><strong id="sectionLabel">Start</strong></div>
+                <div><span>{{ __('assessment.ui.focus_points') }}</span><strong id="pointsLabel">0</strong></div>
+                <div><span>{{ __('assessment.ui.checkpoint') }}</span><strong id="sectionLabel">{{ __('assessment.ui.start') }}</strong></div>
                 <div><span id="progressLabel">1 / 30</span><strong id="streakLabel">Ready</strong></div>
             </div>
         </section>
@@ -30,31 +35,31 @@
                 <h2 id="questionText"></h2>
                 <div class="answer-grid" id="answerGrid"></div>
                 <div class="navigation-row">
-                    <button type="button" class="secondary-button" id="backButton">Back</button>
-                    <span id="motivationLabel">Pick the answer that feels closest.</span>
-                    <button type="button" class="primary-button" id="nextButton">Next</button>
+                    <button type="button" class="secondary-button" id="backButton">{{ __('assessment.ui.back') }}</button>
+                    <span id="motivationLabel">{{ __('assessment.ui.pick_closest') }}</span>
+                    <button type="button" class="primary-button" id="nextButton">{{ __('assessment.ui.next') }}</button>
                 </div>
             </section>
         </section>
 
         <section class="results-panel" id="resultsPanel" hidden>
             <div>
-                <p class="eyebrow">Your screening result</p>
+                <p class="eyebrow">{{ __('assessment.ui.your_result') }}</p>
                 <h2 id="resultTitle"></h2>
                 <p id="resultSummary"></p>
             </div>
             <div class="result-metrics">
-                <div><span>Inattentive signs</span><strong id="inattentiveCount"></strong></div>
-                <div><span>Hyperactive/impulsive signs</span><strong id="hyperactiveCount"></strong></div>
-                <div><span>Threshold used</span><strong id="thresholdUsed"></strong></div>
+                <div><span>{{ __('assessment.ui.inattentive_signs') }}</span><strong id="inattentiveCount"></strong></div>
+                <div><span>{{ __('assessment.ui.hyperactive_signs') }}</span><strong id="hyperactiveCount"></strong></div>
+                <div><span>{{ __('assessment.ui.threshold_used') }}</span><strong id="thresholdUsed"></strong></div>
             </div>
             <div class="context-grid" id="contextGrid"></div>
             <div>
-                <h3>Thoughtful next steps</h3>
+                <h3>{{ __('assessment.ui.next_steps') }}</h3>
                 <ul id="nextSteps"></ul>
             </div>
             <p class="disclaimer" id="resultDisclaimer"></p>
-            <button type="button" class="secondary-button" id="restartButton">Start over</button>
+            <button type="button" class="secondary-button" id="restartButton">{{ __('assessment.ui.start_over') }}</button>
         </section>
     </main>
 </body>

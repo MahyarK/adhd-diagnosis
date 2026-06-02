@@ -2,6 +2,7 @@ const root = document.querySelector('.shell');
 
 if (root) {
     const sections = JSON.parse(root.dataset.sections);
+    const ui = JSON.parse(root.dataset.ui);
     const questions = sections.flatMap((section) => section.questions.map((question) => ({ ...question, section })));
     const answers = {};
     let index = 0;
@@ -22,18 +23,11 @@ if (root) {
     const motivationLabel = document.getElementById('motivationLabel');
 
     const frequencyOptions = [
-        ['0', 'Never', 'Not my pattern'],
-        ['1', 'Rarely', 'Now and then'],
-        ['2', 'Sometimes', 'Noticeable'],
-        ['3', 'Often', 'Regular'],
-        ['4', 'Very often', 'Frequent'],
-    ];
-
-    const encouragement = [
-        'Nice. Keep the pace easy.',
-        'That counted. Next one is ready.',
-        'Good progress. No perfect answer needed.',
-        'Checkpoint energy. Stay with your first honest read.',
+        ['0', ui.frequency.never, ui.frequency.never_detail],
+        ['1', ui.frequency.rarely, ui.frequency.rarely_detail],
+        ['2', ui.frequency.sometimes, ui.frequency.sometimes_detail],
+        ['3', ui.frequency.often, ui.frequency.often_detail],
+        ['4', ui.frequency.very_often, ui.frequency.very_often_detail],
     ];
 
     function renderRail() {
@@ -60,12 +54,12 @@ if (root) {
         progressBar.style.width = `${((index + 1) / questions.length) * 100}%`;
         sectionLabel.textContent = question.section.label;
         pointsLabel.textContent = answeredCount * 10;
-        streakLabel.textContent = answeredCount > 0 ? `${answeredCount} answered` : 'Ready';
-        motivationLabel.textContent = encouragement[index % encouragement.length];
+        streakLabel.textContent = answeredCount > 0 ? ui.answered.replace(':count', answeredCount) : ui.ready;
+        motivationLabel.textContent = ui.encouragement[index % ui.encouragement.length];
         sectionIntro.textContent = question.section.intro;
         questionText.textContent = question.text;
         backButton.disabled = index === 0;
-        nextButton.textContent = index === questions.length - 1 ? 'See results' : 'Skip';
+        nextButton.textContent = index === questions.length - 1 ? ui.see_results : ui.skip;
 
         answerGrid.innerHTML = options.map(([value, label, detail]) => {
             const selected = String(answers[question.id] ?? '') === value ? 'selected' : '';
@@ -94,7 +88,7 @@ if (root) {
 
         if (answers[question.id] === undefined) {
             answerGrid.classList.add('needs-answer');
-            motivationLabel.textContent = 'Choose one answer to unlock the next card.';
+            motivationLabel.textContent = ui.choose_to_unlock;
             setTimeout(() => answerGrid.classList.remove('needs-answer'), 450);
 
             return;
@@ -112,7 +106,7 @@ if (root) {
 
     async function submitAnswers() {
         nextButton.disabled = true;
-        nextButton.textContent = 'Scoring';
+        nextButton.textContent = ui.scoring;
 
         const response = await fetch(root.dataset.scoreUrl, {
             method: 'POST',
@@ -125,7 +119,7 @@ if (root) {
 
         if (! response.ok) {
             nextButton.disabled = false;
-            nextButton.textContent = 'See results';
+            nextButton.textContent = ui.see_results;
 
             return;
         }
@@ -144,16 +138,16 @@ if (root) {
         document.getElementById('thresholdUsed').textContent = `${result.threshold}+`;
 
         const labels = {
-            childhood: 'Early signs',
-            settings: 'Multiple settings',
-            impairment: 'Meaningful impact',
-            duration: 'Six months or longer',
+            childhood: ui.context.childhood,
+            settings: ui.context.settings,
+            impairment: ui.context.impairment,
+            duration: ui.context.duration,
         };
 
         document.getElementById('contextGrid').innerHTML = Object.entries(result.context).map(([key, value]) => `
             <div class="${value ? 'met' : 'missing'}">
                 <span>${labels[key]}</span>
-                <strong>${value ? 'Present' : 'Needs clarity'}</strong>
+                <strong>${value ? ui.present : ui.needs_clarity}</strong>
             </div>
         `).join('');
 
