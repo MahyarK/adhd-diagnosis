@@ -185,16 +185,27 @@ class AdhdAssessment
 
     private static function profile(string $type, array $ruleOuts): array
     {
-        $profile = __('assessment.results.profiles.'.$type);
+        $profile = self::translated('assessment.results.profiles.'.$type);
 
         if (! is_array($profile)) {
-            $profile = __('assessment.results.profiles.low_signal');
+            $profile = self::translated('assessment.results.profiles.low_signal');
         }
 
         if ($ruleOuts !== []) {
-            $profile['important'][] = __('assessment.results.extra.rule_out_note');
+            $profile['important'][] = self::translated('assessment.results.extra.rule_out_note');
         }
 
         return $profile;
+    }
+
+    private static function translated(string $key): mixed
+    {
+        $value = trans($key);
+
+        if ($value !== $key) {
+            return $value;
+        }
+
+        return trans($key, [], 'en');
     }
 }

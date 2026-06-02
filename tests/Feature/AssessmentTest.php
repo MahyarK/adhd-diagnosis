@@ -67,6 +67,21 @@ class AssessmentTest extends TestCase
             ->assertJsonPath('title', 'Le signal TDAH est plus faible dans ce dépistage');
     }
 
+    public function test_result_profile_falls_back_when_long_form_translation_is_missing(): void
+    {
+        $answers = $this->baseContext();
+
+        foreach (['ia_detail', 'ia_sustain', 'ia_listen', 'ia_finish', 'ia_organize'] as $id) {
+            $answers[$id] = 3;
+        }
+
+        $this->withSession(['locale' => 'fa'])
+            ->postJson('/assessment/score', ['answers' => $answers])
+            ->assertOk()
+            ->assertJsonPath('title', 'الگوی غربالگری: ارائه عمدتاً بی‌توجه ADHD')
+            ->assertJsonPath('profile.plain_title', 'What inattentive presentation means');
+    }
+
     private function baseContext(): array
     {
         return [
