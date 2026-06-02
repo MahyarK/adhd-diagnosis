@@ -21,6 +21,12 @@ if (root) {
     const pointsLabel = document.getElementById('pointsLabel');
     const streakLabel = document.getElementById('streakLabel');
     const motivationLabel = document.getElementById('motivationLabel');
+    const findCliniciansButton = document.getElementById('findCliniciansButton');
+    const clinicianMapPanel = document.getElementById('clinicianMapPanel');
+    const clinicianStatus = document.getElementById('clinicianStatus');
+    const clinicianList = document.getElementById('clinicianList');
+    const fallbackMapLink = document.getElementById('fallbackMapLink');
+    let clinicianMap = null;
 
     const frequencyOptions = [
         ['0', ui.frequency.never, ui.frequency.never_detail],
@@ -136,6 +142,10 @@ if (root) {
         document.getElementById('inattentiveCount').textContent = `${result.counts.inattentive} of 9`;
         document.getElementById('hyperactiveCount').textContent = `${result.counts.hyperactive} of 9`;
         document.getElementById('thresholdUsed').textContent = `${result.threshold}+`;
+        document.getElementById('scoreSummary').textContent = ui.score_summary
+            .replace(':inattentive', result.counts.inattentive)
+            .replace(':hyperactive', result.counts.hyperactive)
+            .replace(':threshold', result.threshold);
 
         const labels = {
             childhood: ui.context.childhood,
@@ -151,10 +161,37 @@ if (root) {
             </div>
         `).join('');
 
+        renderProfile(result.profile);
+
         document.getElementById('nextSteps').innerHTML = result.next_steps
-            .slice(0, 3)
             .map((step) => `<li>${step}</li>`)
             .join('');
+    }
+
+    function renderProfile(profile) {
+        document.getElementById('profileReport').innerHTML = `
+            <article class="explain-card wide">
+                <h3>${profile.plain_title}</h3>
+                <p>${profile.plain}</p>
+                <p class="kind-note">${profile.not_character}</p>
+            </article>
+            ${renderListCard(profile.daily_title, profile.daily)}
+            ${renderListCard(profile.strengths_title, profile.strengths)}
+            ${renderListCard(profile.handles_title, profile.handles, 'wide')}
+            ${renderListCard(profile.clinician_title, profile.clinician)}
+            ${renderListCard(profile.important_title, profile.important, 'important')}
+        `;
+    }
+
+    function renderListCard(title, items, extraClass = '') {
+        return `
+            <article class="explain-card ${extraClass}">
+                <h3>${title}</h3>
+                <ol>
+                    ${items.map((item) => `<li>${item}</li>`).join('')}
+                </ol>
+            </article>
+        `;
     }
 
     nextButton.addEventListener('click', () => {
@@ -171,5 +208,166 @@ if (root) {
         window.location.reload();
     });
 
+    findCliniciansButton.addEventListener('click', () => {
+        showClinicianMap();
+    });
+
     renderQuestion();
+
+    async function showClinicianMap() {
+        clinicianMapPanel.hidden = false;
+        findCliniciansButton.disabled = true;
+        clinicianStatus.textContent = ui.map_requesting_location;
+        clinicianMapPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        if (! navigator.geolocation) {
+            showMapFallback(ui.map_location_unavailable);
+
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+
+                fallbackMapLink.href = `https://www.google.com/maps/search/ADHD+psychologist+psychiatrist+near+me/@${latitude},${longitude},13z`;
+                clinicianStatus.textContent = ui.map_loading;
+
+                try {
+                    await loadLeaflet();
+                    renderMap(latitude, longitude);
+                    const clinicians = await fetchNearbyClinicians(latitude, longitude);
+                    renderClinicians(clinicians, latitude, longitude);
+                } catch (error) {
+                    showMapFallback(ui.map_lookup_failed);
+                }
+            },
+            () => showMapFallback(ui.map_permission_denied),
+            { enableHighAccuracy: false, maximumAge: 300000, timeout: 12000 },
+        );
+    }
+
+    function showMapFallback(message) {
+        findCliniciansButton.disabled = false;
+        clinicianStatus.textContent = message;
+        clinicianList.innerHTML = `
+            <a class="clinician-card" href="https://www.google.com/maps/search/ADHD+psychologist+psychiatrist+near+me" target="_blank" rel="noreferrer">
+                <strong>${ui.open_maps}</strong>
+                <span>${ui.map_fallback_copy}</span>
+            </a>
+        `;
+    }
+
+    async function loadLeaflet() {
+        if (window.L) {
+            return;
+        }
+
+        await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    function renderMap(latitude, longitude) {
+        if (clinicianMap) {
+            clinicianMap.remove();
+        }
+
+        clinicianMap = L.map('clinicianMap', { scrollWheelZoom: false }).setView([latitude, longitude], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+        }).addTo(clinicianMap);
+        L.marker([latitude, longitude]).addTo(clinicianMap).bindPopup(ui.your_location);
+    }
+
+    async function fetchNearbyClinicians(latitude, longitude) {
+        const radius = 15000;
+        const query = `
+            [out:json][timeout:25];
+            (
+              node(around:${radius},${latitude},${longitude})["healthcare"~"psychologist|psychiatrist|psychotherapist|doctor|clinic"];
+              way(around:${radius},${latitude},${longitude})["healthcare"~"psychologist|psychiatrist|psychotherapist|doctor|clinic"];
+              relation(around:${radius},${latitude},${longitude})["healthcare"~"psychologist|psychiatrist|psychotherapist|doctor|clinic"];
+              node(around:${radius},${latitude},${longitude})["amenity"~"doctors|clinic|hospital"]["name"];
+              way(around:${radius},${latitude},${longitude})["amenity"~"doctors|clinic|hospital"]["name"];
+              relation(around:${radius},${latitude},${longitude})["amenity"~"doctors|clinic|hospital"]["name"];
+            );
+            out center tags 50;
+        `;
+        const response = await fetch('https://overpass-api.de/api/interpreter', {
+            method: 'POST',
+            body: new URLSearchParams({ data: query }),
+        });
+
+        if (! response.ok) {
+            throw new Error('Overpass lookup failed');
+        }
+
+        const data = await response.json();
+
+        return data.elements
+            .map((element) => {
+                const lat = element.lat ?? element.center?.lat;
+                const lon = element.lon ?? element.center?.lon;
+
+                if (! lat || ! lon) {
+                    return null;
+                }
+
+                return {
+                    id: `${element.type}-${element.id}`,
+                    name: element.tags?.name ?? ui.unnamed_clinician,
+                    kind: element.tags?.healthcare ?? element.tags?.amenity ?? ui.clinician,
+                    lat,
+                    lon,
+                    distance: distanceKm(latitude, longitude, lat, lon),
+                };
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 40);
+    }
+
+    function renderClinicians(clinicians, latitude, longitude) {
+        if (clinicians.length === 0) {
+            clinicianStatus.textContent = ui.map_no_results;
+            showMapFallback(ui.map_no_results);
+
+            return;
+        }
+
+        clinicianStatus.textContent = ui.map_results.replace(':count', clinicians.length);
+        clinicianList.innerHTML = clinicians.map((clinician) => `
+            <a class="clinician-card" href="https://www.google.com/maps/search/?api=1&query=${clinician.lat},${clinician.lon}" target="_blank" rel="noreferrer">
+                <strong>${clinician.name}</strong>
+                <span>${clinician.kind} · ${clinician.distance.toFixed(1)} km</span>
+            </a>
+        `).join('');
+
+        clinicians.forEach((clinician) => {
+            L.marker([clinician.lat, clinician.lon])
+                .addTo(clinicianMap)
+                .bindPopup(`<strong>${clinician.name}</strong><br>${clinician.kind}<br>${clinician.distance.toFixed(1)} km`);
+        });
+
+        clinicianMap.fitBounds([
+            [latitude, longitude],
+            ...clinicians.slice(0, 12).map((clinician) => [clinician.lat, clinician.lon]),
+        ], { padding: [28, 28], maxZoom: 14 });
+    }
+
+    function distanceKm(lat1, lon1, lat2, lon2) {
+        const toRadians = (degrees) => degrees * Math.PI / 180;
+        const earthRadiusKm = 6371;
+        const dLat = toRadians(lat2 - lat1);
+        const dLon = toRadians(lon2 - lon1);
+        const a = Math.sin(dLat / 2) ** 2
+            + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) ** 2;
+
+        return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
 }

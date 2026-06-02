@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('assessment.meta.title') }}</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -48,12 +49,39 @@
                 <h2 id="resultTitle"></h2>
                 <p id="resultSummary"></p>
             </div>
-            <div class="result-metrics">
-                <div><span>{{ __('assessment.ui.inattentive_signs') }}</span><strong id="inattentiveCount"></strong></div>
-                <div><span>{{ __('assessment.ui.hyperactive_signs') }}</span><strong id="hyperactiveCount"></strong></div>
-                <div><span>{{ __('assessment.ui.threshold_used') }}</span><strong id="thresholdUsed"></strong></div>
-            </div>
-            <div class="context-grid" id="contextGrid"></div>
+            <details class="score-details">
+                <summary>
+                    <span>{{ __('assessment.ui.score_breakdown') }}</span>
+                    <strong id="scoreSummary"></strong>
+                </summary>
+                <div class="result-metrics">
+                    <div><span>{{ __('assessment.ui.inattentive_signs') }}</span><strong id="inattentiveCount"></strong></div>
+                    <div><span>{{ __('assessment.ui.hyperactive_signs') }}</span><strong id="hyperactiveCount"></strong></div>
+                    <div><span>{{ __('assessment.ui.threshold_used') }}</span><strong id="thresholdUsed"></strong></div>
+                </div>
+                <div class="context-grid" id="contextGrid"></div>
+            </details>
+            <div class="profile-report" id="profileReport"></div>
+            <section class="clinician-cta" id="clinicianCta">
+                <div>
+                    <p class="eyebrow">{{ __('assessment.ui.clinician_cta_eyebrow') }}</p>
+                    <h3>{{ __('assessment.ui.clinician_cta_title') }}</h3>
+                    <p>{{ __('assessment.ui.clinician_cta_body') }}</p>
+                </div>
+                <button type="button" class="primary-button" id="findCliniciansButton">{{ __('assessment.ui.find_clinicians') }}</button>
+            </section>
+            <section class="clinician-map-panel" id="clinicianMapPanel" hidden>
+                <div class="map-header">
+                    <div>
+                        <h3>{{ __('assessment.ui.nearby_clinicians') }}</h3>
+                        <p id="clinicianStatus">{{ __('assessment.ui.map_waiting') }}</p>
+                    </div>
+                    <a id="fallbackMapLink" href="https://www.google.com/maps/search/ADHD+clinician+near+me" target="_blank" rel="noreferrer">{{ __('assessment.ui.open_maps') }}</a>
+                </div>
+                <div id="clinicianMap" class="clinician-map" aria-label="{{ __('assessment.ui.nearby_clinicians') }}"></div>
+                <div id="clinicianList" class="clinician-list"></div>
+                <p class="map-note">{{ __('assessment.ui.map_note') }}</p>
+            </section>
             <div>
                 <h3>{{ __('assessment.ui.next_steps') }}</h3>
                 <ul id="nextSteps"></ul>

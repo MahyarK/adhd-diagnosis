@@ -286,13 +286,23 @@ h1 {
 [dir="rtl"] .section-intro,
 [dir="rtl"] .question-panel h2,
 [dir="rtl"] .results-panel p,
-[dir="rtl"] li {
+[dir="rtl"] li,
+[dir="rtl"] .explain-card h3 {
     text-align: right;
+}
+
+[dir="rtl"] .explain-card ol {
+    padding-right: 18px;
+    padding-left: 0;
 }
 
 [dir="rtl"] .disclaimer {
     border-right: 4px solid #d15f3f;
     border-left: 0;
+}
+
+[dir="rtl"] .score-details summary strong {
+    text-align: left;
 }
 
 .needs-answer .answer-option {
@@ -346,12 +356,11 @@ h1 {
 }
 
 .results-panel {
-    display: grid;
-    grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+    display: block;
     height: 100%;
     min-height: 0;
-    gap: 10px;
     padding: 18px;
+    overflow: auto;
 }
 
 .results-panel[hidden],
@@ -378,6 +387,38 @@ h1 {
     background: #fff4eb;
 }
 
+.score-details {
+    margin-top: 10px;
+    border: 1px solid #ddd5c8;
+    border-radius: 8px;
+    background: #fbf8f0;
+}
+
+.score-details summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    min-height: 52px;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.score-details summary span {
+    color: #69665f;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.score-details summary strong {
+    overflow: hidden;
+    font-size: 14px;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .result-metrics,
 .context-grid {
     display: grid;
@@ -386,10 +427,12 @@ h1 {
 
 .result-metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0 10px 8px;
 }
 
 .context-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 0 10px 10px;
 }
 
 .result-metrics div,
@@ -425,12 +468,48 @@ h1 {
     color: #b8472e;
 }
 
-.results-panel h3 {
-    margin-bottom: 5px;
+.profile-report {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.explain-card {
+    padding: 12px;
+    border: 1px solid #ddd5c8;
+    border-radius: 8px;
+    background: #fbf8f0;
+}
+
+.explain-card.wide {
+    grid-column: 1 / -1;
+}
+
+.explain-card.important {
+    border-color: #d15f3f;
+    background: #fff4eb;
+}
+
+.results-panel h3,
+.explain-card h3 {
+    margin-bottom: 7px;
     font-size: 16px;
 }
 
-ul {
+.explain-card p {
+    margin-bottom: 8px;
+}
+
+.kind-note {
+    font-weight: 800;
+}
+
+.results-panel > div:has(> #nextSteps) {
+    margin-top: 12px;
+}
+
+#nextSteps {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
@@ -439,7 +518,7 @@ ul {
     list-style: none;
 }
 
-li {
+#nextSteps li {
     min-height: 62px;
     padding: 9px;
     border: 1px solid #ddd5c8;
@@ -448,6 +527,124 @@ li {
     background: #fbf8f0;
     font-size: 12px;
     line-height: 1.28;
+}
+
+.explain-card ol {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding-left: 18px;
+}
+
+.explain-card li {
+    color: #42443f;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.clinician-cta,
+.clinician-map-panel {
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #d8d0c2;
+    border-radius: 8px;
+    background: #edf7f3;
+}
+
+.clinician-cta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+}
+
+.clinician-cta h3,
+.clinician-map-panel h3 {
+    margin-bottom: 6px;
+}
+
+.clinician-cta p,
+.map-header p,
+.map-note {
+    margin-bottom: 0;
+    color: #4f5f5a;
+}
+
+.map-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.map-header a {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 1px solid #17675d;
+    border-radius: 8px;
+    color: #123b35;
+    background: #fffdf8;
+    font-size: 13px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.clinician-map {
+    height: 320px;
+    overflow: hidden;
+    border: 1px solid #c9d8d3;
+    border-radius: 8px;
+    background: #f7fbf9;
+}
+
+.clinician-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.clinician-card {
+    display: block;
+    min-height: 66px;
+    padding: 10px;
+    border: 1px solid #c9d8d3;
+    border-radius: 8px;
+    color: #24312e;
+    background: #fffdf8;
+    text-decoration: none;
+}
+
+.clinician-card strong,
+.clinician-card span {
+    display: block;
+}
+
+.clinician-card strong {
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.clinician-card span {
+    color: #5e6865;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.map-note {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.disclaimer {
+    margin-top: 12px;
+}
+
+#restartButton {
+    width: 100%;
+    margin-top: 10px;
 }
 
 @media (max-width: 860px) {
@@ -559,14 +756,25 @@ li {
         font-size: 12px;
     }
 
+    .score-details summary {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .score-details summary strong {
+        text-align: left;
+        white-space: normal;
+    }
+
     .context-grid,
-    ul {
+    #nextSteps,
+    .profile-report {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .result-metrics div,
     .context-grid div,
-    li {
+    #nextSteps li {
         min-height: 48px;
         padding: 7px;
     }
@@ -582,7 +790,46 @@ li {
         font-size: 15px;
     }
 
-    li {
+    #nextSteps li {
         font-size: 10px;
+    }
+
+    .explain-card {
+        padding: 8px;
+    }
+
+    .explain-card li {
+        font-size: 11px;
+    }
+
+    .clinician-cta,
+    .map-header {
+        grid-template-columns: 1fr;
+    }
+
+    .clinician-cta {
+        display: grid;
+    }
+
+    .map-header {
+        display: grid;
+    }
+
+    .clinician-map {
+        height: 260px;
+    }
+
+    .clinician-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .profile-report,
+    #nextSteps,
+    .context-grid,
+    .result-metrics,
+    .clinician-list {
+        grid-template-columns: 1fr;
     }
 }

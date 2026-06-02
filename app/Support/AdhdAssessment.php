@@ -113,6 +113,7 @@ class AdhdAssessment
             'context' => $context,
             'rule_outs' => $ruleOuts,
             'next_steps' => self::nextSteps($type, $ruleOuts, $answers),
+            'profile' => self::profile($type, $ruleOuts),
             'disclaimer' => __('assessment.results.disclaimer'),
         ];
     }
@@ -180,5 +181,20 @@ class AdhdAssessment
         }
 
         return $steps;
+    }
+
+    private static function profile(string $type, array $ruleOuts): array
+    {
+        $profile = __('assessment.results.profiles.'.$type);
+
+        if (! is_array($profile)) {
+            $profile = __('assessment.results.profiles.low_signal');
+        }
+
+        if ($ruleOuts !== []) {
+            $profile['important'][] = __('assessment.results.extra.rule_out_note');
+        }
+
+        return $profile;
     }
 }

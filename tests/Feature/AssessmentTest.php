@@ -11,6 +11,8 @@ class AssessmentTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Gentle ADHD screening')
+            ->assertSee('Find clinicians near you')
+            ->assertSee('Score details')
             ->assertSee('assessment/score');
     }
 
@@ -37,7 +39,8 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertJsonPath('type', 'combined')
             ->assertJsonPath('counts.inattentive', 5)
-            ->assertJsonPath('counts.hyperactive', 5);
+            ->assertJsonPath('counts.hyperactive', 5)
+            ->assertJsonPath('profile.plain_title', 'What combined presentation means');
     }
 
     public function test_symptoms_without_context_are_flagged_for_more_context(): void
