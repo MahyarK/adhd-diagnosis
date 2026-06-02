@@ -9,6 +9,28 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
+    <header class="navbar" role="banner">
+        <a class="navbar-brand" href="{{ route('assessment.show') }}">
+            <span class="navbar-eyebrow">{{ __('assessment.meta.eyebrow') }}</span>
+            <span class="navbar-title">{{ __('assessment.meta.heading') }}</span>
+        </a>
+        <nav class="lang-dropdown" aria-label="{{ __('assessment.ui.language') }}">
+            <details>
+                <summary>
+                    <span>{{ $locales[$locale] }}</span>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </summary>
+                <div class="lang-menu">
+                    @foreach ($locales as $code => $label)
+                        <a href="{{ route('assessment.show', ['lang' => $code]) }}" @class(['active' => $locale === $code])>{{ $label }}</a>
+                    @endforeach
+                </div>
+            </details>
+        </nav>
+    </header>
+
     <main class="shell" data-sections='@json($sections)' data-ui='@json($ui)' data-score-url="{{ route('assessment.score') }}">
         <section class="top-bar" aria-labelledby="page-title">
             <div>
@@ -16,11 +38,6 @@
                 <h1 id="page-title">{{ __('assessment.meta.heading') }}</h1>
                 <p class="lede">{{ __('assessment.meta.lede') }}</p>
             </div>
-            <nav class="language-switcher" aria-label="{{ __('assessment.ui.language') }}">
-                @foreach ($locales as $code => $label)
-                    <a href="{{ route('assessment.show', ['lang' => $code]) }}" @class(['active' => $locale === $code])>{{ $label }}</a>
-                @endforeach
-            </nav>
             <div class="score-strip" aria-live="polite">
                 <div><span>{{ __('assessment.ui.focus_points') }}</span><strong id="pointsLabel">0</strong></div>
                 <div><span>{{ __('assessment.ui.checkpoint') }}</span><strong id="sectionLabel">{{ __('assessment.ui.start') }}</strong></div>

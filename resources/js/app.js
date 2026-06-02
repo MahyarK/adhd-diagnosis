@@ -1,3 +1,11 @@
+// Close language dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const details = document.querySelector('.lang-dropdown details');
+    if (details && details.open && !details.contains(e.target)) {
+        details.open = false;
+    }
+});
+
 const root = document.querySelector('.shell');
 
 if (root) {
