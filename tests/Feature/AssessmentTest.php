@@ -144,6 +144,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('بدون منتظر ماندن برای انگیزه، یک اسپرینت کاری کوچک شروع کن.');
 
+        $this->get('/tools/emotional-reset?lang=en')
+            ->assertOk()
+            ->assertSee('Climb out of a shame spiral one gentle step at a time.');
+
         $this->get('/tools/provider-shortlist?lang=en')
             ->assertOk()
             ->assertSee('Keep possible support options in one place.');

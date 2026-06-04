@@ -486,6 +486,10 @@ if (toolRoot) {
         initFocusSprint(tools);
     }
 
+    if (tool === 'emotion') {
+        initEmotionalReset(tools);
+    }
+
     if (tool === 'appointment') {
         initAppointmentPrep(tools);
     }
@@ -1450,6 +1454,102 @@ function focusToText(tools, data) {
     ].join('\n');
 }
 
+function initEmotionalReset(tools) {
+    const form = document.getElementById('emotionForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.emotion') ?? '{}');
+    const fields = {
+        trigger: document.getElementById('emotionTrigger'),
+        intensity: document.getElementById('emotionIntensity'),
+        body: document.getElementById('emotionBody'),
+        story: document.getElementById('emotionStory'),
+        next: document.getElementById('emotionNext'),
+        support: document.getElementById('emotionSupport'),
+    };
+
+    hydrateFields(fields, saved);
+    renderEmotionalReset(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.emotion', JSON.stringify(data));
+        renderEmotionalReset(tools, data);
+    });
+
+    document.getElementById('emotionPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('emotionDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-emotional-reset-card.txt', emotionToText(tools, collectFields(fields)));
+    });
+    document.getElementById('emotionClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.emotion');
+        hydrateFields(fields, {});
+        renderEmotionalReset(tools, {});
+    });
+}
+
+function renderEmotionalReset(tools, data) {
+    const plan = emotionPlan(tools.emotion, data);
+
+    document.getElementById('emotionOutputTitle').textContent = plan.title;
+    document.getElementById('emotionFirstText').textContent = plan.first;
+    document.getElementById('emotionGroundList').innerHTML = plan.ground
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('emotionReframeText').textContent = plan.reframe;
+    document.getElementById('emotionNextText').textContent = plan.next;
+    document.getElementById('emotionScriptText').textContent = plan.script;
+    document.getElementById('emotionStopText').textContent = plan.stop;
+}
+
+function emotionPlan(copy, data) {
+    const trigger = data.trigger?.trim() || copy.defaults.trigger;
+    const intensity = data.intensity || 'medium';
+    const body = data.body || 'unknown';
+    const story = data.story?.trim() || copy.defaults.story;
+    const next = data.next?.trim() || copy.defaults.next;
+    const support = data.support?.trim() || copy.defaults.support;
+
+    return {
+        title: copy.output_title.replace(':trigger', trigger),
+        first: copy.body_resets[body] || copy.body_resets.unknown,
+        ground: copy.grounding[intensity] || copy.grounding.medium,
+        reframe: copy.reframe
+            .replace(':story', story),
+        next: copy.next_action.replace(':next', next),
+        script: copy.support_script
+            .replace(':support', support)
+            .replace(':trigger', trigger),
+        stop: copy.stop_rule,
+    };
+}
+
+function emotionToText(tools, data) {
+    const copy = tools.emotion;
+    const plan = emotionPlan(copy, data);
+
+    return [
+        plan.title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.ground,
+        ...plan.ground.map((item) => `- ${item}`),
+        '',
+        copy.sections.reframe,
+        plan.reframe,
+        '',
+        copy.sections.next,
+        plan.next,
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
 function initAppointmentPrep(tools) {
     const form = document.getElementById('appointmentForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.appointment') ?? '{}');
@@ -1981,6 +2081,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.energy',
             'adhdSupport.decision',
             'adhdSupport.focus',
+            'adhdSupport.emotion',
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
@@ -2009,6 +2110,7 @@ function readSupportKit(locale = 'en') {
         energy: readJson('adhdSupport.energy'),
         decision: readJson('adhdSupport.decision'),
         focus: readJson('adhdSupport.focus'),
+        emotion: readJson('adhdSupport.emotion'),
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
@@ -2053,6 +2155,7 @@ function renderDashboard(copy, saved) {
         energy: saved.energy?.must || saved.energy?.state,
         decision: saved.decision?.relief || firstLine(saved.decision?.options),
         focus: saved.focus?.task || saved.focus?.mode,
+        emotion: saved.emotion?.trigger || saved.emotion?.intensity,
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
@@ -2145,6 +2248,10 @@ function dashboardNext(saved) {
 
     if (saved.focus?.task || saved.focus?.mode) {
         return { key: 'focus' };
+    }
+
+    if (saved.emotion?.trigger || saved.emotion?.intensity) {
+        return { key: 'emotion' };
     }
 
     if (saved.goal?.goal) {
