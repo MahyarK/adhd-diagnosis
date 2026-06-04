@@ -82,6 +82,72 @@ class AssessmentTest extends TestCase
             ->assertJsonPath('profile.plain_title', 'ارائه بی‌توجه یعنی چه');
     }
 
+    public function test_support_tool_pages_load(): void
+    {
+        $this->get('/dashboard?lang=en')
+            ->assertOk()
+            ->assertSee('Your local ADHD support kit.');
+
+        $this->get('/resources?lang=en')
+            ->assertOk()
+            ->assertSee('Start with trustworthy help, not a research spiral.');
+
+        $this->get('/tools/goal-builder?lang=en')
+            ->assertOk()
+            ->assertSee('Make one goal small enough to start.');
+
+        $this->get('/tools/daily-planner?lang=nl')
+            ->assertOk()
+            ->assertSee('Maak een dagplan dat het echte leven overleeft.');
+
+        $this->get('/tools/weekly-reset?lang=en')
+            ->assertOk()
+            ->assertSee('Reset the week without shame.');
+
+        $this->get('/tools/appointment-prep?lang=fr')
+            ->assertOk()
+            ->assertSee('Rendre la demande d’aide plus facile.');
+
+        $this->get('/tools/care-notes?lang=nl')
+            ->assertOk()
+            ->assertSee('Ga het gesprek in met je verhaal op orde.');
+
+        $this->get('/tools/support-request?lang=fa')
+            ->assertOk()
+            ->assertSee('کمک بخواه بدون اینکه مجبور باشی همان لحظه کلمات را پیدا کنی.');
+
+        $this->get('/tools/provider-shortlist?lang=en')
+            ->assertOk()
+            ->assertSee('Keep possible support options in one place.');
+
+        $this->get('/tools/access-plan?lang=en')
+            ->assertOk()
+            ->assertSee('Make getting help less expensive and less vague.');
+
+        $this->get('/tools/task-breakdown?lang=fa')
+            ->assertOk()
+            ->assertSee('یک کار سنگین را به قدم‌های کوچک و قابل دیدن تبدیل کن.');
+
+        $this->get('/tools/reminders?lang=en')
+            ->assertOk()
+            ->assertSee('Make the next step harder to forget.');
+
+        $this->get('/tools/symptom-tracker?lang=en')
+            ->assertOk()
+            ->assertSee('Track patterns without overthinking it.');
+    }
+
+    public function test_supported_translation_files_cover_result_and_tool_keys(): void
+    {
+        $english = require base_path('lang/en/assessment.php');
+
+        foreach (['nl', 'fr', 'fa'] as $locale) {
+            $translated = require base_path("lang/{$locale}/assessment.php");
+
+            $this->assertTranslationKeys($english, $translated, $locale);
+        }
+    }
+
     private function baseContext(): array
     {
         return [
@@ -98,5 +164,19 @@ class AssessmentTest extends TestCase
             'family' => 'unknown',
             'support' => 'maybe',
         ];
+    }
+
+    private function assertTranslationKeys(array $expected, array $actual, string $locale, string $path = ''): void
+    {
+        foreach ($expected as $key => $value) {
+            $currentPath = $path === '' ? (string) $key : "{$path}.{$key}";
+
+            $this->assertArrayHasKey($key, $actual, "Missing {$currentPath} in {$locale} translations.");
+
+            if (is_array($value)) {
+                $this->assertIsArray($actual[$key], "Expected {$currentPath} in {$locale} to be an array.");
+                $this->assertTranslationKeys($value, $actual[$key], $locale, $currentPath);
+            }
+        }
     }
 }

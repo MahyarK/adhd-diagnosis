@@ -13,6 +13,21 @@ This is a screening and preparation tool, not a medical diagnosis.
 - Questions for inattentive symptoms, hyperactive/impulsive symptoms, childhood onset, duration, multiple settings, impairment, masking, family pattern, and possible overlapping causes
 - Server-side scoring for inattentive, hyperactive/impulsive, combined, lower-signal, and needs-more-context results
 - Clear next steps for clinician follow-up
+- Local support dashboard for saved results and tool outputs
+- Goal builder, daily planner, weekly reset, appointment prep, care notes, support request, and task breakdown worksheets
+- Follow-up reminder tool with downloadable calendar files
+- Symptom/context tracker for clinician-ready notes
+- Starter resource library with reputable public-health/nonprofit links
+- Provider shortlist for possible clinicians, clinics, and support offices
+- Low-cost access plan for cost, waitlists, referrals, and fallback options
+- Print/download support for practical follow-through
+- English, Dutch, French, and Persian language support
+
+## Product Direction
+
+The long-term goal is to grow this into a free ADHD support hub for people who cannot easily afford help, procrastinate looking for help, or forget follow-up steps. Planned modules include goal creation, printable and downloadable plans, daily planning, task breakdown, reminders, clinician search support, and a practical resource library.
+
+See [docs/PRODUCT_ROADMAP.md](docs/PRODUCT_ROADMAP.md) for the full product roadmap and phased implementation plan.
 
 ## Tech Stack
 

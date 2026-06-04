@@ -5,3 +5,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AssessmentController::class, 'show'])->name('assessment.show');
 Route::post('/assessment/score', [AssessmentController::class, 'score'])->name('assessment.score');
+Route::get('/dashboard', [AssessmentController::class, 'dashboard'])->name('dashboard');
+Route::get('/resources', [AssessmentController::class, 'resources'])->name('resources');
+Route::get('/tools/goal-builder', [AssessmentController::class, 'goalBuilder'])->name('tools.goal');
+Route::get('/tools/daily-planner', [AssessmentController::class, 'dailyPlanner'])->name('tools.planner');
+Route::get('/tools/weekly-reset', [AssessmentController::class, 'weeklyReset'])->name('tools.weekly');
+Route::get('/tools/appointment-prep', [AssessmentController::class, 'appointmentPrep'])->name('tools.appointment');
+Route::get('/tools/care-notes', [AssessmentController::class, 'careNotes'])->name('tools.care');
+Route::get('/tools/support-request', [AssessmentController::class, 'supportRequest'])->name('tools.support');
+Route::get('/tools/provider-shortlist', [AssessmentController::class, 'providerShortlist'])->name('tools.providers');
+Route::get('/tools/access-plan', [AssessmentController::class, 'accessPlan'])->name('tools.access');
+Route::get('/tools/task-breakdown', [AssessmentController::class, 'taskBreakdown'])->name('tools.task');
+Route::get('/tools/reminders', [AssessmentController::class, 'reminders'])->name('tools.reminders');
+Route::get('/tools/symptom-tracker', [AssessmentController::class, 'symptomTracker'])->name('tools.tracker');

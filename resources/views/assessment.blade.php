@@ -9,29 +9,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <header class="navbar" role="banner">
-        <a class="navbar-brand" href="{{ route('assessment.show') }}">
-            <span class="navbar-eyebrow">{{ __('assessment.meta.eyebrow') }}</span>
-            <span class="navbar-title">{{ __('assessment.meta.heading') }}</span>
-        </a>
-        <nav class="lang-dropdown" aria-label="{{ __('assessment.ui.language') }}">
-            <details>
-                <summary>
-                    <span>{{ $locales[$locale] }}</span>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                        <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </summary>
-                <div class="lang-menu">
-                    @foreach ($locales as $code => $label)
-                        <a href="{{ route('assessment.show', ['lang' => $code]) }}" @class(['active' => $locale === $code])>{{ $label }}</a>
-                    @endforeach
-                </div>
-            </details>
-        </nav>
-    </header>
+    @include('partials.navbar')
 
-    <main class="shell" data-sections='@json($sections)' data-ui='@json($ui)' data-score-url="{{ route('assessment.score') }}">
+    <main class="shell" data-locale="{{ $locale }}" data-sections='@json($sections)' data-ui='@json($ui)' data-score-url="{{ route('assessment.score') }}">
         <section class="top-bar" aria-labelledby="page-title">
             <div>
                 <p class="eyebrow">{{ __('assessment.meta.eyebrow') }}</p>
@@ -41,7 +21,7 @@
             <div class="score-strip" aria-live="polite">
                 <div><span>{{ __('assessment.ui.focus_points') }}</span><strong id="pointsLabel">0</strong></div>
                 <div><span>{{ __('assessment.ui.checkpoint') }}</span><strong id="sectionLabel">{{ __('assessment.ui.start') }}</strong></div>
-                <div><span id="progressLabel">1 / 30</span><strong id="streakLabel">Ready</strong></div>
+                <div><span id="progressLabel">1 / 30</span><strong id="streakLabel">{{ __('assessment.ui.ready') }}</strong></div>
             </div>
         </section>
 
@@ -66,6 +46,29 @@
                 <h2 id="resultTitle"></h2>
                 <p id="resultSummary"></p>
             </div>
+            <section class="action-panel">
+                <div>
+                    <p class="eyebrow">{{ __('assessment.ui.action_panel_eyebrow') }}</p>
+                    <h3>{{ __('assessment.ui.action_panel_title') }}</h3>
+                    <p>{{ __('assessment.ui.action_panel_body') }}</p>
+                </div>
+                <div class="action-buttons">
+                    <button type="button" class="secondary-button" id="printResultButton">{{ __('assessment.ui.print_result') }}</button>
+                    <button type="button" class="secondary-button" id="downloadResultButton">{{ __('assessment.ui.download_result') }}</button>
+                    <a class="primary-link" href="{{ route('dashboard', ['lang' => $locale]) }}">{{ __('assessment.ui.open_dashboard') }}</a>
+                    <a class="primary-link" href="{{ route('tools.goal', ['lang' => $locale]) }}" id="createGoalLink">{{ __('assessment.ui.create_goal') }}</a>
+                    <a class="primary-link" href="{{ route('tools.planner', ['lang' => $locale]) }}" id="buildPlanLink">{{ __('assessment.ui.build_plan') }}</a>
+                    <a class="primary-link" href="{{ route('tools.weekly', ['lang' => $locale]) }}">{{ __('assessment.ui.weekly_reset') }}</a>
+                    <a class="primary-link" href="{{ route('tools.appointment', ['lang' => $locale]) }}">{{ __('assessment.ui.prepare_appointment') }}</a>
+                    <a class="primary-link" href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
+                    <a class="primary-link" href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>
+                    <a class="primary-link" href="{{ route('tools.providers', ['lang' => $locale]) }}">{{ __('assessment.ui.provider_shortlist') }}</a>
+                    <a class="primary-link" href="{{ route('tools.access', ['lang' => $locale]) }}">{{ __('assessment.ui.access_plan') }}</a>
+                    <a class="primary-link" href="{{ route('tools.task', ['lang' => $locale]) }}">{{ __('assessment.ui.break_task') }}</a>
+                    <a class="primary-link" href="{{ route('tools.reminders', ['lang' => $locale]) }}">{{ __('assessment.ui.set_reminder') }}</a>
+                    <a class="primary-link" href="{{ route('tools.tracker', ['lang' => $locale]) }}">{{ __('assessment.ui.track_symptoms') }}</a>
+                </div>
+            </section>
             <details class="score-details">
                 <summary>
                     <span>{{ __('assessment.ui.score_breakdown') }}</span>

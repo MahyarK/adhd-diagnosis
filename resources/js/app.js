@@ -1,3 +1,22 @@
+const supportStorage = (() => {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            return window.localStorage;
+        }
+    } catch {
+        // Some restricted browser modes expose storage but block access.
+    }
+
+    const memory = new Map();
+
+    return {
+        getItem: (key) => memory.get(key) ?? null,
+        setItem: (key, value) => memory.set(key, String(value)),
+        removeItem: (key) => memory.delete(key),
+        clear: () => memory.clear(),
+    };
+})();
+
 // Close language dropdown when clicking outside
 document.addEventListener('click', (e) => {
     const details = document.querySelector('.lang-dropdown details');
@@ -11,6 +30,7 @@ const root = document.querySelector('.shell');
 if (root) {
     const sections = JSON.parse(root.dataset.sections);
     const ui = JSON.parse(root.dataset.ui);
+    const activeLocale = root.dataset.locale || document.documentElement.lang || 'en';
     const questions = sections.flatMap((section) => section.questions.map((question) => ({ ...question, section })));
     const answers = {};
     let index = 0;
@@ -30,11 +50,14 @@ if (root) {
     const streakLabel = document.getElementById('streakLabel');
     const motivationLabel = document.getElementById('motivationLabel');
     const findCliniciansButton = document.getElementById('findCliniciansButton');
+    const printResultButton = document.getElementById('printResultButton');
+    const downloadResultButton = document.getElementById('downloadResultButton');
     const clinicianMapPanel = document.getElementById('clinicianMapPanel');
     const clinicianStatus = document.getElementById('clinicianStatus');
     const clinicianList = document.getElementById('clinicianList');
     const fallbackMapLink = document.getElementById('fallbackMapLink');
     let clinicianMap = null;
+    let currentResult = null;
 
     const frequencyOptions = [
         ['0', ui.frequency.never, ui.frequency.never_detail],
@@ -142,13 +165,21 @@ if (root) {
     }
 
     function showResults(result) {
+        result.locale = activeLocale;
+        currentResult = result;
+        supportStorage.setItem('adhdSupport.latestResult', JSON.stringify(result));
+        supportStorage.setItem(`adhdSupport.latestResult.${activeLocale}`, JSON.stringify(result));
         document.querySelector('.assessment-layout').hidden = true;
         resultsPanel.hidden = false;
         document.getElementById('resultTitle').textContent = result.title;
         document.getElementById('resultSummary').textContent = result.summary;
         document.getElementById('resultDisclaimer').textContent = result.disclaimer;
-        document.getElementById('inattentiveCount').textContent = `${result.counts.inattentive} of 9`;
-        document.getElementById('hyperactiveCount').textContent = `${result.counts.hyperactive} of 9`;
+        document.getElementById('inattentiveCount').textContent = ui.count_of_total
+            .replace(':count', result.counts.inattentive)
+            .replace(':total', 9);
+        document.getElementById('hyperactiveCount').textContent = ui.count_of_total
+            .replace(':count', result.counts.hyperactive)
+            .replace(':total', 9);
         document.getElementById('thresholdUsed').textContent = `${result.threshold}+`;
         document.getElementById('scoreSummary').textContent = ui.score_summary
             .replace(':inattentive', result.counts.inattentive)
@@ -218,6 +249,18 @@ if (root) {
 
     findCliniciansButton.addEventListener('click', () => {
         showClinicianMap();
+    });
+
+    printResultButton.addEventListener('click', () => {
+        window.print();
+    });
+
+    downloadResultButton.addEventListener('click', () => {
+        if (! currentResult) {
+            return;
+        }
+
+        downloadText('adhd-screening-result.txt', resultToText(currentResult));
     });
 
     renderQuestion();
@@ -378,4 +421,1243 @@ if (root) {
 
         return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
+
+    function resultToText(result) {
+        return [
+            result.title,
+            '',
+            result.summary,
+            '',
+            `${ui.inattentive_signs}: ${result.counts.inattentive}/9`,
+            `${ui.hyperactive_signs}: ${result.counts.hyperactive}/9`,
+            `${ui.threshold_used}: ${result.threshold}+`,
+            '',
+            result.profile.plain_title,
+            result.profile.plain,
+            result.profile.not_character,
+            '',
+            result.profile.handles_title,
+            ...result.profile.handles.map((item) => `- ${item}`),
+            '',
+            ui.next_steps,
+            ...result.next_steps.map((item) => `- ${item}`),
+            '',
+            result.disclaimer,
+        ].join('\n');
+    }
+}
+
+const toolRoot = document.querySelector('.tool-shell');
+
+if (toolRoot) {
+    const tools = JSON.parse(toolRoot.dataset.tools);
+    const tool = toolRoot.dataset.tool;
+    const activeToolLocale = toolRoot.dataset.locale || document.documentElement.lang || 'en';
+
+    if (tool === 'goal') {
+        initGoalBuilder(tools);
+    }
+
+    if (tool === 'planner') {
+        initDailyPlanner(tools);
+    }
+
+    if (tool === 'weekly') {
+        initWeeklyReset(tools);
+    }
+
+    if (tool === 'appointment') {
+        initAppointmentPrep(tools);
+    }
+
+    if (tool === 'care') {
+        initCareNotes(tools);
+    }
+
+    if (tool === 'support') {
+        initSupportRequest(tools);
+    }
+
+    if (tool === 'providers') {
+        initProviderShortlist(tools);
+    }
+
+    if (tool === 'access') {
+        initAccessPlan(tools);
+    }
+
+    if (tool === 'task') {
+        initTaskBreakdown(tools);
+    }
+
+    if (tool === 'dashboard') {
+        initDashboard(tools, activeToolLocale);
+    }
+
+    if (tool === 'reminders') {
+        initReminders(tools);
+    }
+
+    if (tool === 'tracker') {
+        initTracker(tools);
+    }
+}
+
+function initGoalBuilder(tools) {
+    const form = document.getElementById('goalForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.goal') ?? '{}');
+    const fields = {
+        goal: document.getElementById('goalText'),
+        why: document.getElementById('goalWhy'),
+        blocker: document.getElementById('goalBlocker'),
+        energy: document.getElementById('goalEnergy'),
+    };
+
+    hydrateFields(fields, saved);
+    renderGoal(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.goal', JSON.stringify(data));
+        renderGoal(tools, data);
+    });
+
+    document.getElementById('goalPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('goalDownloadButton').addEventListener('click', () => {
+        const data = collectFields(fields);
+        downloadText('adhd-goal-card.txt', goalToText(tools, data));
+    });
+    document.getElementById('goalClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.goal');
+        hydrateFields(fields, {});
+        renderGoal(tools, {});
+    });
+}
+
+function renderGoal(tools, data) {
+    const copy = tools.goal;
+    const goal = data.goal?.trim();
+    const blocker = data.blocker?.trim();
+    const why = data.why?.trim();
+    const energy = data.energy || 'low';
+    const microsteps = buildMicrosteps(goal, energy);
+
+    document.getElementById('goalOutputTitle').textContent = goal || copy.empty_title;
+    document.getElementById('goalFirstStep').textContent = goal ? microsteps[0] : copy.empty_copy;
+    document.getElementById('goalMicrosteps').innerHTML = goal
+        ? microsteps.map((step) => `<li>${step}</li>`).join('')
+        : '';
+    document.getElementById('goalSupport').textContent = blocker
+        ? `${copy.defaults.support} ${copy.labels.blocker}: ${blocker}.`
+        : copy.defaults.support;
+    document.getElementById('goalDone').textContent = why
+        ? `${copy.defaults.done} ${copy.labels.why}: ${why}.`
+        : copy.defaults.done;
+}
+
+function buildMicrosteps(goal, energy) {
+    if (! goal) {
+        return [];
+    }
+
+    const base = [
+        `Write this on a visible note: ${goal}.`,
+        'Set a 5-minute timer.',
+        'Do the smallest visible part without trying to finish.',
+        'Stop and decide the next tiny action.',
+    ];
+
+    if (energy === 'medium') {
+        base.splice(2, 0, 'Clear one small space or open the needed app/document.');
+    }
+
+    if (energy === 'urgent') {
+        base.splice(1, 0, 'Choose the version that is good enough, not perfect.');
+        base.push('Send, submit, ask, or schedule the next handoff.');
+    }
+
+    return base;
+}
+
+function goalToText(tools, data) {
+    const copy = tools.goal;
+    const goal = data.goal?.trim() || copy.empty_title;
+    const steps = buildMicrosteps(goal, data.energy || 'low');
+
+    return [
+        copy.output_eyebrow,
+        goal,
+        '',
+        copy.sections.first_step,
+        steps[0] ?? copy.defaults.first_step,
+        '',
+        copy.sections.microsteps,
+        ...steps.map((step) => `- ${step}`),
+        '',
+        copy.sections.support,
+        data.blocker ? `${copy.defaults.support} ${copy.labels.blocker}: ${data.blocker}` : copy.defaults.support,
+        '',
+        copy.sections.done,
+        data.why ? `${copy.defaults.done} ${copy.labels.why}: ${data.why}` : copy.defaults.done,
+    ].join('\n');
+}
+
+function initDailyPlanner(tools) {
+    const form = document.getElementById('plannerForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.planner') ?? '{}');
+    const fields = {
+        must: document.getElementById('planMust'),
+        should: document.getElementById('planShould'),
+        body: document.getElementById('planBody'),
+        scary: document.getElementById('planScary'),
+        recovery: document.getElementById('planRecovery'),
+    };
+
+    hydrateFields(fields, saved);
+    renderPlanner(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.planner', JSON.stringify(data));
+        renderPlanner(tools, data);
+    });
+
+    document.getElementById('plannerPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('plannerDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-daily-plan.txt', plannerToText(tools, collectFields(fields)));
+    });
+    document.getElementById('plannerClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.planner');
+        hydrateFields(fields, {});
+        renderPlanner(tools, {});
+    });
+}
+
+function renderPlanner(tools, data) {
+    const copy = tools.planner;
+
+    renderList('plannerMustList', lines(data.must), copy.defaults.must);
+    renderList('plannerShouldList', lines(data.should), copy.defaults.should);
+    document.getElementById('plannerBodyText').textContent = data.body || copy.defaults.body;
+    document.getElementById('plannerScaryText').textContent = data.scary || copy.defaults.scary;
+    document.getElementById('plannerRecoveryText').textContent = data.recovery || copy.defaults.recovery;
+}
+
+function plannerToText(tools, data) {
+    const copy = tools.planner;
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.must,
+        ...withDefault(lines(data.must), copy.defaults.must).map((item) => `- ${item}`),
+        '',
+        copy.sections.should,
+        ...withDefault(lines(data.should), copy.defaults.should).map((item) => `- ${item}`),
+        '',
+        `${copy.sections.body}: ${data.body || copy.defaults.body}`,
+        `${copy.sections.scary}: ${data.scary || copy.defaults.scary}`,
+        `${copy.sections.recovery}: ${data.recovery || copy.defaults.recovery}`,
+    ].join('\n');
+}
+
+function initWeeklyReset(tools) {
+    const form = document.getElementById('weeklyForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.weekly') ?? '{}');
+    const fields = {
+        wins: document.getElementById('weeklyWins'),
+        loose: document.getElementById('weeklyLoose'),
+        must: document.getElementById('weeklyMust'),
+        support: document.getElementById('weeklySupport'),
+        reset: document.getElementById('weeklyResetMode'),
+    };
+
+    hydrateFields(fields, saved);
+    renderWeeklyReset(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.weekly', JSON.stringify(data));
+        renderWeeklyReset(tools, data);
+    });
+
+    document.getElementById('weeklyPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('weeklyDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-weekly-reset.txt', weeklyToText(tools, collectFields(fields)));
+    });
+    document.getElementById('weeklyClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.weekly');
+        hydrateFields(fields, {});
+        renderWeeklyReset(tools, {});
+    });
+}
+
+function renderWeeklyReset(tools, data) {
+    const copy = tools.weekly;
+    const mode = data.reset || 'gentle';
+
+    renderList('weeklyWinsList', lines(data.wins), copy.defaults.wins);
+    renderList('weeklyLooseList', lines(data.loose), copy.defaults.loose);
+    renderList('weeklyMustList', lines(data.must), copy.defaults.must);
+    document.getElementById('weeklySupportText').textContent = data.support || copy.defaults.support;
+    document.getElementById('weeklyResetList').innerHTML = (copy.sequences[mode] || copy.sequences.gentle)
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+}
+
+function weeklyToText(tools, data) {
+    const copy = tools.weekly;
+    const mode = data.reset || 'gentle';
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.wins,
+        ...withDefault(lines(data.wins), copy.defaults.wins).map((item) => `- ${item}`),
+        '',
+        copy.sections.loose,
+        ...withDefault(lines(data.loose), copy.defaults.loose).map((item) => `- ${item}`),
+        '',
+        copy.sections.must,
+        ...withDefault(lines(data.must), copy.defaults.must).map((item) => `- ${item}`),
+        '',
+        `${copy.sections.support}: ${data.support || copy.defaults.support}`,
+        '',
+        copy.sections.reset,
+        ...(copy.sequences[mode] || copy.sequences.gentle).map((item) => `- ${item}`),
+    ].join('\n');
+}
+
+function initAppointmentPrep(tools) {
+    const form = document.getElementById('appointmentForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.appointment') ?? '{}');
+    const fields = {
+        provider: document.getElementById('appointmentProvider'),
+        symptoms: document.getElementById('appointmentSymptoms'),
+        impact: document.getElementById('appointmentImpact'),
+        questions: document.getElementById('appointmentQuestions'),
+        contact: document.getElementById('appointmentContact'),
+    };
+
+    hydrateFields(fields, saved);
+    renderAppointmentPrep(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.appointment', JSON.stringify(data));
+        renderAppointmentPrep(tools, data);
+    });
+
+    document.getElementById('appointmentPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('appointmentDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-appointment-prep.txt', appointmentToText(tools, collectFields(fields)));
+    });
+    document.getElementById('appointmentClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.appointment');
+        hydrateFields(fields, {});
+        renderAppointmentPrep(tools, {});
+    });
+}
+
+function renderAppointmentPrep(tools, data) {
+    const copy = tools.appointment;
+    const provider = data.provider?.trim() || copy.defaults.provider;
+    const symptoms = data.symptoms?.trim() || copy.defaults.symptoms;
+    const impact = data.impact?.trim() || copy.defaults.impact;
+    const contact = data.contact || 'call';
+
+    document.getElementById('appointmentOutputTitle').textContent = `${copy.output_title}: ${provider}`;
+    renderList('appointmentBringList', copy.defaults.bring, copy.defaults.bring[0]);
+    document.getElementById('appointmentScript').textContent = buildAppointmentScript(copy, contact, symptoms, impact);
+    renderList('appointmentQuestionList', withDefault(lines(data.questions), copy.defaults.questions[0]), copy.defaults.questions[0]);
+    document.getElementById('appointmentNotes').textContent = copy.defaults.note;
+}
+
+function buildAppointmentScript(copy, contact, symptoms, impact) {
+    const template = copy.scripts[contact] || copy.scripts.call;
+
+    return `${template} ${copy.fields.symptoms}: ${symptoms}. ${copy.fields.impact}: ${impact}.`;
+}
+
+function appointmentToText(tools, data) {
+    const copy = tools.appointment;
+    const provider = data.provider?.trim() || copy.defaults.provider;
+
+    return [
+        `${copy.output_title}: ${provider}`,
+        '',
+        copy.sections.bring,
+        ...copy.defaults.bring.map((item) => `- ${item}`),
+        '',
+        copy.sections.say,
+        buildAppointmentScript(copy, data.contact || 'call', data.symptoms || copy.defaults.symptoms, data.impact || copy.defaults.impact),
+        '',
+        copy.sections.questions,
+        ...withDefault(lines(data.questions), copy.defaults.questions[0]).map((item) => `- ${item}`),
+        '',
+        copy.sections.notes,
+        copy.defaults.note,
+    ].join('\n');
+}
+
+function initCareNotes(tools) {
+    const form = document.getElementById('careForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.care') ?? '{}');
+    const fields = {
+        main: document.getElementById('careMain'),
+        history: document.getElementById('careHistory'),
+        settings: document.getElementById('careSettings'),
+        overlap: document.getElementById('careOverlap'),
+        help: document.getElementById('careHelp'),
+    };
+
+    hydrateFields(fields, saved);
+    renderCareNotes(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.care', JSON.stringify(data));
+        renderCareNotes(tools, data);
+    });
+
+    document.getElementById('carePrintButton').addEventListener('click', () => window.print());
+    document.getElementById('careDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-care-discussion-notes.txt', careToText(tools, collectFields(fields)));
+    });
+    document.getElementById('careClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.care');
+        hydrateFields(fields, {});
+        renderCareNotes(tools, {});
+    });
+}
+
+function renderCareNotes(tools, data) {
+    const copy = tools.care;
+    const main = data.main?.trim();
+
+    document.getElementById('careOutputTitle').textContent = main || copy.empty_title;
+    document.getElementById('careOpening').textContent = buildCareOpening(copy, data);
+    renderList('careHistoryList', withDefault(lines(data.history), copy.defaults.history), copy.defaults.history[0]);
+    renderList('careSettingsList', withDefault(lines(data.settings), copy.defaults.settings), copy.defaults.settings[0]);
+    renderList('careOverlapList', withDefault(lines(data.overlap), copy.defaults.overlap), copy.defaults.overlap[0]);
+    renderList('careAskList', careAsks(copy, data), copy.defaults.ask[0]);
+}
+
+function buildCareOpening(copy, data) {
+    const main = data.main?.trim() || copy.defaults.main;
+    const help = data.help?.trim() || copy.defaults.help;
+
+    return copy.opening
+        .replace(':main', main)
+        .replace(':help', help);
+}
+
+function careAsks(copy, data) {
+    const asks = [...copy.defaults.ask];
+    const help = data.help?.trim();
+
+    if (help) {
+        asks.unshift(`${copy.labels.help}: ${help}`);
+    }
+
+    return asks;
+}
+
+function careToText(tools, data) {
+    const copy = tools.care;
+
+    return [
+        data.main?.trim() || copy.empty_title,
+        '',
+        copy.sections.opening,
+        buildCareOpening(copy, data),
+        '',
+        copy.sections.history,
+        ...withDefault(lines(data.history), copy.defaults.history).map((item) => `- ${item}`),
+        '',
+        copy.sections.settings,
+        ...withDefault(lines(data.settings), copy.defaults.settings).map((item) => `- ${item}`),
+        '',
+        copy.sections.overlap,
+        ...withDefault(lines(data.overlap), copy.defaults.overlap).map((item) => `- ${item}`),
+        '',
+        copy.sections.ask,
+        ...careAsks(copy, data).map((item) => `- ${item}`),
+    ].join('\n');
+}
+
+function initSupportRequest(tools) {
+    const form = document.getElementById('supportForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.support') ?? '{}');
+    const fields = {
+        audience: document.getElementById('supportAudience'),
+        situation: document.getElementById('supportSituation'),
+        barrier: document.getElementById('supportBarrier'),
+        request: document.getElementById('supportRequest'),
+        trial: document.getElementById('supportTrial'),
+        tone: document.getElementById('supportTone'),
+    };
+
+    hydrateFields(fields, saved);
+    renderSupportRequest(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.support', JSON.stringify(data));
+        renderSupportRequest(tools, data);
+    });
+
+    document.getElementById('supportPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('supportDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-support-request.txt', supportToText(tools, collectFields(fields)));
+    });
+    document.getElementById('supportClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.support');
+        hydrateFields(fields, {});
+        renderSupportRequest(tools, {});
+    });
+}
+
+function renderSupportRequest(tools, data) {
+    const copy = tools.support;
+    const audience = data.audience || 'work';
+    const request = data.request?.trim() || copy.defaults.request[audience] || copy.defaults.request.work;
+
+    document.getElementById('supportOutputTitle').textContent = data.situation?.trim() || copy.empty_title;
+    document.getElementById('supportMessage').textContent = buildSupportMessage(copy, data);
+    renderList('supportAskList', supportAskList(copy, data, request), request);
+    document.getElementById('supportExperiment').textContent = data.trial?.trim() || copy.defaults.trial;
+    document.getElementById('supportFollowUp').textContent = copy.follow_up
+        .replace(':time', copy.review_times[audience] || copy.review_times.work);
+}
+
+function buildSupportMessage(copy, data) {
+    const audience = data.audience || 'work';
+    const tone = data.tone || 'warm';
+    const situation = data.situation?.trim() || copy.defaults.situation[audience] || copy.defaults.situation.work;
+    const barrier = data.barrier?.trim() || copy.defaults.barrier;
+    const request = data.request?.trim() || copy.defaults.request[audience] || copy.defaults.request.work;
+    const template = copy.messages[tone] || copy.messages.warm;
+
+    return template
+        .replace(':situation', situation)
+        .replace(':barrier', barrier)
+        .replace(':request', request);
+}
+
+function supportAskList(copy, data, request) {
+    const asks = [request, ...copy.defaults.asks];
+    const barrier = data.barrier?.trim();
+
+    if (barrier) {
+        asks.push(`${copy.labels.barrier}: ${barrier}`);
+    }
+
+    return asks;
+}
+
+function supportToText(tools, data) {
+    const copy = tools.support;
+    const audience = data.audience || 'work';
+    const request = data.request?.trim() || copy.defaults.request[audience] || copy.defaults.request.work;
+
+    return [
+        data.situation?.trim() || copy.empty_title,
+        '',
+        copy.sections.message,
+        buildSupportMessage(copy, data),
+        '',
+        copy.sections.ask,
+        ...supportAskList(copy, data, request).map((item) => `- ${item}`),
+        '',
+        copy.sections.experiment,
+        data.trial?.trim() || copy.defaults.trial,
+        '',
+        copy.sections.follow_up,
+        copy.follow_up.replace(':time', copy.review_times[audience] || copy.review_times.work),
+    ].join('\n');
+}
+
+function initProviderShortlist(tools) {
+    const form = document.getElementById('providerForm');
+    const fields = {
+        name: document.getElementById('providerName'),
+        kind: document.getElementById('providerKind'),
+        contact: document.getElementById('providerContact'),
+        cost: document.getElementById('providerCost'),
+        status: document.getElementById('providerStatus'),
+        notes: document.getElementById('providerNotes'),
+    };
+
+    renderProviders(tools, readProviders());
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const providers = readProviders();
+        providers.push({ ...collectFields(fields), id: Date.now() });
+        supportStorage.setItem('adhdSupport.providers', JSON.stringify(providers));
+        hydrateFields(fields, {});
+        renderProviders(tools, providers);
+    });
+
+    document.getElementById('providersDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-provider-shortlist.txt', providersToText(tools, readProviders()));
+    });
+
+    document.getElementById('providersClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.providers');
+        renderProviders(tools, []);
+    });
+}
+
+function readProviders() {
+    const providers = readJson('adhdSupport.providers');
+
+    return Array.isArray(providers) ? providers : [];
+}
+
+function renderProviders(tools, providers) {
+    const copy = tools.providers;
+    const list = document.getElementById('providersList');
+
+    if (providers.length === 0) {
+        list.innerHTML = `<article class="provider-card"><p>${copy.empty}</p></article>`;
+
+        return;
+    }
+
+    list.innerHTML = providers.map((provider) => `
+        <article class="provider-card">
+            <h3>${provider.name}</h3>
+            <dl>
+                ${provider.kind ? `<div><dt>${copy.labels.kind}</dt><dd>${provider.kind}</dd></div>` : ''}
+                ${provider.contact ? `<div><dt>${copy.labels.contact}</dt><dd>${provider.contact}</dd></div>` : ''}
+                ${provider.cost ? `<div><dt>${copy.labels.cost}</dt><dd>${provider.cost}</dd></div>` : ''}
+                <div><dt>${copy.labels.status}</dt><dd>${copy.statuses[provider.status] || copy.statuses.saved}</dd></div>
+                ${provider.notes ? `<div><dt>${copy.labels.notes}</dt><dd>${provider.notes}</dd></div>` : ''}
+            </dl>
+        </article>
+    `).join('');
+}
+
+function providersToText(tools, providers) {
+    const copy = tools.providers;
+
+    if (providers.length === 0) {
+        return copy.empty;
+    }
+
+    return providers.flatMap((provider, index) => [
+        `${index + 1}. ${provider.name}`,
+        provider.kind ? `${copy.labels.kind}: ${provider.kind}` : '',
+        provider.contact ? `${copy.labels.contact}: ${provider.contact}` : '',
+        provider.cost ? `${copy.labels.cost}: ${provider.cost}` : '',
+        `${copy.labels.status}: ${copy.statuses[provider.status] || copy.statuses.saved}`,
+        provider.notes ? `${copy.labels.notes}: ${provider.notes}` : '',
+        '',
+    ].filter(Boolean)).join('\n');
+}
+
+function initAccessPlan(tools) {
+    const form = document.getElementById('accessForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.access') ?? '{}');
+    const fields = {
+        barrier: document.getElementById('accessBarrier'),
+        location: document.getElementById('accessLocation'),
+        budget: document.getElementById('accessBudget'),
+        support: document.getElementById('accessSupport'),
+        notes: document.getElementById('accessNotes'),
+    };
+
+    hydrateFields(fields, saved);
+    renderAccessPlan(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.access', JSON.stringify(data));
+        renderAccessPlan(tools, data);
+    });
+
+    document.getElementById('accessDownloadButton').addEventListener('click', () => {
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.access', JSON.stringify(data));
+        renderAccessPlan(tools, data);
+        downloadText('adhd-access-plan.txt', accessToText(tools, data));
+    });
+
+    document.getElementById('accessClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.access');
+        hydrateFields(fields, {});
+        renderAccessPlan(tools, {});
+    });
+}
+
+function renderAccessPlan(tools, data) {
+    const copy = tools.access;
+    const barrier = data.barrier || 'unsure';
+    const barrierLabel = copy.barriers[barrier] || copy.barriers.unsure;
+
+    document.getElementById('accessOutputTitle').textContent = `${copy.output_title}: ${barrierLabel}`;
+    document.getElementById('accessFirstText').textContent = copy.first_steps[barrier] || copy.first_steps.unsure;
+    renderList('accessAskList', accessQuestions(copy, data), copy.questions[0]);
+    renderList('accessFallbackList', copy.fallbacks, copy.fallbacks[0]);
+}
+
+function accessQuestions(copy, data) {
+    return [
+        ...copy.questions,
+        data.budget ? `${copy.fields.budget}: ${data.budget}` : '',
+        data.location ? `${copy.fields.location}: ${data.location}` : '',
+        data.support ? `${copy.fields.support}: ${data.support}` : '',
+        data.notes ? `${copy.fields.notes}: ${data.notes}` : '',
+    ].filter(Boolean);
+}
+
+function accessToText(tools, data) {
+    const copy = tools.access;
+    const barrier = data.barrier || 'unsure';
+
+    return [
+        copy.output_title,
+        `${copy.fields.barrier}: ${copy.barriers[barrier] || copy.barriers.unsure}`,
+        '',
+        copy.sections.first,
+        copy.first_steps[barrier] || copy.first_steps.unsure,
+        '',
+        copy.sections.ask,
+        ...accessQuestions(copy, data).map((item) => `- ${item}`),
+        '',
+        copy.sections.fallback,
+        ...copy.fallbacks.map((item) => `- ${item}`),
+        '',
+        copy.sections.sources,
+        ...copy.sources.map((source) => `- ${source.label}: ${source.url}`),
+    ].join('\n');
+}
+
+function initTaskBreakdown(tools) {
+    const form = document.getElementById('taskForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.task') ?? '{}');
+    const fields = {
+        dump: document.getElementById('taskDump'),
+        focus: document.getElementById('taskFocus'),
+        stuck: document.getElementById('taskStuck'),
+        done: document.getElementById('taskDone'),
+    };
+
+    hydrateFields(fields, saved);
+    renderTaskBreakdown(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.task', JSON.stringify(data));
+        renderTaskBreakdown(tools, data);
+    });
+
+    document.getElementById('taskPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('taskDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-task-breakdown.txt', taskToText(tools, collectFields(fields)));
+    });
+    document.getElementById('taskClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.task');
+        hydrateFields(fields, {});
+        renderTaskBreakdown(tools, {});
+    });
+}
+
+function renderTaskBreakdown(tools, data) {
+    const copy = tools.task;
+    const task = data.focus?.trim();
+    const stuck = data.stuck || 'unclear';
+    const steps = taskMicrosteps(copy, task, stuck);
+    const nowItems = task ? copy.defaults.now : [copy.empty_copy];
+    const hidden = taskHiddenSteps(copy, data.dump);
+
+    document.getElementById('taskOutputTitle').textContent = task || copy.empty_title;
+    renderList('taskNowList', nowItems, copy.empty_copy);
+    document.getElementById('taskMicrosteps').innerHTML = task
+        ? steps.map((step) => `<li>${step}</li>`).join('')
+        : '';
+    renderList('taskHiddenList', hidden, copy.defaults.hidden[0]);
+    document.getElementById('taskDoneText').textContent = data.done?.trim() || copy.defaults.done;
+    document.getElementById('taskResetText').textContent = copy.defaults.reset;
+}
+
+function taskHiddenSteps(copy, dump) {
+    const dumpedItems = lines(dump).slice(0, 4);
+
+    if (dumpedItems.length === 0) {
+        return copy.defaults.hidden;
+    }
+
+    return [
+        ...copy.defaults.hidden,
+        ...dumpedItems.map((item) => `${copy.labels.park}: ${item}`),
+    ];
+}
+
+function taskMicrosteps(copy, task, stuck) {
+    if (! task) {
+        return [];
+    }
+
+    return [
+        `${copy.fields.focus}: ${task}.`,
+        ...(copy.templates[stuck] || copy.templates.unclear),
+    ];
+}
+
+function taskToText(tools, data) {
+    const copy = tools.task;
+    const task = data.focus?.trim() || copy.empty_title;
+    const hidden = taskHiddenSteps(copy, data.dump);
+
+    return [
+        task,
+        '',
+        copy.sections.now,
+        ...copy.defaults.now.map((item) => `- ${item}`),
+        '',
+        copy.sections.microsteps,
+        ...taskMicrosteps(copy, data.focus, data.stuck || 'unclear').map((item) => `- ${item}`),
+        '',
+        copy.sections.hidden,
+        ...hidden.map((item) => `- ${item}`),
+        '',
+        copy.sections.done,
+        data.done?.trim() || copy.defaults.done,
+        '',
+        copy.sections.reset,
+        copy.defaults.reset,
+    ].join('\n');
+}
+
+function initDashboard(tools, locale) {
+    const copy = tools.dashboard;
+    const saved = readSupportKit(locale);
+
+    renderDashboard(copy, saved);
+
+    document.getElementById('dashboardExportButton').addEventListener('click', () => {
+        downloadText('adhd-support-kit.json', JSON.stringify(readSupportKit(locale), null, 2));
+    });
+
+    document.getElementById('dashboardClearButton').addEventListener('click', () => {
+        [
+            'adhdSupport.latestResult',
+            `adhdSupport.latestResult.${locale}`,
+            'adhdSupport.goal',
+            'adhdSupport.planner',
+            'adhdSupport.weekly',
+            'adhdSupport.appointment',
+            'adhdSupport.care',
+            'adhdSupport.support',
+            'adhdSupport.providers',
+            'adhdSupport.access',
+            'adhdSupport.task',
+            'adhdSupport.reminders',
+            'adhdSupport.tracker',
+        ].forEach((key) => supportStorage.removeItem(key));
+
+        renderDashboard(copy, readSupportKit(locale));
+        document.getElementById('dashboardNextBody').textContent = copy.cleared;
+    });
+}
+
+function readSupportKit(locale = 'en') {
+    return {
+        result: localizedSavedResult(locale),
+        goal: readJson('adhdSupport.goal'),
+        planner: readJson('adhdSupport.planner'),
+        weekly: readJson('adhdSupport.weekly'),
+        appointment: readJson('adhdSupport.appointment'),
+        care: readJson('adhdSupport.care'),
+        support: readJson('adhdSupport.support'),
+        providers: readProviders(),
+        access: readJson('adhdSupport.access'),
+        task: readJson('adhdSupport.task'),
+        reminders: readJson('adhdSupport.reminders'),
+        tracker: readJson('adhdSupport.tracker'),
+    };
+}
+
+function localizedSavedResult(locale) {
+    const localized = readJson(`adhdSupport.latestResult.${locale}`);
+
+    if (localized) {
+        return localized;
+    }
+
+    const legacy = readJson('adhdSupport.latestResult');
+
+    return legacy?.locale === locale ? legacy : null;
+}
+
+function readJson(key) {
+    try {
+        return JSON.parse(supportStorage.getItem(key) || 'null');
+    } catch {
+        return null;
+    }
+}
+
+function renderDashboard(copy, saved) {
+    const summaries = {
+        result: saved.result?.title,
+        goal: saved.goal?.goal,
+        planner: firstLine(saved.planner?.must),
+        weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
+        appointment: saved.appointment?.provider,
+        care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
+        support: saved.support?.situation || saved.support?.request,
+        providers: saved.providers?.length ? String(saved.providers.length) : '',
+        access: saved.access?.barrier ? copy.cards.access.title : '',
+        task: saved.task?.focus,
+        reminders: reminderSummary(saved.reminders),
+        tracker: saved.tracker?.date,
+    };
+
+    Object.entries(copy.cards).forEach(([key, card]) => {
+        const value = summaries[key];
+        const cardElement = document.querySelector(`[data-dashboard-card="${key}"]`);
+        const statusElement = document.querySelector(`[data-dashboard-status="${key}"]`);
+        const summaryElement = document.querySelector(`[data-dashboard-summary="${key}"]`);
+
+        cardElement.classList.toggle('saved', Boolean(value));
+        statusElement.textContent = value ? copy.saved : copy.not_saved;
+        summaryElement.textContent = value
+            ? copy.summaries[key].replace(':value', value)
+            : card.empty;
+    });
+
+    const next = dashboardNext(saved);
+    const nextTitle = document.getElementById('dashboardNextTitle');
+    const nextBody = document.getElementById('dashboardNextBody');
+    const nextLink = document.getElementById('dashboardNextLink');
+
+    if (! next) {
+        nextTitle.textContent = copy.empty_title;
+        nextBody.textContent = copy.empty_body;
+        nextLink.href = document.querySelector('[data-dashboard-card="goal"] a').href;
+        nextLink.textContent = copy.start_link;
+
+        return;
+    }
+
+    nextTitle.textContent = copy.cards[next.key].title;
+    nextBody.textContent = copy.next[next.key];
+    nextLink.href = document.querySelector(`[data-dashboard-card="${next.key}"] a`).href;
+    nextLink.textContent = copy.cards[next.key].action;
+}
+
+function dashboardNext(saved) {
+    if (saved.task?.focus) {
+        return { key: 'task' };
+    }
+
+    if (saved.reminders?.date) {
+        return { key: 'reminders' };
+    }
+
+    if (saved.tracker?.date) {
+        return { key: 'tracker' };
+    }
+
+    if (saved.providers?.length) {
+        return { key: 'providers' };
+    }
+
+    if (saved.access?.barrier) {
+        return { key: 'access' };
+    }
+
+    if (saved.weekly?.must || saved.weekly?.loose) {
+        return { key: 'weekly' };
+    }
+
+    if (saved.planner?.must) {
+        return { key: 'planner' };
+    }
+
+    if (saved.goal?.goal) {
+        return { key: 'goal' };
+    }
+
+    if (saved.appointment?.provider) {
+        return { key: 'appointment' };
+    }
+
+    if (saved.care?.main || saved.care?.help) {
+        return { key: 'care' };
+    }
+
+    if (saved.support?.situation || saved.support?.request) {
+        return { key: 'support' };
+    }
+
+    if (saved.result?.title) {
+        return { key: 'result' };
+    }
+
+    return { key: 'resources' };
+}
+
+function firstLine(value) {
+    return lines(value)[0] || '';
+}
+
+function initReminders(tools) {
+    const form = document.getElementById('reminderForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.reminders') ?? '{}');
+    const fields = {
+        kind: document.getElementById('reminderKind'),
+        date: document.getElementById('reminderDate'),
+        time: document.getElementById('reminderTime'),
+        note: document.getElementById('reminderNote'),
+    };
+
+    hydrateFields(fields, defaultReminder(saved));
+    renderReminder(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.reminders', JSON.stringify(data));
+        renderReminder(tools, data);
+    });
+
+    document.getElementById('reminderDownloadButton').addEventListener('click', () => {
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.reminders', JSON.stringify(data));
+        renderReminder(tools, data);
+        downloadText(tools.reminders.filename, reminderToIcs(tools.reminders, data));
+    });
+
+    document.getElementById('reminderClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.reminders');
+        hydrateFields(fields, defaultReminder({}));
+        renderReminder(tools, collectFields(fields));
+    });
+}
+
+function defaultReminder(saved) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return {
+        kind: saved.kind || 'book',
+        date: saved.date || tomorrow.toISOString().slice(0, 10),
+        time: saved.time || '09:00',
+        note: saved.note || '',
+    };
+}
+
+function renderReminder(tools, data) {
+    const copy = tools.reminders;
+    const kindLabel = copy.kinds[data.kind] || copy.kinds.book;
+
+    document.getElementById('reminderOutputTitle').textContent = copy.calendar_title.replace(':kind', kindLabel);
+    document.getElementById('reminderWhenText').textContent = reminderSummary(data);
+    document.getElementById('reminderWhyText').textContent = copy.why;
+    document.getElementById('reminderScriptText').textContent = reminderScript(copy, data);
+}
+
+function reminderSummary(data) {
+    if (! data?.date) {
+        return '';
+    }
+
+    return [data.date, data.time].filter(Boolean).join(' ');
+}
+
+function reminderScript(copy, data) {
+    const script = copy.scripts[data.kind] || copy.scripts.book;
+    const note = data.note?.trim();
+
+    return note ? `${script} ${note}` : script;
+}
+
+function reminderToIcs(copy, data) {
+    const kindLabel = copy.kinds[data.kind] || copy.kinds.book;
+    const start = icsDate(data.date, data.time);
+    const end = icsDate(data.date, addMinutes(data.time, 30));
+    const title = copy.calendar_title.replace(':kind', kindLabel);
+    const description = reminderScript(copy, data);
+
+    return [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//ADHD Support Hub//Reminder//EN',
+        'BEGIN:VEVENT',
+        `UID:${calendarUid()}@adhd-support-hub`,
+        `DTSTAMP:${icsDateTime(new Date())}`,
+        `DTSTART:${start}`,
+        `DTEND:${end}`,
+        `SUMMARY:${escapeIcs(title)}`,
+        `DESCRIPTION:${escapeIcs(description)}`,
+        'END:VEVENT',
+        'END:VCALENDAR',
+        '',
+    ].join('\r\n');
+}
+
+function calendarUid() {
+    if (window.crypto?.randomUUID) {
+        return window.crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function addMinutes(time, minutes) {
+    const [hours, mins] = (time || '09:00').split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours || 0, mins || 0, 0, 0);
+    date.setMinutes(date.getMinutes() + minutes);
+
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function icsDate(date, time) {
+    return `${(date || new Date().toISOString().slice(0, 10)).replaceAll('-', '')}T${(time || '09:00').replace(':', '')}00`;
+}
+
+function icsDateTime(date) {
+    return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+}
+
+function escapeIcs(value) {
+    return String(value)
+        .replaceAll('\\', '\\\\')
+        .replaceAll(';', '\\;')
+        .replaceAll(',', '\\,')
+        .replaceAll('\n', '\\n');
+}
+
+function initTracker(tools) {
+    const form = document.getElementById('trackerForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.tracker') ?? '{}');
+    const fields = {
+        date: document.getElementById('trackerDate'),
+        sleep: document.getElementById('trackerSleep'),
+        focus: document.getElementById('trackerFocus'),
+        stress: document.getElementById('trackerStress'),
+        context: document.getElementById('trackerContext'),
+        notes: document.getElementById('trackerNotes'),
+    };
+
+    hydrateFields(fields, defaultTracker(saved));
+    renderTracker(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.tracker', JSON.stringify(data));
+        renderTracker(tools, data);
+    });
+
+    document.getElementById('trackerDownloadButton').addEventListener('click', () => {
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.tracker', JSON.stringify(data));
+        renderTracker(tools, data);
+        downloadText('adhd-symptom-snapshot.txt', trackerToText(tools, data));
+    });
+
+    document.getElementById('trackerClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.tracker');
+        hydrateFields(fields, defaultTracker({}));
+        renderTracker(tools, collectFields(fields));
+    });
+}
+
+function defaultTracker(saved) {
+    return {
+        date: saved.date || new Date().toISOString().slice(0, 10),
+        sleep: saved.sleep || '',
+        focus: saved.focus || '3',
+        stress: saved.stress || '3',
+        context: saved.context || '',
+        notes: saved.notes || '',
+    };
+}
+
+function renderTracker(tools, data) {
+    const copy = tools.tracker;
+
+    document.getElementById('trackerOutputTitle').textContent = data.date || copy.empty_title;
+    document.getElementById('trackerScoresText').textContent = `${copy.labels.focus}: ${data.focus || '3'} · ${copy.labels.stress}: ${data.stress || '3'}`;
+    document.getElementById('trackerSleepText').textContent = data.sleep
+        ? `${copy.labels.sleep}: ${data.sleep} ${copy.labels.hours}`
+        : copy.defaults.sleep;
+    document.getElementById('trackerContextText').textContent = data.context || copy.defaults.context;
+    document.getElementById('trackerNotesText').textContent = data.notes || copy.defaults.notes;
+}
+
+function trackerToText(tools, data) {
+    const copy = tools.tracker;
+
+    return [
+        `${copy.output_eyebrow}: ${data.date}`,
+        '',
+        copy.sections.scores,
+        `${copy.labels.focus}: ${data.focus || '3'}`,
+        `${copy.labels.stress}: ${data.stress || '3'}`,
+        '',
+        copy.sections.sleep,
+        data.sleep ? `${data.sleep} ${copy.labels.hours}` : copy.defaults.sleep,
+        '',
+        copy.sections.context,
+        data.context || copy.defaults.context,
+        '',
+        copy.sections.notes,
+        data.notes || copy.defaults.notes,
+    ].join('\n');
+}
+
+function hydrateFields(fields, data) {
+    Object.entries(fields).forEach(([key, field]) => {
+        field.value = data[key] ?? '';
+    });
+}
+
+function collectFields(fields) {
+    return Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value]));
+}
+
+function lines(value) {
+    return (value || '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+}
+
+function withDefault(items, fallback) {
+    return items.length > 0 ? items : [fallback];
+}
+
+function renderList(id, items, fallback) {
+    document.getElementById(id).innerHTML = withDefault(items, fallback)
+        .map((item) => `<li>${item}</li>`)
+        .join('');
+}
+
+function downloadText(filename, contents) {
+    const blob = new Blob([contents], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
 }
