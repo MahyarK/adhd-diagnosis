@@ -14,6 +14,7 @@
         <a href="{{ route('tools.energy', ['lang' => $locale]) }}">{{ __('assessment.ui.energy_crash') }}</a>
         <a href="{{ route('tools.decision', ['lang' => $locale]) }}">{{ __('assessment.ui.decision_priority') }}</a>
         <a href="{{ route('tools.focus', ['lang' => $locale]) }}">{{ __('assessment.ui.focus_sprint') }}</a>
+        <a href="{{ route('tools.emotion', ['lang' => $locale]) }}">{{ __('assessment.ui.emotional_reset') }}</a>
         <a href="{{ route('tools.appointment', ['lang' => $locale]) }}">{{ __('assessment.ui.appointment_prep') }}</a>
         <a href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
         <a href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>

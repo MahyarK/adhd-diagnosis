@@ -84,6 +84,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.focus-sprint');
     }
 
+    public function emotionalReset(Request $request): View
+    {
+        return $this->toolView($request, 'tools.emotional-reset');
+    }
+
     public function appointmentPrep(Request $request): View
     {
         return $this->toolView($request, 'tools.appointment-prep');
