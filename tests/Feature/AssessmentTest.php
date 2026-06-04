@@ -140,6 +140,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Kies wat eerst komt wanneer alles even dringend voelt.');
 
+        $this->get('/tools/focus-sprint?lang=fa')
+            ->assertOk()
+            ->assertSee('بدون منتظر ماندن برای انگیزه، یک اسپرینت کاری کوچک شروع کن.');
+
         $this->get('/tools/provider-shortlist?lang=en')
             ->assertOk()
             ->assertSee('Keep possible support options in one place.');

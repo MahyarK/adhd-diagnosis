@@ -482,6 +482,10 @@ if (toolRoot) {
         initDecisionPriority(tools);
     }
 
+    if (tool === 'focus') {
+        initFocusSprint(tools);
+    }
+
     if (tool === 'appointment') {
         initAppointmentPrep(tools);
     }
@@ -1351,6 +1355,101 @@ function decisionToText(tools, data) {
     ].join('\n');
 }
 
+function initFocusSprint(tools) {
+    const form = document.getElementById('focusForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.focus') ?? '{}');
+    const fields = {
+        task: document.getElementById('focusTask'),
+        mode: document.getElementById('focusMode'),
+        minutes: document.getElementById('focusMinutes'),
+        distraction: document.getElementById('focusDistraction'),
+        support: document.getElementById('focusSupport'),
+        reward: document.getElementById('focusReward'),
+    };
+
+    hydrateFields(fields, saved);
+    renderFocusSprint(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.focus', JSON.stringify(data));
+        renderFocusSprint(tools, data);
+    });
+
+    document.getElementById('focusPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('focusDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-focus-sprint-card.txt', focusToText(tools, collectFields(fields)));
+    });
+    document.getElementById('focusClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.focus');
+        hydrateFields(fields, {});
+        renderFocusSprint(tools, {});
+    });
+}
+
+function renderFocusSprint(tools, data) {
+    const plan = focusPlan(tools.focus, data);
+
+    document.getElementById('focusOutputTitle').textContent = plan.title;
+    document.getElementById('focusStartText').textContent = plan.start;
+    document.getElementById('focusStepList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('focusDistractionText').textContent = plan.distraction;
+    document.getElementById('focusSupportText').textContent = plan.support;
+    document.getElementById('focusRewardText').textContent = plan.reward;
+    document.getElementById('focusStopText').textContent = plan.stop;
+}
+
+function focusPlan(copy, data) {
+    const task = data.task?.trim() || copy.defaults.task;
+    const mode = data.mode || 'start';
+    const minutes = data.minutes || '10';
+    const distraction = data.distraction?.trim() || copy.defaults.distraction;
+    const support = copy.supports[data.support || 'timer'] || copy.supports.timer;
+    const reward = data.reward?.trim() || copy.defaults.reward;
+
+    return {
+        title: copy.output_title.replace(':task', task),
+        start: copy.start_cue
+            .replace(':minutes', copy.minutes[minutes] || copy.minutes['10'])
+            .replace(':task', task),
+        steps: copy.steps[mode] || copy.steps.start,
+        distraction: copy.distraction_rule.replace(':distraction', distraction),
+        support: copy.support_prompt.replace(':support', support),
+        reward: copy.reward_rule.replace(':reward', reward),
+        stop: copy.stop_rule,
+    };
+}
+
+function focusToText(tools, data) {
+    const copy = tools.focus;
+    const plan = focusPlan(copy, data);
+
+    return [
+        plan.title,
+        '',
+        copy.sections.start,
+        plan.start,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.distraction,
+        plan.distraction,
+        '',
+        copy.sections.support,
+        plan.support,
+        '',
+        copy.sections.reward,
+        plan.reward,
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
 function initAppointmentPrep(tools) {
     const form = document.getElementById('appointmentForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.appointment') ?? '{}');
@@ -1881,6 +1980,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.communication',
             'adhdSupport.energy',
             'adhdSupport.decision',
+            'adhdSupport.focus',
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
@@ -1908,6 +2008,7 @@ function readSupportKit(locale = 'en') {
         communication: readJson('adhdSupport.communication'),
         energy: readJson('adhdSupport.energy'),
         decision: readJson('adhdSupport.decision'),
+        focus: readJson('adhdSupport.focus'),
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
@@ -1951,6 +2052,7 @@ function renderDashboard(copy, saved) {
         communication: saved.communication?.person || saved.communication?.situation,
         energy: saved.energy?.must || saved.energy?.state,
         decision: saved.decision?.relief || firstLine(saved.decision?.options),
+        focus: saved.focus?.task || saved.focus?.mode,
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
@@ -2039,6 +2141,10 @@ function dashboardNext(saved) {
 
     if (saved.decision?.relief || saved.decision?.options) {
         return { key: 'decision' };
+    }
+
+    if (saved.focus?.task || saved.focus?.mode) {
+        return { key: 'focus' };
     }
 
     if (saved.goal?.goal) {
