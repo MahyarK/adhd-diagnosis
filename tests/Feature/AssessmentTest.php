@@ -136,6 +136,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Créez un plan basse capacité pour la journée que vous avez vraiment.');
 
+        $this->get('/tools/decision-priority?lang=nl')
+            ->assertOk()
+            ->assertSee('Kies wat eerst komt wanneer alles even dringend voelt.');
+
         $this->get('/tools/provider-shortlist?lang=en')
             ->assertOk()
             ->assertSee('Keep possible support options in one place.');

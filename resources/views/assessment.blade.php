@@ -62,6 +62,8 @@
                     <a class="primary-link" href="{{ route('tools.weekly', ['lang' => $locale]) }}">{{ __('assessment.ui.weekly_reset') }}</a>
                     <a class="primary-link" href="{{ route('tools.communication', ['lang' => $locale]) }}">{{ __('assessment.ui.communication_repair') }}</a>
                     <a class="primary-link" href="{{ route('tools.energy', ['lang' => $locale]) }}">{{ __('assessment.ui.energy_crash') }}</a>
+                    <a class="primary-link" href="{{ route('tools.decision', ['lang' => $locale]) }}">{{ __('assessment.ui.decision_priority') }}</a>
+                    <a class="primary-link" href="{{ route('tools.focus', ['lang' => $locale]) }}">{{ __('assessment.ui.focus_sprint') }}</a>
                     <a class="primary-link" href="{{ route('tools.appointment', ['lang' => $locale]) }}">{{ __('assessment.ui.prepare_appointment') }}</a>
                     <a class="primary-link" href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
                     <a class="primary-link" href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>

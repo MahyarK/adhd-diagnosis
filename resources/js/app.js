@@ -478,6 +478,10 @@ if (toolRoot) {
         initEnergyCrash(tools);
     }
 
+    if (tool === 'decision') {
+        initDecisionPriority(tools);
+    }
+
     if (tool === 'appointment') {
         initAppointmentPrep(tools);
     }
@@ -1249,6 +1253,104 @@ function energyToText(tools, data) {
     ].join('\n');
 }
 
+function initDecisionPriority(tools) {
+    const form = document.getElementById('decisionForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.decision') ?? '{}');
+    const fields = {
+        options: document.getElementById('decisionOptions'),
+        urgency: document.getElementById('decisionUrgency'),
+        energy: document.getElementById('decisionEnergy'),
+        consequence: document.getElementById('decisionConsequence'),
+        relief: document.getElementById('decisionRelief'),
+        support: document.getElementById('decisionSupport'),
+    };
+
+    hydrateFields(fields, saved);
+    renderDecisionPriority(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.decision', JSON.stringify(data));
+        renderDecisionPriority(tools, data);
+    });
+
+    document.getElementById('decisionPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('decisionDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-decision-priority-card.txt', decisionToText(tools, collectFields(fields)));
+    });
+    document.getElementById('decisionClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.decision');
+        hydrateFields(fields, {});
+        renderDecisionPriority(tools, {});
+    });
+}
+
+function renderDecisionPriority(tools, data) {
+    const plan = decisionPlan(tools.decision, data);
+
+    document.getElementById('decisionOutputTitle').textContent = plan.title;
+    document.getElementById('decisionChosenText').textContent = plan.chosen;
+    document.getElementById('decisionWhyText').textContent = plan.why;
+    document.getElementById('decisionFirstText').textContent = plan.first;
+    document.getElementById('decisionStepList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    renderList('decisionParkedList', plan.parked, tools.decision.defaults.parked);
+    document.getElementById('decisionScriptText').textContent = plan.script;
+    document.getElementById('decisionStopText').textContent = plan.stop;
+}
+
+function decisionPlan(copy, data) {
+    const options = lines(data.options);
+    const relief = data.relief?.trim();
+    const chosen = relief || options[0] || copy.defaults.chosen;
+    const parked = options.filter((option) => option !== chosen);
+    const energy = data.energy || 'low';
+    const consequence = data.consequence || 'unsure';
+    const support = data.support?.trim() || copy.defaults.support;
+
+    return {
+        title: copy.output_title.replace(':choice', chosen),
+        chosen,
+        parked,
+        why: copy.reasons[consequence] || copy.reasons.unsure,
+        first: copy.first_action.replace(':choice', chosen),
+        steps: copy.steps[energy] || copy.steps.low,
+        script: copy.support_script
+            .replace(':support', support)
+            .replace(':choice', chosen),
+        stop: copy.stop_rule,
+    };
+}
+
+function decisionToText(tools, data) {
+    const copy = tools.decision;
+    const plan = decisionPlan(copy, data);
+
+    return [
+        plan.title,
+        '',
+        `${copy.sections.chosen}: ${plan.chosen}`,
+        '',
+        `${copy.sections.why}: ${plan.why}`,
+        '',
+        `${copy.sections.first}: ${plan.first}`,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.parked,
+        ...withDefault(plan.parked, copy.defaults.parked).map((item) => `- ${item}`),
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
 function initAppointmentPrep(tools) {
     const form = document.getElementById('appointmentForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.appointment') ?? '{}');
@@ -1778,6 +1880,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.weekly',
             'adhdSupport.communication',
             'adhdSupport.energy',
+            'adhdSupport.decision',
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
@@ -1804,6 +1907,7 @@ function readSupportKit(locale = 'en') {
         weekly: readJson('adhdSupport.weekly'),
         communication: readJson('adhdSupport.communication'),
         energy: readJson('adhdSupport.energy'),
+        decision: readJson('adhdSupport.decision'),
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
@@ -1846,6 +1950,7 @@ function renderDashboard(copy, saved) {
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
         communication: saved.communication?.person || saved.communication?.situation,
         energy: saved.energy?.must || saved.energy?.state,
+        decision: saved.decision?.relief || firstLine(saved.decision?.options),
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
@@ -1930,6 +2035,10 @@ function dashboardNext(saved) {
 
     if (saved.energy?.must || saved.energy?.state) {
         return { key: 'energy' };
+    }
+
+    if (saved.decision?.relief || saved.decision?.options) {
+        return { key: 'decision' };
     }
 
     if (saved.goal?.goal) {

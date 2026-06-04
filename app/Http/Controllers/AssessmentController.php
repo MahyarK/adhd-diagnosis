@@ -74,6 +74,16 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.energy-crash');
     }
 
+    public function decisionPriority(Request $request): View
+    {
+        return $this->toolView($request, 'tools.decision-priority');
+    }
+
+    public function focusSprint(Request $request): View
+    {
+        return $this->toolView($request, 'tools.focus-sprint');
+    }
+
     public function appointmentPrep(Request $request): View
     {
         return $this->toolView($request, 'tools.appointment-prep');
