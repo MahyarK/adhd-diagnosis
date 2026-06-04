@@ -12,6 +12,7 @@ Route::get('/tools/daily-planner', [AssessmentController::class, 'dailyPlanner']
 Route::get('/tools/routine-builder', [AssessmentController::class, 'routineBuilder'])->name('tools.routine');
 Route::get('/tools/weekly-reset', [AssessmentController::class, 'weeklyReset'])->name('tools.weekly');
 Route::get('/tools/communication-repair', [AssessmentController::class, 'communicationRepair'])->name('tools.communication');
+Route::get('/tools/energy-crash', [AssessmentController::class, 'energyCrash'])->name('tools.energy');
 Route::get('/tools/appointment-prep', [AssessmentController::class, 'appointmentPrep'])->name('tools.appointment');
 Route::get('/tools/care-notes', [AssessmentController::class, 'careNotes'])->name('tools.care');
 Route::get('/tools/support-request', [AssessmentController::class, 'supportRequest'])->name('tools.support');

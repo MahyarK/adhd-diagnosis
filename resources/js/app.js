@@ -474,6 +474,10 @@ if (toolRoot) {
         initCommunicationRepair(tools);
     }
 
+    if (tool === 'energy') {
+        initEnergyCrash(tools);
+    }
+
     if (tool === 'appointment') {
         initAppointmentPrep(tools);
     }
@@ -1147,6 +1151,104 @@ function communicationToText(tools, data) {
     ].join('\n');
 }
 
+function initEnergyCrash(tools) {
+    const form = document.getElementById('energyForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.energy') ?? '{}');
+    const fields = {
+        state: document.getElementById('energyState'),
+        must: document.getElementById('energyMust'),
+        body: document.getElementById('energyBody'),
+        drop: document.getElementById('energyDrop'),
+        support: document.getElementById('energySupport'),
+        time: document.getElementById('energyTime'),
+    };
+
+    hydrateFields(fields, saved);
+    renderEnergyCrash(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.energy', JSON.stringify(data));
+        renderEnergyCrash(tools, data);
+    });
+
+    document.getElementById('energyPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('energyDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-energy-crash-plan.txt', energyToText(tools, collectFields(fields)));
+    });
+    document.getElementById('energyClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.energy');
+        hydrateFields(fields, {});
+        renderEnergyCrash(tools, {});
+    });
+}
+
+function renderEnergyCrash(tools, data) {
+    const plan = energyPlan(tools.energy, data);
+
+    document.getElementById('energyOutputTitle').textContent = plan.title;
+    document.getElementById('energyFirstText').textContent = plan.first;
+    document.getElementById('energyBodyText').textContent = plan.body;
+    document.getElementById('energyStepList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('energyDropText').textContent = plan.drop;
+    document.getElementById('energyScriptText').textContent = plan.script;
+    document.getElementById('energyStopText').textContent = plan.stop;
+}
+
+function energyPlan(copy, data) {
+    const state = data.state || 'empty';
+    const body = data.body || 'water';
+    const time = data.time || '10';
+    const must = data.must?.trim() || copy.defaults.must;
+    const drop = data.drop?.trim() || copy.defaults.drop;
+    const support = data.support?.trim() || copy.defaults.support;
+
+    return {
+        title: copy.output_title.replace(':state', copy.states[state] || copy.states.empty),
+        first: copy.first_action
+            .replace(':time', copy.times[time] || copy.times['10'])
+            .replace(':must', must),
+        body: copy.body_resets[body] || copy.body_resets.water,
+        steps: copy.steps[state] || copy.steps.empty,
+        drop: copy.drop_rule.replace(':drop', drop),
+        script: copy.support_script
+            .replace(':support', support)
+            .replace(':must', must)
+            .replace(':time', copy.times[time] || copy.times['10']),
+        stop: copy.stop_rule,
+    };
+}
+
+function energyToText(tools, data) {
+    const copy = tools.energy;
+    const plan = energyPlan(copy, data);
+
+    return [
+        plan.title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.body,
+        plan.body,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.drop,
+        plan.drop,
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
 function initAppointmentPrep(tools) {
     const form = document.getElementById('appointmentForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.appointment') ?? '{}');
@@ -1675,6 +1777,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.routine',
             'adhdSupport.weekly',
             'adhdSupport.communication',
+            'adhdSupport.energy',
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
@@ -1700,6 +1803,7 @@ function readSupportKit(locale = 'en') {
         routine: readJson('adhdSupport.routine'),
         weekly: readJson('adhdSupport.weekly'),
         communication: readJson('adhdSupport.communication'),
+        energy: readJson('adhdSupport.energy'),
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
@@ -1741,6 +1845,7 @@ function renderDashboard(copy, saved) {
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
         communication: saved.communication?.person || saved.communication?.situation,
+        energy: saved.energy?.must || saved.energy?.state,
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
@@ -1821,6 +1926,10 @@ function dashboardNext(saved) {
 
     if (saved.communication?.person || saved.communication?.situation) {
         return { key: 'communication' };
+    }
+
+    if (saved.energy?.must || saved.energy?.state) {
+        return { key: 'energy' };
     }
 
     if (saved.goal?.goal) {

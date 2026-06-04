@@ -69,6 +69,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.communication-repair');
     }
 
+    public function energyCrash(Request $request): View
+    {
+        return $this->toolView($request, 'tools.energy-crash');
+    }
+
     public function appointmentPrep(Request $request): View
     {
         return $this->toolView($request, 'tools.appointment-prep');

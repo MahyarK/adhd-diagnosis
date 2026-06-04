@@ -132,6 +132,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Stuur het bericht zonder het de hele dag te herschrijven.');
 
+        $this->get('/tools/energy-crash?lang=fr')
+            ->assertOk()
+            ->assertSee('Créez un plan basse capacité pour la journée que vous avez vraiment.');
+
         $this->get('/tools/provider-shortlist?lang=en')
             ->assertOk()
             ->assertSee('Keep possible support options in one place.');
