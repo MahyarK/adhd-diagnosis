@@ -12,6 +12,8 @@
         <a href="{{ route('tools.appointment', ['lang' => $locale]) }}">{{ __('assessment.ui.appointment_prep') }}</a>
         <a href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
         <a href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>
+        <a href="{{ route('tools.home', ['lang' => $locale]) }}">{{ __('assessment.ui.home_reset') }}</a>
+        <a href="{{ route('tools.money', ['lang' => $locale]) }}">{{ __('assessment.ui.money_admin') }}</a>
         <a href="{{ route('tools.providers', ['lang' => $locale]) }}">{{ __('assessment.ui.provider_shortlist') }}</a>
         <a href="{{ route('tools.access', ['lang' => $locale]) }}">{{ __('assessment.ui.access_plan') }}</a>
         <a href="{{ route('tools.task', ['lang' => $locale]) }}">{{ __('assessment.ui.task_breakdown') }}</a>

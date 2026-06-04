@@ -85,6 +85,8 @@ Features:
 - Morning/evening routine builder.
 - Time-block planner with buffers.
 - “If I fall off” recovery plan.
+- Home reset planner for cleaning, clutter, dishes, trash, and leaving-home routines.
+- Money/admin rescue planner for bills, forms, emails, appointments, and overdue tasks.
 - Visual checklist mode.
 - Printable planner pages.
 - Downloadable weekly plan.
@@ -231,6 +233,8 @@ Downloads:
 - Task breakdown sheet.
 - Medication/therapy discussion notes.
 - Work/school/home support request draft.
+- Home reset card.
+- Money/admin rescue card.
 - Symptom tracker.
 - Sleep/stress tracker.
 
@@ -344,7 +348,9 @@ Build this next:
 11. Add a provider shortlist for possible clinicians, clinics, and support offices.
 12. Add a low-cost access plan for care barriers.
 13. Add care discussion notes and a support request builder.
-14. Save goals/plans/weekly reset/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+14. Add a home reset tool for cleaning and clutter overwhelm.
+15. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
+16. Save goals/plans/weekly reset/home reset/money-admin rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -355,6 +361,8 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create one realistic goal and print/download it.
 - A user can create a daily plan and print/download it.
 - A user can create a weekly reset plan and print/download it.
+- A user can create a small home reset plan and print/download it.
+- A user can create a money/admin rescue card and print/download it.
 - A user can prepare what to say to a clinician and print/download it.
 - A user can draft a practical support request for work, school, home, or a trusted helper.
 - A user can break an overwhelming task into tiny steps and print/download it.

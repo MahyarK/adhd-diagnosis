@@ -478,6 +478,14 @@ if (toolRoot) {
         initSupportRequest(tools);
     }
 
+    if (tool === 'home') {
+        initHomeReset(tools);
+    }
+
+    if (tool === 'money') {
+        initMoneyAdmin(tools);
+    }
+
     if (tool === 'providers') {
         initProviderShortlist(tools);
     }
@@ -660,6 +668,211 @@ function plannerToText(tools, data) {
         `${copy.sections.body}: ${data.body || copy.defaults.body}`,
         `${copy.sections.scary}: ${data.scary || copy.defaults.scary}`,
         `${copy.sections.recovery}: ${data.recovery || copy.defaults.recovery}`,
+    ].join('\n');
+}
+
+function initHomeReset(tools) {
+    const form = document.getElementById('homeForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.home') ?? '{}');
+    const fields = {
+        space: document.getElementById('homeSpace'),
+        mode: document.getElementById('homeMode'),
+        time: document.getElementById('homeTime'),
+        blocker: document.getElementById('homeBlocker'),
+        reward: document.getElementById('homeReward'),
+    };
+
+    hydrateFields(fields, saved);
+    renderHomeReset(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.home', JSON.stringify(data));
+        renderHomeReset(tools, data);
+    });
+
+    document.getElementById('homePrintButton').addEventListener('click', () => window.print());
+    document.getElementById('homeDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-home-reset.txt', homeToText(tools, collectFields(fields)));
+    });
+    document.getElementById('homeClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.home');
+        hydrateFields(fields, {});
+        renderHomeReset(tools, {});
+    });
+}
+
+function renderHomeReset(tools, data) {
+    const copy = tools.home;
+    const space = data.space?.trim() || copy.defaults.space;
+    const mode = data.mode || 'low_energy';
+    const minutes = Number(data.time || 10);
+
+    document.getElementById('homeOutputTitle').textContent = copy.output_title.replace(':space', space);
+    document.getElementById('homeStartText').textContent = homeStart(copy, space, minutes, data.blocker);
+    document.getElementById('homeStepList').innerHTML = homeSteps(copy, mode, minutes)
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    renderList('homeParkingList', copy.parking, copy.parking[0]);
+    document.getElementById('homeStopText').textContent = data.reward?.trim()
+        ? `${copy.stop_with_reward} ${data.reward.trim()}`
+        : copy.stop;
+    document.getElementById('homeKindText').textContent = copy.kind;
+}
+
+function homeStart(copy, space, minutes, blocker) {
+    const start = copy.start
+        .replace(':space', space)
+        .replace(':minutes', minutes);
+
+    return blocker?.trim()
+        ? `${start} ${copy.blocker_note.replace(':blocker', blocker.trim())}`
+        : start;
+}
+
+function homeSteps(copy, mode, minutes) {
+    const steps = [...(copy.sequences[mode] || copy.sequences.low_energy)];
+
+    if (minutes <= 5) {
+        return steps.slice(0, 3);
+    }
+
+    if (minutes >= 20) {
+        return [...steps, ...copy.extra_steps];
+    }
+
+    return steps;
+}
+
+function homeToText(tools, data) {
+    const copy = tools.home;
+    const space = data.space?.trim() || copy.defaults.space;
+    const mode = data.mode || 'low_energy';
+    const minutes = Number(data.time || 10);
+
+    return [
+        copy.output_title.replace(':space', space),
+        '',
+        copy.sections.start,
+        homeStart(copy, space, minutes, data.blocker),
+        '',
+        copy.sections.steps,
+        ...homeSteps(copy, mode, minutes).map((item) => `- ${item}`),
+        '',
+        copy.sections.parking,
+        ...copy.parking.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        data.reward?.trim() ? `${copy.stop_with_reward} ${data.reward.trim()}` : copy.stop,
+        '',
+        copy.sections.kind,
+        copy.kind,
+    ].join('\n');
+}
+
+function initMoneyAdmin(tools) {
+    const form = document.getElementById('moneyForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.money') ?? '{}');
+    const fields = {
+        task: document.getElementById('moneyTask'),
+        category: document.getElementById('moneyCategory'),
+        urgency: document.getElementById('moneyUrgency'),
+        blocker: document.getElementById('moneyBlocker'),
+        contact: document.getElementById('moneyContact'),
+        outcome: document.getElementById('moneyOutcome'),
+    };
+
+    hydrateFields(fields, saved);
+    renderMoneyAdmin(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.money', JSON.stringify(data));
+        renderMoneyAdmin(tools, data);
+    });
+
+    document.getElementById('moneyPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('moneyDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-money-admin-rescue.txt', moneyToText(tools, collectFields(fields)));
+    });
+    document.getElementById('moneyClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.money');
+        hydrateFields(fields, {});
+        renderMoneyAdmin(tools, {});
+    });
+}
+
+function renderMoneyAdmin(tools, data) {
+    const copy = tools.money;
+    const category = data.category || 'overdue';
+    const task = data.task?.trim() || copy.defaults.task[category] || copy.defaults.task.overdue;
+    const outcome = data.outcome?.trim() || copy.defaults.outcome;
+
+    document.getElementById('moneyOutputTitle').textContent = copy.output_title.replace(':task', task);
+    document.getElementById('moneyFirstText').textContent = moneyFirstAction(copy, task, category, data.urgency, data.blocker);
+    document.getElementById('moneyStepList').innerHTML = moneySteps(copy, category)
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('moneyScriptText').textContent = moneyScript(copy, category, data.contact, task);
+    renderList('moneyQuestionList', moneyQuestions(copy, category, outcome), copy.questions.shared[0]);
+    document.getElementById('moneyStopText').textContent = copy.stop_rule.replace(':outcome', outcome);
+}
+
+function moneyFirstAction(copy, task, category, urgency, blocker) {
+    const urgencyText = copy.urgency_notes[urgency || 'unsure'] || copy.urgency_notes.unsure;
+    const blockerText = blocker?.trim()
+        ? ` ${copy.blocker_note.replace(':blocker', blocker.trim())}`
+        : '';
+
+    return `${copy.first_action.replace(':task', task).replace(':category', copy.categories[category] || copy.categories.overdue)} ${urgencyText}${blockerText}`;
+}
+
+function moneySteps(copy, category) {
+    return copy.steps[category] || copy.steps.overdue;
+}
+
+function moneyScript(copy, category, contact, task) {
+    const person = contact?.trim() || copy.defaults.contact[category] || copy.defaults.contact.overdue;
+    const template = copy.scripts[category] || copy.scripts.overdue;
+
+    return template
+        .replace(':contact', person)
+        .replace(':task', task);
+}
+
+function moneyQuestions(copy, category, outcome) {
+    return [
+        ...(copy.questions[category] || copy.questions.overdue),
+        ...copy.questions.shared,
+        copy.outcome_question.replace(':outcome', outcome),
+    ];
+}
+
+function moneyToText(tools, data) {
+    const copy = tools.money;
+    const category = data.category || 'overdue';
+    const task = data.task?.trim() || copy.defaults.task[category] || copy.defaults.task.overdue;
+    const outcome = data.outcome?.trim() || copy.defaults.outcome;
+
+    return [
+        copy.output_title.replace(':task', task),
+        '',
+        copy.sections.first,
+        moneyFirstAction(copy, task, category, data.urgency, data.blocker),
+        '',
+        copy.sections.steps,
+        ...moneySteps(copy, category).map((item) => `- ${item}`),
+        '',
+        copy.sections.script,
+        moneyScript(copy, category, data.contact, task),
+        '',
+        copy.sections.questions,
+        ...moneyQuestions(copy, category, outcome).map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        copy.stop_rule.replace(':outcome', outcome),
     ].join('\n');
 }
 
@@ -1260,6 +1473,8 @@ function initDashboard(tools, locale) {
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
+            'adhdSupport.home',
+            'adhdSupport.money',
             'adhdSupport.providers',
             'adhdSupport.access',
             'adhdSupport.task',
@@ -1281,6 +1496,8 @@ function readSupportKit(locale = 'en') {
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
+        home: readJson('adhdSupport.home'),
+        money: readJson('adhdSupport.money'),
         providers: readProviders(),
         access: readJson('adhdSupport.access'),
         task: readJson('adhdSupport.task'),
@@ -1318,6 +1535,8 @@ function renderDashboard(copy, saved) {
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
+        home: saved.home?.space || saved.home?.mode,
+        money: saved.money?.task || saved.money?.category,
         providers: saved.providers?.length ? String(saved.providers.length) : '',
         access: saved.access?.barrier ? copy.cards.access.title : '',
         task: saved.task?.focus,
@@ -1401,6 +1620,14 @@ function dashboardNext(saved) {
 
     if (saved.support?.situation || saved.support?.request) {
         return { key: 'support' };
+    }
+
+    if (saved.home?.space || saved.home?.mode) {
+        return { key: 'home' };
+    }
+
+    if (saved.money?.task || saved.money?.category) {
+        return { key: 'money' };
     }
 
     if (saved.result?.title) {

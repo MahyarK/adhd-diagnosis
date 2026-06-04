@@ -116,6 +116,14 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('کمک بخواه بدون اینکه مجبور باشی همان لحظه کلمات را پیدا کنی.');
 
+        $this->get('/tools/home-reset?lang=nl')
+            ->assertOk()
+            ->assertSee('Reset één plek zonder er een levensreorganisatie van te maken.');
+
+        $this->get('/tools/money-admin?lang=en')
+            ->assertOk()
+            ->assertSee('Unstick one bill, form, message, or overdue admin task.');
+
         $this->get('/tools/provider-shortlist?lang=en')
             ->assertOk()
             ->assertSee('Keep possible support options in one place.');

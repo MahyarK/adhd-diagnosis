@@ -74,6 +74,16 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.support-request');
     }
 
+    public function homeReset(Request $request): View
+    {
+        return $this->toolView($request, 'tools.home-reset');
+    }
+
+    public function moneyAdmin(Request $request): View
+    {
+        return $this->toolView($request, 'tools.money-admin');
+    }
+
     public function providerShortlist(Request $request): View
     {
         return $this->toolView($request, 'tools.provider-shortlist');
