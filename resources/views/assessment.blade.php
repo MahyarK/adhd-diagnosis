@@ -58,7 +58,9 @@
                     <a class="primary-link" href="{{ route('dashboard', ['lang' => $locale]) }}">{{ __('assessment.ui.open_dashboard') }}</a>
                     <a class="primary-link" href="{{ route('tools.goal', ['lang' => $locale]) }}" id="createGoalLink">{{ __('assessment.ui.create_goal') }}</a>
                     <a class="primary-link" href="{{ route('tools.planner', ['lang' => $locale]) }}" id="buildPlanLink">{{ __('assessment.ui.build_plan') }}</a>
+                    <a class="primary-link" href="{{ route('tools.routine', ['lang' => $locale]) }}">{{ __('assessment.ui.routine_builder') }}</a>
                     <a class="primary-link" href="{{ route('tools.weekly', ['lang' => $locale]) }}">{{ __('assessment.ui.weekly_reset') }}</a>
+                    <a class="primary-link" href="{{ route('tools.communication', ['lang' => $locale]) }}">{{ __('assessment.ui.communication_repair') }}</a>
                     <a class="primary-link" href="{{ route('tools.appointment', ['lang' => $locale]) }}">{{ __('assessment.ui.prepare_appointment') }}</a>
                     <a class="primary-link" href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
                     <a class="primary-link" href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>

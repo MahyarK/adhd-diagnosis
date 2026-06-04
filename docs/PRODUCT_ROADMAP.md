@@ -87,6 +87,7 @@ Features:
 - “If I fall off” recovery plan.
 - Home reset planner for cleaning, clutter, dishes, trash, and leaving-home routines.
 - Money/admin rescue planner for bills, forms, emails, appointments, and overdue tasks.
+- Communication repair planner for late replies, conflict, boundaries, and asking for support.
 - Visual checklist mode.
 - Printable planner pages.
 - Downloadable weekly plan.
@@ -235,6 +236,7 @@ Downloads:
 - Work/school/home support request draft.
 - Home reset card.
 - Money/admin rescue card.
+- Communication repair draft.
 - Symptom tracker.
 - Sleep/stress tracker.
 
@@ -350,7 +352,9 @@ Build this next:
 13. Add care discussion notes and a support request builder.
 14. Add a home reset tool for cleaning and clutter overwhelm.
 15. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
-16. Save goals/plans/weekly reset/home reset/money-admin rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+16. Add a morning/evening/leaving-home routine builder.
+17. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
+18. Save goals/plans/routines/weekly reset/communication repair/home reset/money-admin rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -360,7 +364,9 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can find potential local support without manually researching from scratch.
 - A user can create one realistic goal and print/download it.
 - A user can create a daily plan and print/download it.
+- A user can create a small routine card and print/download it.
 - A user can create a weekly reset plan and print/download it.
+- A user can draft a communication repair script and print/download it.
 - A user can create a small home reset plan and print/download it.
 - A user can create a money/admin rescue card and print/download it.
 - A user can prepare what to say to a clinician and print/download it.

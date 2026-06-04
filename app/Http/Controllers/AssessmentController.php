@@ -54,9 +54,19 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.daily-planner');
     }
 
+    public function routineBuilder(Request $request): View
+    {
+        return $this->toolView($request, 'tools.routine-builder');
+    }
+
     public function weeklyReset(Request $request): View
     {
         return $this->toolView($request, 'tools.weekly-reset');
+    }
+
+    public function communicationRepair(Request $request): View
+    {
+        return $this->toolView($request, 'tools.communication-repair');
     }
 
     public function appointmentPrep(Request $request): View

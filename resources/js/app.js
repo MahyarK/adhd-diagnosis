@@ -462,8 +462,16 @@ if (toolRoot) {
         initDailyPlanner(tools);
     }
 
+    if (tool === 'routine') {
+        initRoutineBuilder(tools);
+    }
+
     if (tool === 'weekly') {
         initWeeklyReset(tools);
+    }
+
+    if (tool === 'communication') {
+        initCommunicationRepair(tools);
     }
 
     if (tool === 'appointment') {
@@ -668,6 +676,109 @@ function plannerToText(tools, data) {
         `${copy.sections.body}: ${data.body || copy.defaults.body}`,
         `${copy.sections.scary}: ${data.scary || copy.defaults.scary}`,
         `${copy.sections.recovery}: ${data.recovery || copy.defaults.recovery}`,
+    ].join('\n');
+}
+
+function initRoutineBuilder(tools) {
+    const form = document.getElementById('routineForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.routine') ?? '{}');
+    const fields = {
+        kind: document.getElementById('routineKind'),
+        anchor: document.getElementById('routineAnchor'),
+        must: document.getElementById('routineMust'),
+        friction: document.getElementById('routineFriction'),
+        fallback: document.getElementById('routineFallback'),
+    };
+
+    hydrateFields(fields, saved);
+    renderRoutine(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.routine', JSON.stringify(data));
+        renderRoutine(tools, data);
+    });
+
+    document.getElementById('routinePrintButton').addEventListener('click', () => window.print());
+    document.getElementById('routineDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-routine-card.txt', routineToText(tools, collectFields(fields)));
+    });
+    document.getElementById('routineClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.routine');
+        hydrateFields(fields, {});
+        renderRoutine(tools, {});
+    });
+}
+
+function renderRoutine(tools, data) {
+    const copy = tools.routine;
+    const kind = data.kind || 'morning';
+
+    document.getElementById('routineOutputTitle').textContent = `${copy.output_title}: ${copy.kinds[kind] || copy.kinds.morning}`;
+    document.getElementById('routineAnchorText').textContent = routineAnchor(copy, data, kind);
+    document.getElementById('routineStepList').innerHTML = routineSteps(copy, data, kind)
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    renderList('routinePrepList', routinePrep(copy, data, kind), copy.prep[kind][0]);
+    document.getElementById('routineFallbackText').textContent = data.fallback?.trim() || copy.fallbacks[kind] || copy.fallbacks.morning;
+    document.getElementById('routineResetText').textContent = data.friction?.trim()
+        ? `${copy.reset} ${copy.friction_note.replace(':friction', data.friction.trim())}`
+        : copy.reset;
+}
+
+function routineAnchor(copy, data, kind) {
+    return data.anchor?.trim() || copy.anchors[kind] || copy.anchors.morning;
+}
+
+function routineSteps(copy, data, kind) {
+    const custom = lines(data.must);
+
+    if (custom.length > 0) {
+        return [
+            copy.start_step,
+            ...custom.slice(0, 5),
+            copy.end_step,
+        ];
+    }
+
+    return copy.steps[kind] || copy.steps.morning;
+}
+
+function routinePrep(copy, data, kind) {
+    const prep = [...(copy.prep[kind] || copy.prep.morning)];
+    const friction = data.friction?.trim();
+
+    if (friction) {
+        prep.push(copy.prep_for_friction.replace(':friction', friction));
+    }
+
+    return prep;
+}
+
+function routineToText(tools, data) {
+    const copy = tools.routine;
+    const kind = data.kind || 'morning';
+
+    return [
+        `${copy.output_title}: ${copy.kinds[kind] || copy.kinds.morning}`,
+        '',
+        copy.sections.anchor,
+        routineAnchor(copy, data, kind),
+        '',
+        copy.sections.steps,
+        ...routineSteps(copy, data, kind).map((item) => `- ${item}`),
+        '',
+        copy.sections.prep,
+        ...routinePrep(copy, data, kind).map((item) => `- ${item}`),
+        '',
+        copy.sections.fallback,
+        data.fallback?.trim() || copy.fallbacks[kind] || copy.fallbacks.morning,
+        '',
+        copy.sections.reset,
+        data.friction?.trim()
+            ? `${copy.reset} ${copy.friction_note.replace(':friction', data.friction.trim())}`
+            : copy.reset,
     ].join('\n');
 }
 
@@ -941,6 +1052,98 @@ function weeklyToText(tools, data) {
         '',
         copy.sections.reset,
         ...(copy.sequences[mode] || copy.sequences.gentle).map((item) => `- ${item}`),
+    ].join('\n');
+}
+
+function initCommunicationRepair(tools) {
+    const form = document.getElementById('communicationForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.communication') ?? '{}');
+    const fields = {
+        situation: document.getElementById('communicationSituation'),
+        person: document.getElementById('communicationPerson'),
+        context: document.getElementById('communicationContext'),
+        need: document.getElementById('communicationNeed'),
+        tone: document.getElementById('communicationTone'),
+    };
+
+    hydrateFields(fields, saved);
+    renderCommunicationRepair(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.communication', JSON.stringify(data));
+        renderCommunicationRepair(tools, data);
+    });
+
+    document.getElementById('communicationPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('communicationDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-communication-repair.txt', communicationToText(tools, collectFields(fields)));
+    });
+    document.getElementById('communicationClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.communication');
+        hydrateFields(fields, {});
+        renderCommunicationRepair(tools, {});
+    });
+}
+
+function renderCommunicationRepair(tools, data) {
+    const copy = tools.communication;
+    const situation = data.situation || 'late_reply';
+    const person = data.person?.trim() || copy.defaults.person;
+
+    document.getElementById('communicationOutputTitle').textContent = copy.output_title
+        .replace(':situation', copy.situations[situation] || copy.situations.late_reply);
+    document.getElementById('communicationMessageText').textContent = communicationMessage(copy, data, situation, person);
+    renderList('communicationBeforeList', communicationBefore(copy, data), copy.before[0]);
+    renderList('communicationRepairList', copy.repairs[situation] || copy.repairs.late_reply, copy.repairs.late_reply[0]);
+    document.getElementById('communicationBoundaryText').textContent = data.need?.trim()
+        ? copy.boundary_with_need.replace(':need', data.need.trim())
+        : copy.boundary;
+}
+
+function communicationMessage(copy, data, situation, person) {
+    const context = data.context?.trim() || copy.defaults.context[situation] || copy.defaults.context.late_reply;
+    const need = data.need?.trim() || copy.defaults.need[situation] || copy.defaults.need.late_reply;
+    const tone = data.tone || 'warm';
+    const template = copy.messages[tone]?.[situation] || copy.messages.warm.late_reply;
+
+    return template
+        .replace(':person', person)
+        .replace(':context', context)
+        .replace(':need', need);
+}
+
+function communicationBefore(copy, data) {
+    const before = [...copy.before];
+    const context = data.context?.trim();
+
+    if (context) {
+        before.push(copy.context_note.replace(':context', context));
+    }
+
+    return before;
+}
+
+function communicationToText(tools, data) {
+    const copy = tools.communication;
+    const situation = data.situation || 'late_reply';
+    const person = data.person?.trim() || copy.defaults.person;
+
+    return [
+        copy.output_title.replace(':situation', copy.situations[situation] || copy.situations.late_reply),
+        '',
+        copy.sections.message,
+        communicationMessage(copy, data, situation, person),
+        '',
+        copy.sections.before,
+        ...communicationBefore(copy, data).map((item) => `- ${item}`),
+        '',
+        copy.sections.repair,
+        ...(copy.repairs[situation] || copy.repairs.late_reply).map((item) => `- ${item}`),
+        '',
+        copy.sections.boundary,
+        data.need?.trim() ? copy.boundary_with_need.replace(':need', data.need.trim()) : copy.boundary,
     ].join('\n');
 }
 
@@ -1469,7 +1672,9 @@ function initDashboard(tools, locale) {
             `adhdSupport.latestResult.${locale}`,
             'adhdSupport.goal',
             'adhdSupport.planner',
+            'adhdSupport.routine',
             'adhdSupport.weekly',
+            'adhdSupport.communication',
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
@@ -1492,7 +1697,9 @@ function readSupportKit(locale = 'en') {
         result: localizedSavedResult(locale),
         goal: readJson('adhdSupport.goal'),
         planner: readJson('adhdSupport.planner'),
+        routine: readJson('adhdSupport.routine'),
         weekly: readJson('adhdSupport.weekly'),
+        communication: readJson('adhdSupport.communication'),
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
@@ -1531,7 +1738,9 @@ function renderDashboard(copy, saved) {
         result: saved.result?.title,
         goal: saved.goal?.goal,
         planner: firstLine(saved.planner?.must),
+        routine: saved.routine?.kind || firstLine(saved.routine?.must),
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
+        communication: saved.communication?.person || saved.communication?.situation,
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
@@ -1604,6 +1813,14 @@ function dashboardNext(saved) {
 
     if (saved.planner?.must) {
         return { key: 'planner' };
+    }
+
+    if (saved.routine?.kind || saved.routine?.must) {
+        return { key: 'routine' };
+    }
+
+    if (saved.communication?.person || saved.communication?.situation) {
+        return { key: 'communication' };
     }
 
     if (saved.goal?.goal) {

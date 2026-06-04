@@ -100,6 +100,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Maak een dagplan dat het echte leven overleeft.');
 
+        $this->get('/tools/routine-builder?lang=fa')
+            ->assertOk()
+            ->assertSee('روتینی بساز که در روزهای ناقص هم کار کند.');
+
         $this->get('/tools/weekly-reset?lang=en')
             ->assertOk()
             ->assertSee('Reset the week without shame.');
@@ -123,6 +127,10 @@ class AssessmentTest extends TestCase
         $this->get('/tools/money-admin?lang=en')
             ->assertOk()
             ->assertSee('Unstick one bill, form, message, or overdue admin task.');
+
+        $this->get('/tools/communication-repair?lang=nl')
+            ->assertOk()
+            ->assertSee('Stuur het bericht zonder het de hele dag te herschrijven.');
 
         $this->get('/tools/provider-shortlist?lang=en')
             ->assertOk()
