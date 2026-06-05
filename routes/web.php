@@ -16,6 +16,7 @@ Route::get('/tools/energy-crash', [AssessmentController::class, 'energyCrash'])-
 Route::get('/tools/decision-priority', [AssessmentController::class, 'decisionPriority'])->name('tools.decision');
 Route::get('/tools/focus-sprint', [AssessmentController::class, 'focusSprint'])->name('tools.focus');
 Route::get('/tools/emotional-reset', [AssessmentController::class, 'emotionalReset'])->name('tools.emotion');
+Route::get('/tools/transition-rescue', [AssessmentController::class, 'transitionRescue'])->name('tools.transition');
 Route::get('/tools/appointment-prep', [AssessmentController::class, 'appointmentPrep'])->name('tools.appointment');
 Route::get('/tools/care-notes', [AssessmentController::class, 'careNotes'])->name('tools.care');
 Route::get('/tools/support-request', [AssessmentController::class, 'supportRequest'])->name('tools.support');

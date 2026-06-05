@@ -366,7 +366,8 @@ Build this next:
 19. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
 20. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
 21. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
-22. Save goals/plans/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/home reset/money-admin rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+22. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
+23. Save goals/plans/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/money-admin rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -383,6 +384,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a decision rescue priority card and print/download it.
 - A user can create a focus sprint card and print/download it.
 - A user can create an emotional reset card and print/download it.
+- A user can create a transition rescue card and print/download it.
 - A user can create a small home reset plan and print/download it.
 - A user can create a money/admin rescue card and print/download it.
 - A user can prepare what to say to a clinician and print/download it.

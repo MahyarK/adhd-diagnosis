@@ -490,6 +490,10 @@ if (toolRoot) {
         initEmotionalReset(tools);
     }
 
+    if (tool === 'transition') {
+        initTransitionRescue(tools);
+    }
+
     if (tool === 'appointment') {
         initAppointmentPrep(tools);
     }
@@ -1550,6 +1554,110 @@ function emotionToText(tools, data) {
     ].join('\n');
 }
 
+function initTransitionRescue(tools) {
+    const form = document.getElementById('transitionForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.transition') ?? '{}');
+    const fields = {
+        transition: document.getElementById('transitionName'),
+        mode: document.getElementById('transitionMode'),
+        time: document.getElementById('transitionTime'),
+        anchor: document.getElementById('transitionAnchor'),
+        blocker: document.getElementById('transitionBlocker'),
+        support: document.getElementById('transitionSupport'),
+    };
+
+    hydrateFields(fields, saved);
+    renderTransitionRescue(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.transition', JSON.stringify(data));
+        renderTransitionRescue(tools, data);
+    });
+
+    document.getElementById('transitionPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('transitionDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-transition-rescue-card.txt', transitionToText(tools, collectFields(fields)));
+    });
+    document.getElementById('transitionClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.transition');
+        hydrateFields(fields, {});
+        renderTransitionRescue(tools, {});
+    });
+}
+
+function renderTransitionRescue(tools, data) {
+    const plan = transitionPlan(tools.transition, data);
+
+    document.getElementById('transitionOutputTitle').textContent = plan.title;
+    document.getElementById('transitionFirstText').textContent = plan.first;
+    document.getElementById('transitionStepsList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('transitionParkingList').innerHTML = plan.parking
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('transitionAnchorText').textContent = plan.anchorCue;
+    document.getElementById('transitionScriptText').textContent = plan.script;
+    document.getElementById('transitionStopText').textContent = plan.stop;
+}
+
+function transitionPlan(copy, data) {
+    const transition = data.transition?.trim() || copy.defaults.transition;
+    const mode = data.mode || 'unsure';
+    const time = data.time?.trim() || copy.defaults.time;
+    const anchor = data.anchor?.trim() || copy.defaults.anchor;
+    const blocker = data.blocker?.trim() || copy.defaults.blocker;
+    const support = data.support?.trim() || copy.defaults.support;
+
+    return {
+        title: copy.output_title.replace(':transition', transition),
+        first: copy.first_actions[mode] || copy.first_actions.unsure,
+        steps: copy.mode_steps[mode] || copy.mode_steps.unsure,
+        parking: [
+            copy.parking.blocker.replace(':blocker', blocker),
+            copy.parking.anchor.replace(':anchor', anchor),
+            copy.parking.time.replace(':time', time),
+        ],
+        anchorCue: copy.anchor_cue
+            .replace(':anchor', anchor)
+            .replace(':transition', transition),
+        script: copy.support_script
+            .replace(':support', support)
+            .replace(':transition', transition)
+            .replace(':time', time),
+        stop: copy.stop_rule,
+    };
+}
+
+function transitionToText(tools, data) {
+    const copy = tools.transition;
+    const plan = transitionPlan(copy, data);
+
+    return [
+        plan.title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.parking,
+        ...plan.parking.map((item) => `- ${item}`),
+        '',
+        copy.sections.anchor,
+        plan.anchorCue,
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
 function initAppointmentPrep(tools) {
     const form = document.getElementById('appointmentForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.appointment') ?? '{}');
@@ -2082,6 +2190,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.decision',
             'adhdSupport.focus',
             'adhdSupport.emotion',
+            'adhdSupport.transition',
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
@@ -2111,6 +2220,7 @@ function readSupportKit(locale = 'en') {
         decision: readJson('adhdSupport.decision'),
         focus: readJson('adhdSupport.focus'),
         emotion: readJson('adhdSupport.emotion'),
+        transition: readJson('adhdSupport.transition'),
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
@@ -2156,6 +2266,7 @@ function renderDashboard(copy, saved) {
         decision: saved.decision?.relief || firstLine(saved.decision?.options),
         focus: saved.focus?.task || saved.focus?.mode,
         emotion: saved.emotion?.trigger || saved.emotion?.intensity,
+        transition: saved.transition?.transition || saved.transition?.mode,
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
@@ -2252,6 +2363,10 @@ function dashboardNext(saved) {
 
     if (saved.emotion?.trigger || saved.emotion?.intensity) {
         return { key: 'emotion' };
+    }
+
+    if (saved.transition?.transition || saved.transition?.mode) {
+        return { key: 'transition' };
     }
 
     if (saved.goal?.goal) {
