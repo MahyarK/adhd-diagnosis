@@ -12,6 +12,7 @@ Route::get('/tools/daily-planner', [AssessmentController::class, 'dailyPlanner']
 Route::get('/tools/time-block', [AssessmentController::class, 'timeBlock'])->name('tools.time');
 Route::get('/tools/body-needs', [AssessmentController::class, 'bodyNeeds'])->name('tools.body');
 Route::get('/tools/food-rescue', [AssessmentController::class, 'foodRescue'])->name('tools.food');
+Route::get('/tools/sleep-wind-down', [AssessmentController::class, 'sleepWindDown'])->name('tools.sleep');
 Route::get('/tools/motivation-menu', [AssessmentController::class, 'motivationMenu'])->name('tools.motivation');
 Route::get('/tools/accountability', [AssessmentController::class, 'accountability'])->name('tools.accountability');
 Route::get('/tools/routine-builder', [AssessmentController::class, 'routineBuilder'])->name('tools.routine');

@@ -498,6 +498,10 @@ if (toolRoot) {
         initFoodRescue(tools);
     }
 
+    if (tool === 'sleep') {
+        initSleepWindDown(tools);
+    }
+
     if (tool === 'motivation') {
         initMotivationMenu(tools);
     }
@@ -1063,6 +1067,103 @@ function foodRescueToText(tools, data) {
         '',
         copy.sections.next,
         plan.next,
+        '',
+        copy.sections.rules,
+        ...plan.rules.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
+function initSleepWindDown(tools) {
+    const form = document.getElementById('sleepForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.sleep') ?? '{}');
+    const fields = {
+        mode: document.getElementById('sleepMode'),
+        wakeTime: document.getElementById('sleepWakeTime'),
+        blocker: document.getElementById('sleepBlocker'),
+        tomorrow: document.getElementById('sleepTomorrow'),
+        screenRule: document.getElementById('sleepScreenRule'),
+        comfort: document.getElementById('sleepComfort'),
+    };
+
+    hydrateFields(fields, {
+        mode: 'late',
+        ...saved,
+    });
+    renderSleepWindDown(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.sleep', JSON.stringify(data));
+        renderSleepWindDown(tools, data);
+    });
+
+    document.getElementById('sleepPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('sleepDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-sleep-wind-down.txt', sleepWindDownToText(tools, collectFields(fields)));
+    });
+    document.getElementById('sleepClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.sleep');
+        hydrateFields(fields, { mode: 'late' });
+        renderSleepWindDown(tools, collectFields(fields));
+    });
+}
+
+function renderSleepWindDown(tools, data) {
+    const plan = sleepWindDownPlan(tools.sleep, data);
+
+    document.getElementById('sleepOutputTitle').textContent = tools.sleep.output_title;
+    document.getElementById('sleepFirstText').textContent = plan.first;
+    document.getElementById('sleepStepsList').innerHTML = plan.steps.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('sleepScreenText').textContent = plan.screen;
+    document.getElementById('sleepTomorrowText').textContent = plan.tomorrow;
+    document.getElementById('sleepRulesList').innerHTML = plan.rules.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('sleepStopText').textContent = plan.stop;
+}
+
+function sleepWindDownPlan(copy, data) {
+    const mode = copy.steps[data.mode] ? data.mode : 'late';
+    const wakeTime = data.wakeTime?.trim() || copy.defaults.wake_time;
+    const blocker = data.blocker?.trim() || copy.defaults.blocker;
+    const tomorrow = data.tomorrow?.trim() || copy.defaults.tomorrow;
+    const screenRule = data.screenRule?.trim() || copy.defaults.screen_rule;
+    const comfort = data.comfort?.trim() || copy.defaults.comfort;
+
+    return {
+        first: copy.first_action
+            .replace(':blocker', blocker)
+            .replace(':comfort', comfort),
+        steps: copy.steps[mode],
+        screen: copy.screen_boundary.replace(':screen_rule', screenRule),
+        tomorrow: copy.tomorrow_launch
+            .replace(':wake_time', wakeTime)
+            .replace(':tomorrow', tomorrow),
+        rules: copy.rules,
+        stop: copy.stop_rule,
+    };
+}
+
+function sleepWindDownToText(tools, data) {
+    const copy = tools.sleep;
+    const plan = sleepWindDownPlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.screen,
+        plan.screen,
+        '',
+        copy.sections.tomorrow,
+        plan.tomorrow,
         '',
         copy.sections.rules,
         ...plan.rules.map((item) => `- ${item}`),
@@ -2853,6 +2954,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.time',
             'adhdSupport.body',
             'adhdSupport.food',
+            'adhdSupport.sleep',
             'adhdSupport.motivation',
             'adhdSupport.accountability',
             'adhdSupport.routine',
@@ -2889,6 +2991,7 @@ function readSupportKit(locale = 'en') {
         time: readJson('adhdSupport.time'),
         body: readJson('adhdSupport.body'),
         food: readJson('adhdSupport.food'),
+        sleep: readJson('adhdSupport.sleep'),
         motivation: readJson('adhdSupport.motivation'),
         accountability: readJson('adhdSupport.accountability'),
         routine: readJson('adhdSupport.routine'),
@@ -2941,6 +3044,7 @@ function renderDashboard(copy, saved) {
         time: firstLine(saved.time?.must) || saved.time?.start,
         body: saved.body?.task || saved.body?.food,
         food: saved.food?.available || saved.food?.energy,
+        sleep: saved.sleep?.wakeTime || saved.sleep?.mode,
         motivation: saved.motivation?.task || saved.motivation?.reward,
         accountability: saved.accountability?.task || saved.accountability?.person,
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
@@ -3036,6 +3140,10 @@ function dashboardNext(saved) {
 
     if (saved.food?.available || saved.food?.energy) {
         return { key: 'food' };
+    }
+
+    if (saved.sleep?.wakeTime || saved.sleep?.mode) {
+        return { key: 'sleep' };
     }
 
     if (saved.motivation?.task || saved.motivation?.reward) {

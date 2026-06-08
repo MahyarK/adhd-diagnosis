@@ -112,6 +112,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Mangez assez pour pouvoir continuer.');
 
+        $this->get('/tools/sleep-wind-down?lang=en')
+            ->assertOk()
+            ->assertSee('Get closer to sleep without a perfect night routine.');
+
         $this->get('/tools/motivation-menu?lang=en')
             ->assertOk()
             ->assertSee('Build a free reward menu for boring tasks.');

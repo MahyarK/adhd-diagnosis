@@ -69,6 +69,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.food-rescue');
     }
 
+    public function sleepWindDown(Request $request): View
+    {
+        return $this->toolView($request, 'tools.sleep-wind-down');
+    }
+
     public function motivationMenu(Request $request): View
     {
         return $this->toolView($request, 'tools.motivation-menu');
