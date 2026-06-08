@@ -104,6 +104,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Faites une carte de journée réaliste, pas un planning impossible.');
 
+        $this->get('/tools/body-needs?lang=fa')
+            ->assertOk()
+            ->assertSee('قبل از سرزنش مغزت، پایه‌ها را چک کن.');
+
         $this->get('/tools/routine-builder?lang=fa')
             ->assertOk()
             ->assertSee('روتینی بساز که در روزهای ناقص هم کار کند.');

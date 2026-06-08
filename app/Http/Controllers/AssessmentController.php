@@ -59,6 +59,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.time-block');
     }
 
+    public function bodyNeeds(Request $request): View
+    {
+        return $this->toolView($request, 'tools.body-needs');
+    }
+
     public function routineBuilder(Request $request): View
     {
         return $this->toolView($request, 'tools.routine-builder');

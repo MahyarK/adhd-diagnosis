@@ -10,6 +10,7 @@ Route::get('/resources', [AssessmentController::class, 'resources'])->name('reso
 Route::get('/tools/goal-builder', [AssessmentController::class, 'goalBuilder'])->name('tools.goal');
 Route::get('/tools/daily-planner', [AssessmentController::class, 'dailyPlanner'])->name('tools.planner');
 Route::get('/tools/time-block', [AssessmentController::class, 'timeBlock'])->name('tools.time');
+Route::get('/tools/body-needs', [AssessmentController::class, 'bodyNeeds'])->name('tools.body');
 Route::get('/tools/routine-builder', [AssessmentController::class, 'routineBuilder'])->name('tools.routine');
 Route::get('/tools/weekly-reset', [AssessmentController::class, 'weeklyReset'])->name('tools.weekly');
 Route::get('/tools/communication-repair', [AssessmentController::class, 'communicationRepair'])->name('tools.communication');

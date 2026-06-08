@@ -466,6 +466,10 @@ if (toolRoot) {
         initTimeBlock(tools);
     }
 
+    if (tool === 'body') {
+        initBodyNeeds(tools);
+    }
+
     if (tool === 'routine') {
         initRoutineBuilder(tools);
     }
@@ -818,6 +822,109 @@ function timeBlockToText(tools, data) {
         '',
         copy.sections.fallback,
         plan.fallback,
+    ].join('\n');
+}
+
+function initBodyNeeds(tools) {
+    const form = document.getElementById('bodyForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.body') ?? '{}');
+    const fields = {
+        food: document.getElementById('bodyFood'),
+        water: document.getElementById('bodyWater'),
+        meds: document.getElementById('bodyMeds'),
+        sleep: document.getElementById('bodySleep'),
+        signal: document.getElementById('bodySignal'),
+        task: document.getElementById('bodyTask'),
+    };
+
+    hydrateFields(fields, {
+        food: 'unknown',
+        water: 'unknown',
+        meds: 'unknown',
+        sleep: 'unknown',
+        signal: 'unknown',
+        ...saved,
+    });
+    renderBodyNeeds(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.body', JSON.stringify(data));
+        renderBodyNeeds(tools, data);
+    });
+
+    document.getElementById('bodyPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('bodyDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-body-needs-checkin.txt', bodyNeedsToText(tools, collectFields(fields)));
+    });
+    document.getElementById('bodyClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.body');
+        hydrateFields(fields, {
+            food: 'unknown',
+            water: 'unknown',
+            meds: 'unknown',
+            sleep: 'unknown',
+            signal: 'unknown',
+        });
+        renderBodyNeeds(tools, collectFields(fields));
+    });
+}
+
+function renderBodyNeeds(tools, data) {
+    const plan = bodyNeedsPlan(tools.body, data);
+
+    document.getElementById('bodyOutputTitle').textContent = tools.body.output_title;
+    document.getElementById('bodyFirstText').textContent = plan.first;
+    document.getElementById('bodyStepsList').innerHTML = plan.steps.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('bodyChecksList').innerHTML = plan.checks.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('bodyTaskText').textContent = plan.task;
+    document.getElementById('bodyStopText').textContent = plan.stop;
+}
+
+function bodyNeedsPlan(copy, data) {
+    const food = data.food || 'unknown';
+    const water = data.water || 'unknown';
+    const meds = data.meds || 'unknown';
+    const sleep = data.sleep || 'unknown';
+    const signal = data.signal || 'unknown';
+    const task = data.task?.trim() || copy.defaults.task;
+
+    return {
+        first: copy.first_actions[food] || copy.first_actions.unknown,
+        steps: [
+            copy.water_steps[water] || copy.water_steps.unknown,
+            copy.meds_steps[meds] || copy.meds_steps.unknown,
+            copy.sleep_steps[sleep] || copy.sleep_steps.unknown,
+            copy.signal_steps[signal] || copy.signal_steps.unknown,
+        ],
+        checks: copy.checks,
+        task: copy.task_adjustment.replace(':task', task),
+        stop: copy.stop_rule,
+    };
+}
+
+function bodyNeedsToText(tools, data) {
+    const copy = tools.body;
+    const plan = bodyNeedsPlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.checks,
+        ...plan.checks.map((item) => `- ${item}`),
+        '',
+        copy.sections.task,
+        plan.task,
+        '',
+        copy.sections.stop,
+        plan.stop,
     ].join('\n');
 }
 
@@ -2306,6 +2413,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.goal',
             'adhdSupport.planner',
             'adhdSupport.time',
+            'adhdSupport.body',
             'adhdSupport.routine',
             'adhdSupport.weekly',
             'adhdSupport.communication',
@@ -2337,6 +2445,7 @@ function readSupportKit(locale = 'en') {
         goal: readJson('adhdSupport.goal'),
         planner: readJson('adhdSupport.planner'),
         time: readJson('adhdSupport.time'),
+        body: readJson('adhdSupport.body'),
         routine: readJson('adhdSupport.routine'),
         weekly: readJson('adhdSupport.weekly'),
         communication: readJson('adhdSupport.communication'),
@@ -2384,6 +2493,7 @@ function renderDashboard(copy, saved) {
         goal: saved.goal?.goal,
         planner: firstLine(saved.planner?.must),
         time: firstLine(saved.time?.must) || saved.time?.start,
+        body: saved.body?.task || saved.body?.food,
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
         communication: saved.communication?.person || saved.communication?.situation,
@@ -2468,6 +2578,10 @@ function dashboardNext(saved) {
 
     if (saved.time?.must || saved.time?.start) {
         return { key: 'time' };
+    }
+
+    if (saved.body?.task || saved.body?.food) {
+        return { key: 'body' };
     }
 
     if (saved.routine?.kind || saved.routine?.must) {
