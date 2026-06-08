@@ -470,6 +470,10 @@ if (toolRoot) {
         initBodyNeeds(tools);
     }
 
+    if (tool === 'motivation') {
+        initMotivationMenu(tools);
+    }
+
     if (tool === 'routine') {
         initRoutineBuilder(tools);
     }
@@ -925,6 +929,103 @@ function bodyNeedsToText(tools, data) {
         '',
         copy.sections.stop,
         plan.stop,
+    ].join('\n');
+}
+
+function initMotivationMenu(tools) {
+    const form = document.getElementById('motivationForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.motivation') ?? '{}');
+    const fields = {
+        task: document.getElementById('motivationTask'),
+        mood: document.getElementById('motivationMood'),
+        reward: document.getElementById('motivationReward'),
+        stimulation: document.getElementById('motivationStimulation'),
+        friction: document.getElementById('motivationFriction'),
+        cost: document.getElementById('motivationCost'),
+    };
+
+    hydrateFields(fields, {
+        reward: 'novelty',
+        stimulation: 'music',
+        ...saved,
+    });
+    renderMotivationMenu(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.motivation', JSON.stringify(data));
+        renderMotivationMenu(tools, data);
+    });
+
+    document.getElementById('motivationPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('motivationDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-motivation-menu.txt', motivationToText(tools, collectFields(fields)));
+    });
+    document.getElementById('motivationClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.motivation');
+        hydrateFields(fields, {
+            reward: 'novelty',
+            stimulation: 'music',
+        });
+        renderMotivationMenu(tools, collectFields(fields));
+    });
+}
+
+function renderMotivationMenu(tools, data) {
+    const plan = motivationPlan(tools.motivation, data);
+
+    document.getElementById('motivationOutputTitle').textContent = tools.motivation.output_title;
+    document.getElementById('motivationStarterText').textContent = plan.starter;
+    document.getElementById('motivationMenuList').innerHTML = plan.menu.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('motivationPairingText').textContent = plan.pairing;
+    document.getElementById('motivationFrictionText').textContent = plan.friction;
+    document.getElementById('motivationRulesList').innerHTML = plan.rules.map((item) => `<li>${item}</li>`).join('');
+}
+
+function motivationPlan(copy, data) {
+    const task = data.task?.trim() || copy.defaults.task;
+    const mood = data.mood?.trim() || copy.defaults.mood;
+    const reward = data.reward || 'novelty';
+    const stimulation = data.stimulation || 'music';
+    const friction = data.friction?.trim() || copy.defaults.friction;
+    const cost = data.cost?.trim() || copy.defaults.cost;
+
+    return {
+        starter: copy.starter
+            .replace(':task', task)
+            .replace(':mood', mood),
+        menu: copy.menus[reward] || copy.menus.novelty,
+        pairing: copy.stimulation[stimulation] || copy.stimulation.music,
+        friction: copy.friction_plan
+            .replace(':friction', friction)
+            .replace(':task', task)
+            .replace(':cost', cost),
+        rules: copy.rules,
+    };
+}
+
+function motivationToText(tools, data) {
+    const copy = tools.motivation;
+    const plan = motivationPlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.starter,
+        plan.starter,
+        '',
+        copy.sections.menu,
+        ...plan.menu.map((item) => `- ${item}`),
+        '',
+        copy.sections.pairing,
+        plan.pairing,
+        '',
+        copy.sections.friction,
+        plan.friction,
+        '',
+        copy.sections.rules,
+        ...plan.rules.map((item) => `- ${item}`),
     ].join('\n');
 }
 
@@ -2414,6 +2515,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.planner',
             'adhdSupport.time',
             'adhdSupport.body',
+            'adhdSupport.motivation',
             'adhdSupport.routine',
             'adhdSupport.weekly',
             'adhdSupport.communication',
@@ -2446,6 +2548,7 @@ function readSupportKit(locale = 'en') {
         planner: readJson('adhdSupport.planner'),
         time: readJson('adhdSupport.time'),
         body: readJson('adhdSupport.body'),
+        motivation: readJson('adhdSupport.motivation'),
         routine: readJson('adhdSupport.routine'),
         weekly: readJson('adhdSupport.weekly'),
         communication: readJson('adhdSupport.communication'),
@@ -2494,6 +2597,7 @@ function renderDashboard(copy, saved) {
         planner: firstLine(saved.planner?.must),
         time: firstLine(saved.time?.must) || saved.time?.start,
         body: saved.body?.task || saved.body?.food,
+        motivation: saved.motivation?.task || saved.motivation?.reward,
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
         communication: saved.communication?.person || saved.communication?.situation,
@@ -2582,6 +2686,10 @@ function dashboardNext(saved) {
 
     if (saved.body?.task || saved.body?.food) {
         return { key: 'body' };
+    }
+
+    if (saved.motivation?.task || saved.motivation?.reward) {
+        return { key: 'motivation' };
     }
 
     if (saved.routine?.kind || saved.routine?.must) {

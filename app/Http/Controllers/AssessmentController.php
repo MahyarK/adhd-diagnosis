@@ -64,6 +64,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.body-needs');
     }
 
+    public function motivationMenu(Request $request): View
+    {
+        return $this->toolView($request, 'tools.motivation-menu');
+    }
+
     public function routineBuilder(Request $request): View
     {
         return $this->toolView($request, 'tools.routine-builder');

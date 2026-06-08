@@ -351,25 +351,26 @@ Build this next:
 4. Add a daily planner page.
 5. Add a time-block planner with buffers and recovery space.
 6. Add a body needs check-in for food, water, medication routine, sleep, movement, pain, and low-capacity moments.
-7. Add an appointment prep page with scripts and a checklist.
-8. Add a task breakdown page with brain dump and microsteps.
-9. Add follow-up reminders with downloadable `.ics` files.
-10. Add a weekly reset planner for recovering from falling behind.
-11. Add a symptom/context tracker for clinician-ready notes.
-12. Add a starter resource library for trustworthy low-friction next steps.
-13. Add a provider shortlist for possible clinicians, clinics, and support offices.
-14. Add a low-cost access plan for care barriers.
-15. Add care discussion notes and a support request builder.
-16. Add a home reset tool for cleaning and clutter overwhelm.
-17. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
-18. Add a morning/evening/leaving-home routine builder.
-19. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
-20. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
-21. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
-22. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
-23. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
-24. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
-25. Save goals/plans/time blocks/body needs/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/money-admin rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+7. Add a motivation menu for free/low-cost rewards, safe stimulation, and boring-task activation.
+8. Add an appointment prep page with scripts and a checklist.
+9. Add a task breakdown page with brain dump and microsteps.
+10. Add follow-up reminders with downloadable `.ics` files.
+11. Add a weekly reset planner for recovering from falling behind.
+12. Add a symptom/context tracker for clinician-ready notes.
+13. Add a starter resource library for trustworthy low-friction next steps.
+14. Add a provider shortlist for possible clinicians, clinics, and support offices.
+15. Add a low-cost access plan for care barriers.
+16. Add care discussion notes and a support request builder.
+17. Add a home reset tool for cleaning and clutter overwhelm.
+18. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
+19. Add a morning/evening/leaving-home routine builder.
+20. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
+21. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
+22. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
+23. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
+24. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
+25. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
+26. Save goals/plans/time blocks/body needs/motivation menus/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/money-admin rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -381,6 +382,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a daily plan and print/download it.
 - A user can create time blocks with buffers and print/download them.
 - A user can create a body needs check-in card and print/download it.
+- A user can create a motivation menu and print/download it.
 - A user can create a small routine card and print/download it.
 - A user can create a weekly reset plan and print/download it.
 - A user can draft a communication repair script and print/download it.
