@@ -64,9 +64,10 @@ button {
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 100;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(150px, auto) 1fr auto auto;
     align-items: center;
-    justify-content: space-between;
+    gap: 14px;
     height: 52px;
     padding: 0 20px;
     background: var(--surface);
@@ -78,6 +79,7 @@ button {
     display: flex;
     align-items: baseline;
     gap: 10px;
+    min-width: 0;
     text-decoration: none;
     color: inherit;
 }
@@ -95,17 +97,21 @@ button {
     font-size: 16px;
     font-weight: 500;
     color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.tool-nav {
+.primary-nav {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     gap: 6px;
     min-width: 0;
 }
 
-.tool-nav a {
+.primary-nav a,
+.tool-menu summary {
     display: inline-flex;
     align-items: center;
     min-height: 32px;
@@ -119,7 +125,79 @@ button {
     transition: background 160ms ease, color 160ms ease;
 }
 
-.tool-nav a:hover {
+.primary-nav a:hover,
+.tool-menu summary:hover {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.tool-menu {
+    position: relative;
+}
+
+.tool-menu details {
+    position: relative;
+}
+
+.tool-menu summary {
+    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.tool-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.tool-menu details[open] summary {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.tool-menu details[open] summary svg {
+    transform: rotate(180deg);
+}
+
+.tool-menu summary svg {
+    flex: 0 0 auto;
+    transition: transform 160ms ease;
+}
+
+.tool-menu-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(170px, 1fr));
+    gap: 4px;
+    width: min(520px, calc(100vw - 24px));
+    max-height: min(70vh, 560px);
+    padding: 8px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+}
+
+.tool-menu-panel a {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+    transition: background 160ms ease, color 160ms ease;
+}
+
+.tool-menu-panel a:hover {
     background: var(--accent-light);
     color: var(--accent);
 }
@@ -516,6 +594,11 @@ h2 {
 
 [dir="rtl"] .navbar-brand {
     flex-direction: row-reverse;
+}
+
+[dir="rtl"] .tool-menu-panel {
+    right: auto;
+    left: 0;
 }
 
 [dir="rtl"] .lang-menu {
@@ -1297,13 +1380,13 @@ h2 {
 /* ── Responsive: tablet ── */
 @media (max-width: 860px) {
     .navbar {
+        grid-template-columns: minmax(120px, 1fr) auto auto;
         padding: 0 12px;
+        gap: 8px;
     }
 
-    .tool-nav {
-        max-width: 48vw;
-        overflow-x: auto;
-        justify-content: flex-start;
+    .primary-nav {
+        display: none;
     }
 
     .navbar-title {
@@ -1495,8 +1578,22 @@ h2 {
         font-size: 13px;
     }
 
-    .tool-nav {
-        display: none;
+    .tool-menu-panel {
+        grid-template-columns: 1fr;
+        right: -88px;
+        width: min(320px, calc(100vw - 16px));
+        max-height: min(72vh, 520px);
+    }
+
+    [dir="rtl"] .tool-menu-panel {
+        right: auto;
+        left: -88px;
+    }
+
+    .lang-dropdown summary,
+    .tool-menu summary {
+        min-height: 34px;
+        padding: 0 10px;
     }
 
     .profile-report,

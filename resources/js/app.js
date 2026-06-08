@@ -17,12 +17,27 @@ const supportStorage = (() => {
     };
 })();
 
-// Close language dropdown when clicking outside
+// Keep header dropdowns from staying open over the page.
 document.addEventListener('click', (e) => {
-    const details = document.querySelector('.lang-dropdown details');
-    if (details && details.open && !details.contains(e.target)) {
-        details.open = false;
-    }
+    document.querySelectorAll('.lang-dropdown details, .tool-menu details').forEach((details) => {
+        if (details.open && !details.contains(e.target)) {
+            details.open = false;
+        }
+    });
+});
+
+document.querySelectorAll('.lang-dropdown details, .tool-menu details').forEach((details) => {
+    details.addEventListener('toggle', () => {
+        if (! details.open) {
+            return;
+        }
+
+        document.querySelectorAll('.lang-dropdown details, .tool-menu details').forEach((other) => {
+            if (other !== details) {
+                other.open = false;
+            }
+        });
+    });
 });
 
 const root = document.querySelector('.shell');
