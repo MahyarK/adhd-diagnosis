@@ -112,6 +112,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Build a free reward menu for boring tasks.');
 
+        $this->get('/tools/accountability?lang=fr')
+            ->assertOk()
+            ->assertSee('Demandez à quelqu’un de témoigner du départ, pas de surveiller la fin.');
+
         $this->get('/tools/routine-builder?lang=fa')
             ->assertOk()
             ->assertSee('روتینی بساز که در روزهای ناقص هم کار کند.');

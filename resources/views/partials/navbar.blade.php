@@ -21,6 +21,7 @@
                 <a href="{{ route('tools.time', ['lang' => $locale]) }}">{{ __('assessment.ui.time_block') }}</a>
                 <a href="{{ route('tools.body', ['lang' => $locale]) }}">{{ __('assessment.ui.body_needs') }}</a>
                 <a href="{{ route('tools.motivation', ['lang' => $locale]) }}">{{ __('assessment.ui.motivation_menu') }}</a>
+                <a href="{{ route('tools.accountability', ['lang' => $locale]) }}">{{ __('assessment.ui.accountability') }}</a>
                 <a href="{{ route('tools.routine', ['lang' => $locale]) }}">{{ __('assessment.ui.routine_builder') }}</a>
                 <a href="{{ route('tools.weekly', ['lang' => $locale]) }}">{{ __('assessment.ui.weekly_reset') }}</a>
                 <a href="{{ route('tools.communication', ['lang' => $locale]) }}">{{ __('assessment.ui.communication_repair') }}</a>

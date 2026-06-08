@@ -61,6 +61,7 @@
                     <a class="primary-link" href="{{ route('tools.time', ['lang' => $locale]) }}">{{ __('assessment.ui.time_block') }}</a>
                     <a class="primary-link" href="{{ route('tools.body', ['lang' => $locale]) }}">{{ __('assessment.ui.body_needs') }}</a>
                     <a class="primary-link" href="{{ route('tools.motivation', ['lang' => $locale]) }}">{{ __('assessment.ui.motivation_menu') }}</a>
+                    <a class="primary-link" href="{{ route('tools.accountability', ['lang' => $locale]) }}">{{ __('assessment.ui.accountability') }}</a>
                     <a class="primary-link" href="{{ route('tools.routine', ['lang' => $locale]) }}">{{ __('assessment.ui.routine_builder') }}</a>
                     <a class="primary-link" href="{{ route('tools.weekly', ['lang' => $locale]) }}">{{ __('assessment.ui.weekly_reset') }}</a>
                     <a class="primary-link" href="{{ route('tools.communication', ['lang' => $locale]) }}">{{ __('assessment.ui.communication_repair') }}</a>

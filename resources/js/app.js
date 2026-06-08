@@ -489,6 +489,10 @@ if (toolRoot) {
         initMotivationMenu(tools);
     }
 
+    if (tool === 'accountability') {
+        initAccountability(tools);
+    }
+
     if (tool === 'routine') {
         initRoutineBuilder(tools);
     }
@@ -1038,6 +1042,105 @@ function motivationToText(tools, data) {
         '',
         copy.sections.friction,
         plan.friction,
+        '',
+        copy.sections.rules,
+        ...plan.rules.map((item) => `- ${item}`),
+    ].join('\n');
+}
+
+function initAccountability(tools) {
+    const form = document.getElementById('accountabilityForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.accountability') ?? '{}');
+    const fields = {
+        task: document.getElementById('accountabilityTask'),
+        person: document.getElementById('accountabilityPerson'),
+        format: document.getElementById('accountabilityFormat'),
+        time: document.getElementById('accountabilityTime'),
+        proof: document.getElementById('accountabilityProof'),
+        missed: document.getElementById('accountabilityMissed'),
+    };
+
+    hydrateFields(fields, {
+        format: 'text',
+        ...saved,
+    });
+    renderAccountability(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.accountability', JSON.stringify(data));
+        renderAccountability(tools, data);
+    });
+
+    document.getElementById('accountabilityPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('accountabilityDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-accountability-checkin.txt', accountabilityToText(tools, collectFields(fields)));
+    });
+    document.getElementById('accountabilityClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.accountability');
+        hydrateFields(fields, { format: 'text' });
+        renderAccountability(tools, collectFields(fields));
+    });
+}
+
+function renderAccountability(tools, data) {
+    const plan = accountabilityPlan(tools.accountability, data);
+
+    document.getElementById('accountabilityOutputTitle').textContent = tools.accountability.output_title;
+    document.getElementById('accountabilityScriptText').textContent = plan.script;
+    document.getElementById('accountabilityStepsList').innerHTML = plan.steps.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('accountabilityProofText').textContent = plan.proof;
+    document.getElementById('accountabilityMissedText').textContent = plan.missed;
+    document.getElementById('accountabilityRulesList').innerHTML = plan.rules.map((item) => `<li>${item}</li>`).join('');
+}
+
+function accountabilityPlan(copy, data) {
+    const task = data.task?.trim() || copy.defaults.task;
+    const person = data.person?.trim() || copy.defaults.person;
+    const format = copy.formats_sentence[data.format] || copy.formats_sentence.text;
+    const time = data.time?.trim() || copy.defaults.time;
+    const proof = data.proof?.trim() || copy.defaults.proof;
+    const missed = data.missed?.trim() || copy.defaults.missed;
+
+    return {
+        script: copy.script
+            .replace(':person', person)
+            .replace(':task', task)
+            .replace(':time', time)
+            .replace(':format', format),
+        steps: [
+            copy.steps.before.replace(':time', time),
+            copy.steps.start
+                .replace(':time', time)
+                .replace(':task', task)
+                .replace(':person', person),
+            copy.steps.after.replace(':proof', proof),
+        ],
+        proof: copy.proof_line.replace(':proof', proof),
+        missed: copy.missed_line.replace(':missed', missed),
+        rules: copy.rules,
+    };
+}
+
+function accountabilityToText(tools, data) {
+    const copy = tools.accountability;
+    const plan = accountabilityPlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.proof,
+        plan.proof,
+        '',
+        copy.sections.missed,
+        plan.missed,
         '',
         copy.sections.rules,
         ...plan.rules.map((item) => `- ${item}`),
@@ -2531,6 +2634,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.time',
             'adhdSupport.body',
             'adhdSupport.motivation',
+            'adhdSupport.accountability',
             'adhdSupport.routine',
             'adhdSupport.weekly',
             'adhdSupport.communication',
@@ -2564,6 +2668,7 @@ function readSupportKit(locale = 'en') {
         time: readJson('adhdSupport.time'),
         body: readJson('adhdSupport.body'),
         motivation: readJson('adhdSupport.motivation'),
+        accountability: readJson('adhdSupport.accountability'),
         routine: readJson('adhdSupport.routine'),
         weekly: readJson('adhdSupport.weekly'),
         communication: readJson('adhdSupport.communication'),
@@ -2613,6 +2718,7 @@ function renderDashboard(copy, saved) {
         time: firstLine(saved.time?.must) || saved.time?.start,
         body: saved.body?.task || saved.body?.food,
         motivation: saved.motivation?.task || saved.motivation?.reward,
+        accountability: saved.accountability?.task || saved.accountability?.person,
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
         communication: saved.communication?.person || saved.communication?.situation,
@@ -2705,6 +2811,10 @@ function dashboardNext(saved) {
 
     if (saved.motivation?.task || saved.motivation?.reward) {
         return { key: 'motivation' };
+    }
+
+    if (saved.accountability?.task || saved.accountability?.person) {
+        return { key: 'accountability' };
     }
 
     if (saved.routine?.kind || saved.routine?.must) {
