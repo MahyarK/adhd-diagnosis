@@ -14,7 +14,7 @@ This is a screening and preparation tool, not a medical diagnosis.
 - Server-side scoring for inattentive, hyperactive/impulsive, combined, lower-signal, and needs-more-context results
 - Clear next steps for clinician follow-up
 - Local support dashboard for saved results and tool outputs
-- Goal builder, daily planner, time blocks, body needs check-in, motivation menu, accountability check-in, routine builder, weekly reset, communication repair, energy crash rescue, decision rescue, focus sprint, emotional reset, transition rescue, home reset, money/admin rescue, appointment prep, care notes, support request, and task breakdown worksheets
+- Goal builder, daily planner, time blocks, body needs check-in, motivation menu, accountability check-in, routine builder, weekly reset, communication repair, energy crash rescue, decision rescue, focus sprint, emotional reset, transition rescue, home reset, money/admin rescue, lost item rescue, appointment prep, care notes, support request, and task breakdown worksheets
 - Follow-up reminder tool with downloadable calendar files
 - Symptom/context tracker for clinician-ready notes
 - Starter resource library with reputable public-health/nonprofit links

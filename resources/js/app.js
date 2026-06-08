@@ -554,6 +554,10 @@ if (toolRoot) {
         initMoneyAdmin(tools);
     }
 
+    if (tool === 'lost') {
+        initLostItem(tools);
+    }
+
     if (tool === 'providers') {
         initProviderShortlist(tools);
     }
@@ -1461,6 +1465,104 @@ function moneyToText(tools, data) {
         '',
         copy.sections.stop,
         copy.stop_rule.replace(':outcome', outcome),
+    ].join('\n');
+}
+
+function initLostItem(tools) {
+    const form = document.getElementById('lostForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.lost') ?? '{}');
+    const fields = {
+        item: document.getElementById('lostItem'),
+        type: document.getElementById('lostType'),
+        urgency: document.getElementById('lostUrgency'),
+        lastSeen: document.getElementById('lostLastSeen'),
+        searchArea: document.getElementById('lostSearchArea'),
+        landingSpot: document.getElementById('lostLandingSpot'),
+    };
+
+    hydrateFields(fields, {
+        type: 'keys',
+        urgency: 'calm',
+        ...saved,
+    });
+    renderLostItem(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.lost', JSON.stringify(data));
+        renderLostItem(tools, data);
+    });
+
+    document.getElementById('lostPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('lostDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-lost-item-rescue.txt', lostItemToText(tools, collectFields(fields)));
+    });
+    document.getElementById('lostClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.lost');
+        hydrateFields(fields, { type: 'keys', urgency: 'calm' });
+        renderLostItem(tools, collectFields(fields));
+    });
+}
+
+function renderLostItem(tools, data) {
+    const plan = lostItemPlan(tools.lost, data);
+
+    document.getElementById('lostOutputTitle').textContent = tools.lost.output_title.replace(':item', plan.item);
+    document.getElementById('lostFirstText').textContent = plan.first;
+    document.getElementById('lostSearchList').innerHTML = plan.search.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('lostBackupList').innerHTML = plan.backup.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('lostPreventionText').textContent = plan.prevention;
+    document.getElementById('lostStopText').textContent = plan.stop;
+}
+
+function lostItemPlan(copy, data) {
+    const item = data.item?.trim() || copy.defaults.item;
+    const type = copy.type_hints[data.type] ? data.type : 'other';
+    const urgency = copy.urgency_lines[data.urgency] ? data.urgency : 'calm';
+    const lastSeen = data.lastSeen?.trim() || copy.defaults.last_seen;
+    const searchArea = data.searchArea?.trim() || copy.defaults.search_area;
+    const landingSpot = data.landingSpot?.trim() || copy.defaults.landing_spot;
+
+    return {
+        item,
+        first: copy.first_action.replace(':item', item),
+        search: [
+            copy.search_steps.area.replace(':search_area', searchArea),
+            copy.search_steps.path.replace(':last_seen', lastSeen),
+            copy.search_steps.type.replace(':hint', copy.type_hints[type]),
+            copy.search_steps.odd,
+            copy.urgency_lines[urgency],
+        ],
+        backup: copy.backup_steps,
+        prevention: copy.prevention_rule
+            .replace(':item', item)
+            .replace(':landing_spot', landingSpot),
+        stop: copy.stop_rule,
+    };
+}
+
+function lostItemToText(tools, data) {
+    const copy = tools.lost;
+    const plan = lostItemPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':item', plan.item),
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.search,
+        ...plan.search.map((item) => `- ${item}`),
+        '',
+        copy.sections.backup,
+        ...plan.backup.map((item) => `- ${item}`),
+        '',
+        copy.sections.prevention,
+        plan.prevention,
+        '',
+        copy.sections.stop,
+        plan.stop,
     ].join('\n');
 }
 
@@ -2657,6 +2759,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.support',
             'adhdSupport.home',
             'adhdSupport.money',
+            'adhdSupport.lost',
             'adhdSupport.providers',
             'adhdSupport.access',
             'adhdSupport.task',
@@ -2691,6 +2794,7 @@ function readSupportKit(locale = 'en') {
         support: readJson('adhdSupport.support'),
         home: readJson('adhdSupport.home'),
         money: readJson('adhdSupport.money'),
+        lost: readJson('adhdSupport.lost'),
         providers: readProviders(),
         access: readJson('adhdSupport.access'),
         task: readJson('adhdSupport.task'),
@@ -2741,6 +2845,7 @@ function renderDashboard(copy, saved) {
         support: saved.support?.situation || saved.support?.request,
         home: saved.home?.space || saved.home?.mode,
         money: saved.money?.task || saved.money?.category,
+        lost: saved.lost?.item || saved.lost?.type,
         providers: saved.providers?.length ? String(saved.providers.length) : '',
         access: saved.access?.barrier ? copy.cards.access.title : '',
         task: saved.task?.focus,
@@ -2876,6 +2981,10 @@ function dashboardNext(saved) {
 
     if (saved.money?.task || saved.money?.category) {
         return { key: 'money' };
+    }
+
+    if (saved.lost?.item || saved.lost?.type) {
+        return { key: 'lost' };
     }
 
     if (saved.result?.title) {

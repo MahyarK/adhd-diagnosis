@@ -139,6 +139,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.money-admin');
     }
 
+    public function lostItem(Request $request): View
+    {
+        return $this->toolView($request, 'tools.lost-item');
+    }
+
     public function providerShortlist(Request $request): View
     {
         return $this->toolView($request, 'tools.provider-shortlist');

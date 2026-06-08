@@ -26,6 +26,7 @@ Route::get('/tools/care-notes', [AssessmentController::class, 'careNotes'])->nam
 Route::get('/tools/support-request', [AssessmentController::class, 'supportRequest'])->name('tools.support');
 Route::get('/tools/home-reset', [AssessmentController::class, 'homeReset'])->name('tools.home');
 Route::get('/tools/money-admin', [AssessmentController::class, 'moneyAdmin'])->name('tools.money');
+Route::get('/tools/lost-item', [AssessmentController::class, 'lostItem'])->name('tools.lost');
 Route::get('/tools/provider-shortlist', [AssessmentController::class, 'providerShortlist'])->name('tools.providers');
 Route::get('/tools/access-plan', [AssessmentController::class, 'accessPlan'])->name('tools.access');
 Route::get('/tools/task-breakdown', [AssessmentController::class, 'taskBreakdown'])->name('tools.task');
