@@ -60,6 +60,7 @@
                     <a class="primary-link" href="{{ route('tools.planner', ['lang' => $locale]) }}" id="buildPlanLink">{{ __('assessment.ui.build_plan') }}</a>
                     <a class="primary-link" href="{{ route('tools.time', ['lang' => $locale]) }}">{{ __('assessment.ui.time_block') }}</a>
                     <a class="primary-link" href="{{ route('tools.body', ['lang' => $locale]) }}">{{ __('assessment.ui.body_needs') }}</a>
+                    <a class="primary-link" href="{{ route('tools.food', ['lang' => $locale]) }}">{{ __('assessment.ui.food_rescue') }}</a>
                     <a class="primary-link" href="{{ route('tools.motivation', ['lang' => $locale]) }}">{{ __('assessment.ui.motivation_menu') }}</a>
                     <a class="primary-link" href="{{ route('tools.accountability', ['lang' => $locale]) }}">{{ __('assessment.ui.accountability') }}</a>
                     <a class="primary-link" href="{{ route('tools.routine', ['lang' => $locale]) }}">{{ __('assessment.ui.routine_builder') }}</a>

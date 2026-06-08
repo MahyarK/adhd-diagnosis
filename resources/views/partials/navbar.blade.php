@@ -7,6 +7,7 @@
                 ['route' => 'tools.planner', 'label' => __('assessment.ui.daily_planner')],
                 ['route' => 'tools.time', 'label' => __('assessment.ui.time_block')],
                 ['route' => 'tools.body', 'label' => __('assessment.ui.body_needs')],
+                ['route' => 'tools.food', 'label' => __('assessment.ui.food_rescue')],
                 ['route' => 'tools.motivation', 'label' => __('assessment.ui.motivation_menu')],
                 ['route' => 'tools.accountability', 'label' => __('assessment.ui.accountability')],
                 ['route' => 'tools.routine', 'label' => __('assessment.ui.routine_builder')],

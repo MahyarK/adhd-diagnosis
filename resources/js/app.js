@@ -494,6 +494,10 @@ if (toolRoot) {
         initBodyNeeds(tools);
     }
 
+    if (tool === 'food') {
+        initFoodRescue(tools);
+    }
+
     if (tool === 'motivation') {
         initMotivationMenu(tools);
     }
@@ -958,6 +962,110 @@ function bodyNeedsToText(tools, data) {
         '',
         copy.sections.task,
         plan.task,
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
+function initFoodRescue(tools) {
+    const form = document.getElementById('foodForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.food') ?? '{}');
+    const fields = {
+        energy: document.getElementById('foodEnergy'),
+        appetite: document.getElementById('foodAppetite'),
+        kitchen: document.getElementById('foodKitchen'),
+        budget: document.getElementById('foodBudget'),
+        available: document.getElementById('foodAvailable'),
+        nextThing: document.getElementById('foodNextThing'),
+    };
+
+    hydrateFields(fields, {
+        energy: 'low',
+        appetite: 'forgot',
+        kitchen: 'microwave',
+        budget: 'very_low',
+        ...saved,
+    });
+    renderFoodRescue(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.food', JSON.stringify(data));
+        renderFoodRescue(tools, data);
+    });
+
+    document.getElementById('foodPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('foodDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-food-rescue.txt', foodRescueToText(tools, collectFields(fields)));
+    });
+    document.getElementById('foodClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.food');
+        hydrateFields(fields, {
+            energy: 'low',
+            appetite: 'forgot',
+            kitchen: 'microwave',
+            budget: 'very_low',
+        });
+        renderFoodRescue(tools, collectFields(fields));
+    });
+}
+
+function renderFoodRescue(tools, data) {
+    const plan = foodRescuePlan(tools.food, data);
+
+    document.getElementById('foodOutputTitle').textContent = tools.food.output_title;
+    document.getElementById('foodFirstText').textContent = plan.first;
+    document.getElementById('foodOptionsList').innerHTML = plan.options.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('foodShoppingList').innerHTML = plan.shopping.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('foodNextText').textContent = plan.next;
+    document.getElementById('foodRulesList').innerHTML = plan.rules.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('foodStopText').textContent = plan.stop;
+}
+
+function foodRescuePlan(copy, data) {
+    const energy = copy.options[data.energy] ? data.energy : 'low';
+    const appetite = copy.appetite_lines[data.appetite] ? data.appetite : 'unsure';
+    const kitchen = copy.kitchen_lines[data.kitchen] ? data.kitchen : 'unsure';
+    const budget = copy.shopping[data.budget] ? data.budget : 'very_low';
+    const available = data.available?.trim() || copy.defaults.available;
+    const nextThing = data.nextThing?.trim() || copy.defaults.next_thing;
+
+    return {
+        first: copy.first_action
+            .replace(':appetite', copy.appetite_lines[appetite])
+            .replace(':kitchen', copy.kitchen_lines[kitchen])
+            .replace(':available', available),
+        options: copy.options[energy],
+        shopping: copy.shopping[budget],
+        next: copy.next_cue.replace(':next_thing', nextThing),
+        rules: copy.rules,
+        stop: copy.stop_rule,
+    };
+}
+
+function foodRescueToText(tools, data) {
+    const copy = tools.food;
+    const plan = foodRescuePlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.options,
+        ...plan.options.map((item) => `- ${item}`),
+        '',
+        copy.sections.shopping,
+        ...plan.shopping.map((item) => `- ${item}`),
+        '',
+        copy.sections.next,
+        plan.next,
+        '',
+        copy.sections.rules,
+        ...plan.rules.map((item) => `- ${item}`),
         '',
         copy.sections.stop,
         plan.stop,
@@ -2744,6 +2852,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.planner',
             'adhdSupport.time',
             'adhdSupport.body',
+            'adhdSupport.food',
             'adhdSupport.motivation',
             'adhdSupport.accountability',
             'adhdSupport.routine',
@@ -2779,6 +2888,7 @@ function readSupportKit(locale = 'en') {
         planner: readJson('adhdSupport.planner'),
         time: readJson('adhdSupport.time'),
         body: readJson('adhdSupport.body'),
+        food: readJson('adhdSupport.food'),
         motivation: readJson('adhdSupport.motivation'),
         accountability: readJson('adhdSupport.accountability'),
         routine: readJson('adhdSupport.routine'),
@@ -2830,6 +2940,7 @@ function renderDashboard(copy, saved) {
         planner: firstLine(saved.planner?.must),
         time: firstLine(saved.time?.must) || saved.time?.start,
         body: saved.body?.task || saved.body?.food,
+        food: saved.food?.available || saved.food?.energy,
         motivation: saved.motivation?.task || saved.motivation?.reward,
         accountability: saved.accountability?.task || saved.accountability?.person,
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
@@ -2921,6 +3032,10 @@ function dashboardNext(saved) {
 
     if (saved.body?.task || saved.body?.food) {
         return { key: 'body' };
+    }
+
+    if (saved.food?.available || saved.food?.energy) {
+        return { key: 'food' };
     }
 
     if (saved.motivation?.task || saved.motivation?.reward) {
