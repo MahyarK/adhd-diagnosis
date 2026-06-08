@@ -100,6 +100,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Maak een dagplan dat het echte leven overleeft.');
 
+        $this->get('/tools/time-block?lang=fr')
+            ->assertOk()
+            ->assertSee('Faites une carte de journée réaliste, pas un planning impossible.');
+
         $this->get('/tools/routine-builder?lang=fa')
             ->assertOk()
             ->assertSee('روتینی بساز که در روزهای ناقص هم کار کند.');

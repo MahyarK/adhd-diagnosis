@@ -462,6 +462,10 @@ if (toolRoot) {
         initDailyPlanner(tools);
     }
 
+    if (tool === 'time') {
+        initTimeBlock(tools);
+    }
+
     if (tool === 'routine') {
         initRoutineBuilder(tools);
     }
@@ -696,6 +700,124 @@ function plannerToText(tools, data) {
         `${copy.sections.body}: ${data.body || copy.defaults.body}`,
         `${copy.sections.scary}: ${data.scary || copy.defaults.scary}`,
         `${copy.sections.recovery}: ${data.recovery || copy.defaults.recovery}`,
+    ].join('\n');
+}
+
+function initTimeBlock(tools) {
+    const form = document.getElementById('timeForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.time') ?? '{}');
+    const defaults = tools.time.defaults;
+    const fields = {
+        start: document.getElementById('timeStart'),
+        end: document.getElementById('timeEnd'),
+        must: document.getElementById('timeMust'),
+        fixed: document.getElementById('timeFixed'),
+        buffer: document.getElementById('timeBuffer'),
+        energy: document.getElementById('timeEnergy'),
+        recovery: document.getElementById('timeRecovery'),
+    };
+
+    hydrateFields(fields, {
+        start: defaults.start,
+        end: defaults.end,
+        buffer: defaults.buffer,
+        energy: defaults.energy,
+        ...saved,
+    });
+    renderTimeBlock(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.time', JSON.stringify(data));
+        renderTimeBlock(tools, data);
+    });
+
+    document.getElementById('timePrintButton').addEventListener('click', () => window.print());
+    document.getElementById('timeDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-time-block-plan.txt', timeBlockToText(tools, collectFields(fields)));
+    });
+    document.getElementById('timeClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.time');
+        hydrateFields(fields, defaults);
+        renderTimeBlock(tools, collectFields(fields));
+    });
+}
+
+function renderTimeBlock(tools, data) {
+    const plan = timeBlockPlan(tools.time, data);
+
+    document.getElementById('timeOutputTitle').textContent = plan.title;
+    document.getElementById('timeBlocksList').innerHTML = plan.blocks.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('timeFixedList').innerHTML = plan.fixed.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('timeBufferList').innerHTML = plan.buffers.map((item) => `<li>${item}</li>`).join('');
+    document.getElementById('timeRecoveryText').textContent = plan.recovery;
+    document.getElementById('timeFallbackText').textContent = plan.fallback;
+}
+
+function timeBlockPlan(copy, data) {
+    const start = parseClock(data.start) ?? parseClock(copy.defaults.start);
+    let end = parseClock(data.end) ?? parseClock(copy.defaults.end);
+    const buffer = copy.buffer_minutes[data.buffer] ?? copy.buffer_minutes.medium;
+    const focus = copy.focus_minutes[data.energy] ?? copy.focus_minutes.medium;
+    const tasks = lines(data.must).slice(0, 5);
+    const fixed = withDefault(lines(data.fixed), copy.defaults.fixed);
+    const recovery = data.recovery?.trim() || copy.defaults.recovery;
+
+    if (end <= start) {
+        end = start + 240;
+    }
+
+    let cursor = start;
+    const blocks = [];
+
+    (tasks.length ? tasks : [copy.defaults.must]).forEach((task) => {
+        if (cursor >= end) {
+            return;
+        }
+
+        const blockEnd = Math.min(cursor + focus, end);
+        blocks.push(`${formatClock(cursor)} - ${formatClock(blockEnd)}: ${task}`);
+        cursor = Math.min(blockEnd + buffer, end);
+    });
+
+    return {
+        title: copy.output_title
+            .replace(':start', formatClock(start))
+            .replace(':end', formatClock(end)),
+        blocks,
+        fixed,
+        buffers: [
+            copy.buffer_rules.after.replace(':minutes', String(buffer)),
+            copy.buffer_rules.before_fixed,
+            copy.buffer_rules.blank,
+        ],
+        recovery: copy.recovery_block.replace(':recovery', recovery),
+        fallback: copy.fallback_rule,
+    };
+}
+
+function timeBlockToText(tools, data) {
+    const copy = tools.time;
+    const plan = timeBlockPlan(copy, data);
+
+    return [
+        plan.title,
+        '',
+        copy.sections.blocks,
+        ...plan.blocks.map((item) => `- ${item}`),
+        '',
+        copy.sections.fixed,
+        ...plan.fixed.map((item) => `- ${item}`),
+        '',
+        copy.sections.buffers,
+        ...plan.buffers.map((item) => `- ${item}`),
+        '',
+        copy.sections.recovery,
+        plan.recovery,
+        '',
+        copy.sections.fallback,
+        plan.fallback,
     ].join('\n');
 }
 
@@ -2183,6 +2305,7 @@ function initDashboard(tools, locale) {
             `adhdSupport.latestResult.${locale}`,
             'adhdSupport.goal',
             'adhdSupport.planner',
+            'adhdSupport.time',
             'adhdSupport.routine',
             'adhdSupport.weekly',
             'adhdSupport.communication',
@@ -2213,6 +2336,7 @@ function readSupportKit(locale = 'en') {
         result: localizedSavedResult(locale),
         goal: readJson('adhdSupport.goal'),
         planner: readJson('adhdSupport.planner'),
+        time: readJson('adhdSupport.time'),
         routine: readJson('adhdSupport.routine'),
         weekly: readJson('adhdSupport.weekly'),
         communication: readJson('adhdSupport.communication'),
@@ -2259,6 +2383,7 @@ function renderDashboard(copy, saved) {
         result: saved.result?.title,
         goal: saved.goal?.goal,
         planner: firstLine(saved.planner?.must),
+        time: firstLine(saved.time?.must) || saved.time?.start,
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
         communication: saved.communication?.person || saved.communication?.situation,
@@ -2339,6 +2464,10 @@ function dashboardNext(saved) {
 
     if (saved.planner?.must) {
         return { key: 'planner' };
+    }
+
+    if (saved.time?.must || saved.time?.start) {
+        return { key: 'time' };
     }
 
     if (saved.routine?.kind || saved.routine?.must) {
@@ -2620,6 +2749,31 @@ function hydrateFields(fields, data) {
 
 function collectFields(fields) {
     return Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value]));
+}
+
+function parseClock(value) {
+    const match = String(value || '').match(/^(\d{1,2}):(\d{2})$/);
+
+    if (! match) {
+        return null;
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+
+    if (hours > 23 || minutes > 59) {
+        return null;
+    }
+
+    return (hours * 60) + minutes;
+}
+
+function formatClock(value) {
+    const minutes = Math.max(0, Math.min(value, 1439));
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+
+    return `${String(hours).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
 }
 
 function lines(value) {

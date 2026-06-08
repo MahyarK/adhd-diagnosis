@@ -54,6 +54,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.daily-planner');
     }
 
+    public function timeBlock(Request $request): View
+    {
+        return $this->toolView($request, 'tools.time-block');
+    }
+
     public function routineBuilder(Request $request): View
     {
         return $this->toolView($request, 'tools.routine-builder');
