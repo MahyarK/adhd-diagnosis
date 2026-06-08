@@ -38,6 +38,15 @@ document.querySelectorAll('.lang-dropdown details, .tool-menu details').forEach(
             }
         });
     });
+
+    details.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') {
+            return;
+        }
+
+        details.open = false;
+        details.querySelector('summary')?.focus();
+    });
 });
 
 const root = document.querySelector('.shell');

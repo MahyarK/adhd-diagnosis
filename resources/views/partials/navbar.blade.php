@@ -1,45 +1,73 @@
+@php
+    $toolGroups = [
+        [
+            'label' => __('assessment.ui.tools_group_start'),
+            'links' => [
+                ['route' => 'tools.goal', 'label' => __('assessment.ui.goal_builder')],
+                ['route' => 'tools.planner', 'label' => __('assessment.ui.daily_planner')],
+                ['route' => 'tools.time', 'label' => __('assessment.ui.time_block')],
+                ['route' => 'tools.body', 'label' => __('assessment.ui.body_needs')],
+                ['route' => 'tools.motivation', 'label' => __('assessment.ui.motivation_menu')],
+                ['route' => 'tools.accountability', 'label' => __('assessment.ui.accountability')],
+                ['route' => 'tools.routine', 'label' => __('assessment.ui.routine_builder')],
+                ['route' => 'tools.focus', 'label' => __('assessment.ui.focus_sprint')],
+            ],
+        ],
+        [
+            'label' => __('assessment.ui.tools_group_rescue'),
+            'links' => [
+                ['route' => 'tools.energy', 'label' => __('assessment.ui.energy_crash')],
+                ['route' => 'tools.decision', 'label' => __('assessment.ui.decision_priority')],
+                ['route' => 'tools.emotion', 'label' => __('assessment.ui.emotional_reset')],
+                ['route' => 'tools.transition', 'label' => __('assessment.ui.transition_rescue')],
+                ['route' => 'tools.communication', 'label' => __('assessment.ui.communication_repair')],
+                ['route' => 'tools.home', 'label' => __('assessment.ui.home_reset')],
+                ['route' => 'tools.money', 'label' => __('assessment.ui.money_admin')],
+            ],
+        ],
+        [
+            'label' => __('assessment.ui.tools_group_care'),
+            'links' => [
+                ['route' => 'tools.appointment', 'label' => __('assessment.ui.appointment_prep')],
+                ['route' => 'tools.care', 'label' => __('assessment.ui.care_notes')],
+                ['route' => 'tools.support', 'label' => __('assessment.ui.support_request')],
+                ['route' => 'tools.providers', 'label' => __('assessment.ui.provider_shortlist')],
+                ['route' => 'tools.access', 'label' => __('assessment.ui.access_plan')],
+                ['route' => 'tools.weekly', 'label' => __('assessment.ui.weekly_reset')],
+                ['route' => 'tools.task', 'label' => __('assessment.ui.task_breakdown')],
+                ['route' => 'tools.reminders', 'label' => __('assessment.ui.reminders')],
+                ['route' => 'tools.tracker', 'label' => __('assessment.ui.symptom_tracker')],
+            ],
+        ],
+    ];
+@endphp
+
 <header class="navbar" role="banner">
     <a class="navbar-brand" href="{{ route('assessment.show') }}">
         <span class="navbar-eyebrow">{{ __('assessment.meta.eyebrow') }}</span>
         <span class="navbar-title">{{ __('assessment.meta.heading') }}</span>
     </a>
     <nav class="primary-nav" aria-label="{{ __('assessment.ui.tools') }}">
-        <a href="{{ route('dashboard', ['lang' => $locale]) }}">{{ __('assessment.ui.dashboard') }}</a>
-        <a href="{{ route('resources', ['lang' => $locale]) }}">{{ __('assessment.ui.resource_library') }}</a>
+        <a href="{{ route('dashboard', ['lang' => $locale]) }}" @class(['active' => request()->routeIs('dashboard')])>{{ __('assessment.ui.dashboard') }}</a>
+        <a href="{{ route('resources', ['lang' => $locale]) }}" @class(['active' => request()->routeIs('resources')])>{{ __('assessment.ui.resource_library') }}</a>
     </nav>
     <nav class="tool-menu" aria-label="{{ __('assessment.ui.tools') }}">
         <details>
-            <summary>
+            <summary @class(['active' => request()->routeIs('tools.*')])>
                 <span>{{ __('assessment.ui.tools') }}</span>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </summary>
             <div class="tool-menu-panel">
-                <a href="{{ route('tools.goal', ['lang' => $locale]) }}">{{ __('assessment.ui.goal_builder') }}</a>
-                <a href="{{ route('tools.planner', ['lang' => $locale]) }}">{{ __('assessment.ui.daily_planner') }}</a>
-                <a href="{{ route('tools.time', ['lang' => $locale]) }}">{{ __('assessment.ui.time_block') }}</a>
-                <a href="{{ route('tools.body', ['lang' => $locale]) }}">{{ __('assessment.ui.body_needs') }}</a>
-                <a href="{{ route('tools.motivation', ['lang' => $locale]) }}">{{ __('assessment.ui.motivation_menu') }}</a>
-                <a href="{{ route('tools.accountability', ['lang' => $locale]) }}">{{ __('assessment.ui.accountability') }}</a>
-                <a href="{{ route('tools.routine', ['lang' => $locale]) }}">{{ __('assessment.ui.routine_builder') }}</a>
-                <a href="{{ route('tools.weekly', ['lang' => $locale]) }}">{{ __('assessment.ui.weekly_reset') }}</a>
-                <a href="{{ route('tools.communication', ['lang' => $locale]) }}">{{ __('assessment.ui.communication_repair') }}</a>
-                <a href="{{ route('tools.energy', ['lang' => $locale]) }}">{{ __('assessment.ui.energy_crash') }}</a>
-                <a href="{{ route('tools.decision', ['lang' => $locale]) }}">{{ __('assessment.ui.decision_priority') }}</a>
-                <a href="{{ route('tools.focus', ['lang' => $locale]) }}">{{ __('assessment.ui.focus_sprint') }}</a>
-                <a href="{{ route('tools.emotion', ['lang' => $locale]) }}">{{ __('assessment.ui.emotional_reset') }}</a>
-                <a href="{{ route('tools.transition', ['lang' => $locale]) }}">{{ __('assessment.ui.transition_rescue') }}</a>
-                <a href="{{ route('tools.appointment', ['lang' => $locale]) }}">{{ __('assessment.ui.appointment_prep') }}</a>
-                <a href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
-                <a href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>
-                <a href="{{ route('tools.home', ['lang' => $locale]) }}">{{ __('assessment.ui.home_reset') }}</a>
-                <a href="{{ route('tools.money', ['lang' => $locale]) }}">{{ __('assessment.ui.money_admin') }}</a>
-                <a href="{{ route('tools.providers', ['lang' => $locale]) }}">{{ __('assessment.ui.provider_shortlist') }}</a>
-                <a href="{{ route('tools.access', ['lang' => $locale]) }}">{{ __('assessment.ui.access_plan') }}</a>
-                <a href="{{ route('tools.task', ['lang' => $locale]) }}">{{ __('assessment.ui.task_breakdown') }}</a>
-                <a href="{{ route('tools.reminders', ['lang' => $locale]) }}">{{ __('assessment.ui.reminders') }}</a>
-                <a href="{{ route('tools.tracker', ['lang' => $locale]) }}">{{ __('assessment.ui.symptom_tracker') }}</a>
+                @foreach ($toolGroups as $group)
+                    <section class="tool-menu-group">
+                        <p>{{ $group['label'] }}</p>
+                        @foreach ($group['links'] as $link)
+                            <a href="{{ route($link['route'], ['lang' => $locale]) }}" @class(['active' => request()->routeIs($link['route'])])>{{ $link['label'] }}</a>
+                        @endforeach
+                    </section>
+                @endforeach
             </div>
         </details>
     </nav>
