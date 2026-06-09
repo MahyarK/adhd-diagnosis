@@ -38,6 +38,7 @@
                 ['route' => 'tools.appointment', 'label' => __('assessment.ui.appointment_prep')],
                 ['route' => 'tools.care', 'label' => __('assessment.ui.care_notes')],
                 ['route' => 'tools.support', 'label' => __('assessment.ui.support_request')],
+                ['route' => 'tools.workschool', 'label' => __('assessment.ui.work_school_support')],
                 ['route' => 'tools.providers', 'label' => __('assessment.ui.provider_shortlist')],
                 ['route' => 'tools.access', 'label' => __('assessment.ui.access_plan')],
                 ['route' => 'tools.weekly', 'label' => __('assessment.ui.weekly_reset')],

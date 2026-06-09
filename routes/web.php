@@ -27,6 +27,7 @@ Route::get('/tools/transition-rescue', [AssessmentController::class, 'transition
 Route::get('/tools/appointment-prep', [AssessmentController::class, 'appointmentPrep'])->name('tools.appointment');
 Route::get('/tools/care-notes', [AssessmentController::class, 'careNotes'])->name('tools.care');
 Route::get('/tools/support-request', [AssessmentController::class, 'supportRequest'])->name('tools.support');
+Route::get('/tools/work-school-support', [AssessmentController::class, 'workSchoolSupport'])->name('tools.workschool');
 Route::get('/tools/home-reset', [AssessmentController::class, 'homeReset'])->name('tools.home');
 Route::get('/tools/laundry-rescue', [AssessmentController::class, 'laundryRescue'])->name('tools.laundry');
 Route::get('/tools/digital-clutter', [AssessmentController::class, 'digitalClutter'])->name('tools.digital');

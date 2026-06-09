@@ -558,6 +558,10 @@ if (toolRoot) {
         initSupportRequest(tools);
     }
 
+    if (tool === 'workschool') {
+        initWorkSchoolSupport(tools);
+    }
+
     if (tool === 'home') {
         initHomeReset(tools);
     }
@@ -3113,6 +3117,111 @@ function supportToText(tools, data) {
     ].join('\n');
 }
 
+function initWorkSchoolSupport(tools) {
+    const form = document.getElementById('workSchoolForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.workschool') ?? '{}');
+    const fields = {
+        setting: document.getElementById('workSchoolSetting'),
+        challenge: document.getElementById('workSchoolChallenge'),
+        supportStyle: document.getElementById('workSchoolSupportStyle'),
+        friction: document.getElementById('workSchoolFriction'),
+        person: document.getElementById('workSchoolPerson'),
+        trial: document.getElementById('workSchoolTrial'),
+    };
+
+    hydrateFields(fields, {
+        setting: 'work',
+        challenge: 'focus',
+        supportStyle: 'written',
+        ...saved,
+    });
+    renderWorkSchoolSupport(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.workschool', JSON.stringify(data));
+        renderWorkSchoolSupport(tools, data);
+    });
+
+    document.getElementById('workSchoolPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('workSchoolDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-work-school-support.txt', workSchoolSupportToText(tools, collectFields(fields)));
+    });
+    document.getElementById('workSchoolClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.workschool');
+        hydrateFields(fields, { setting: 'work', challenge: 'focus', supportStyle: 'written' });
+        renderWorkSchoolSupport(tools, collectFields(fields));
+    });
+}
+
+function renderWorkSchoolSupport(tools, data) {
+    const plan = workSchoolSupportPlan(tools.workschool, data);
+
+    document.getElementById('workSchoolOutputTitle').textContent = tools.workschool.output_title.replace(':setting', plan.settingLabel);
+    document.getElementById('workSchoolFirstText').textContent = plan.first;
+    renderList('workSchoolOptionList', plan.options, tools.workschool.defaults.option);
+    document.getElementById('workSchoolScriptText').textContent = plan.script;
+    document.getElementById('workSchoolTrialText').textContent = plan.trial;
+    renderList('workSchoolReviewList', plan.review, tools.workschool.defaults.review);
+    document.getElementById('workSchoolBoundaryText').textContent = plan.boundary;
+}
+
+function workSchoolSupportPlan(copy, data) {
+    const setting = copy.settings[data.setting] ? data.setting : 'work';
+    const challenge = copy.challenge_options[data.challenge] ? data.challenge : 'focus';
+    const supportStyle = copy.style_options[data.supportStyle] ? data.supportStyle : 'written';
+    const friction = data.friction?.trim() || copy.defaults.friction;
+    const person = data.person?.trim() || copy.defaults.person[setting] || copy.defaults.person.work;
+    const trial = data.trial?.trim() || copy.defaults.trial;
+
+    return {
+        settingLabel: copy.settings[setting],
+        first: copy.first_ask
+            .replace(':setting', copy.setting_words[setting] || copy.setting_words.work)
+            .replace(':trial', trial),
+        options: [
+            copy.style_options[supportStyle],
+            ...copy.challenge_options[challenge],
+        ],
+        script: copy.script
+            .replace(':person', person)
+            .replace(':setting', copy.setting_words[setting] || copy.setting_words.work)
+            .replace(':friction', friction)
+            .replace(':trial', trial),
+        trial: copy.trial_plan.replace(':trial', trial),
+        review: copy.review_points,
+        boundary: copy.boundary,
+    };
+}
+
+function workSchoolSupportToText(tools, data) {
+    const copy = tools.workschool;
+    const plan = workSchoolSupportPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':setting', plan.settingLabel),
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.options,
+        ...plan.options.map((item) => `- ${item}`),
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.trial,
+        plan.trial,
+        '',
+        copy.sections.review,
+        ...plan.review.map((item) => `- ${item}`),
+        '',
+        copy.sections.boundary,
+        plan.boundary,
+    ].join('\n');
+}
+
 function initProviderShortlist(tools) {
     const form = document.getElementById('providerForm');
     const fields = {
@@ -3403,6 +3512,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.appointment',
             'adhdSupport.care',
             'adhdSupport.support',
+            'adhdSupport.workschool',
             'adhdSupport.home',
             'adhdSupport.laundry',
             'adhdSupport.digital',
@@ -3444,6 +3554,7 @@ function readSupportKit(locale = 'en') {
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
+        workschool: readJson('adhdSupport.workschool'),
         home: readJson('adhdSupport.home'),
         laundry: readJson('adhdSupport.laundry'),
         digital: readJson('adhdSupport.digital'),
@@ -3501,6 +3612,7 @@ function renderDashboard(copy, saved) {
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
+        workschool: saved.workschool?.challenge || saved.workschool?.setting,
         home: saved.home?.space || saved.home?.mode,
         laundry: saved.laundry?.needed || saved.laundry?.mode,
         digital: saved.digital?.target || saved.digital?.mode,
@@ -3646,6 +3758,10 @@ function dashboardNext(saved) {
 
     if (saved.support?.situation || saved.support?.request) {
         return { key: 'support' };
+    }
+
+    if (saved.workschool?.challenge || saved.workschool?.setting) {
+        return { key: 'workschool' };
     }
 
     if (saved.home?.space || saved.home?.mode) {
