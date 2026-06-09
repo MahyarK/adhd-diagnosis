@@ -149,6 +149,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.laundry-rescue');
     }
 
+    public function digitalClutter(Request $request): View
+    {
+        return $this->toolView($request, 'tools.digital-clutter');
+    }
+
     public function moneyAdmin(Request $request): View
     {
         return $this->toolView($request, 'tools.money-admin');

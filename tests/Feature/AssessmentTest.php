@@ -152,6 +152,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Protéger d’abord la prochaine tenue portable.');
 
+        $this->get('/tools/digital-clutter?lang=nl')
+            ->assertOk()
+            ->assertSee('Vind de volgende digitale stap zonder het hele internet op te ruimen.');
+
         $this->get('/tools/money-admin?lang=en')
             ->assertOk()
             ->assertSee('Unstick one bill, form, message, or overdue admin task.');

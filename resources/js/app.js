@@ -562,6 +562,10 @@ if (toolRoot) {
         initLaundryRescue(tools);
     }
 
+    if (tool === 'digital') {
+        initDigitalClutter(tools);
+    }
+
     if (tool === 'money') {
         initMoneyAdmin(tools);
     }
@@ -1677,6 +1681,113 @@ function laundryRescueToText(tools, data) {
         '',
         copy.sections.minimums,
         ...plan.minimums.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
+function initDigitalClutter(tools) {
+    const form = document.getElementById('digitalForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.digital') ?? '{}');
+    const fields = {
+        mode: document.getElementById('digitalMode'),
+        target: document.getElementById('digitalTarget'),
+        energy: document.getElementById('digitalEnergy'),
+        device: document.getElementById('digitalDevice'),
+        blocker: document.getElementById('digitalBlocker'),
+        deadline: document.getElementById('digitalDeadline'),
+    };
+
+    hydrateFields(fields, {
+        mode: 'overwhelm',
+        energy: 'low',
+        device: 'unknown',
+        ...saved,
+    });
+    renderDigitalClutter(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.digital', JSON.stringify(data));
+        renderDigitalClutter(tools, data);
+    });
+
+    document.getElementById('digitalPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('digitalDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-digital-clutter-rescue.txt', digitalClutterToText(tools, collectFields(fields)));
+    });
+    document.getElementById('digitalClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.digital');
+        hydrateFields(fields, { mode: 'overwhelm', energy: 'low', device: 'unknown' });
+        renderDigitalClutter(tools, collectFields(fields));
+    });
+}
+
+function renderDigitalClutter(tools, data) {
+    const copy = tools.digital;
+    const plan = digitalClutterPlan(copy, data);
+
+    document.getElementById('digitalOutputTitle').textContent = copy.output_title;
+    document.getElementById('digitalFirstText').textContent = plan.first;
+    document.getElementById('digitalStepsList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('digitalSearchText').textContent = plan.search;
+    document.getElementById('digitalShutdownText').textContent = plan.shutdown;
+    renderList('digitalParkingList', plan.parking, copy.parking_rules[0]);
+    document.getElementById('digitalStopText').textContent = plan.stop;
+}
+
+function digitalClutterPlan(copy, data) {
+    const mode = data.mode || 'overwhelm';
+    const energy = data.energy || 'low';
+    const device = data.device || 'unknown';
+    const target = data.target?.trim() || copy.defaults.target;
+    const deadline = data.deadline?.trim() || copy.defaults.deadline;
+    const blocker = data.blocker?.trim() || '';
+    const steps = [
+        ...(copy.mode_steps[mode] || copy.mode_steps.overwhelm),
+        copy.device_steps[device] || copy.device_steps.unknown,
+        copy.energy_steps[energy] || copy.energy_steps.low,
+    ];
+
+    if (blocker) {
+        steps.push(copy.blocker_line.replace(':blocker', blocker));
+    }
+
+    return {
+        first: copy.first_action.replace(':target', target),
+        steps,
+        search: copy.search_rule,
+        shutdown: copy.shutdown_rule.replace(':deadline', deadline),
+        parking: copy.parking_rules,
+        stop: copy.stop_rule,
+    };
+}
+
+function digitalClutterToText(tools, data) {
+    const copy = tools.digital;
+    const plan = digitalClutterPlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.search,
+        plan.search,
+        '',
+        copy.sections.shutdown,
+        plan.shutdown,
+        '',
+        copy.sections.parking,
+        ...plan.parking.map((item) => `- ${item}`),
         '',
         copy.sections.stop,
         plan.stop,
@@ -3081,6 +3192,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.support',
             'adhdSupport.home',
             'adhdSupport.laundry',
+            'adhdSupport.digital',
             'adhdSupport.money',
             'adhdSupport.lost',
             'adhdSupport.providers',
@@ -3119,6 +3231,7 @@ function readSupportKit(locale = 'en') {
         support: readJson('adhdSupport.support'),
         home: readJson('adhdSupport.home'),
         laundry: readJson('adhdSupport.laundry'),
+        digital: readJson('adhdSupport.digital'),
         money: readJson('adhdSupport.money'),
         lost: readJson('adhdSupport.lost'),
         providers: readProviders(),
@@ -3173,6 +3286,7 @@ function renderDashboard(copy, saved) {
         support: saved.support?.situation || saved.support?.request,
         home: saved.home?.space || saved.home?.mode,
         laundry: saved.laundry?.needed || saved.laundry?.mode,
+        digital: saved.digital?.target || saved.digital?.mode,
         money: saved.money?.task || saved.money?.category,
         lost: saved.lost?.item || saved.lost?.type,
         providers: saved.providers?.length ? String(saved.providers.length) : '',
@@ -3318,6 +3432,10 @@ function dashboardNext(saved) {
 
     if (saved.laundry?.needed || saved.laundry?.mode) {
         return { key: 'laundry' };
+    }
+
+    if (saved.digital?.target || saved.digital?.mode) {
+        return { key: 'digital' };
     }
 
     if (saved.money?.task || saved.money?.category) {
