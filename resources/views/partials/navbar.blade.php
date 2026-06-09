@@ -29,6 +29,7 @@
                 ['route' => 'tools.digital', 'label' => __('assessment.ui.digital_clutter')],
                 ['route' => 'tools.money', 'label' => __('assessment.ui.money_admin')],
                 ['route' => 'tools.lost', 'label' => __('assessment.ui.lost_item')],
+                ['route' => 'tools.errand', 'label' => __('assessment.ui.errand_launch')],
             ],
         ],
         [

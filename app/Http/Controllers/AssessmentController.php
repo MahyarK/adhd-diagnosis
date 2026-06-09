@@ -169,6 +169,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.lost-item');
     }
 
+    public function errandLaunch(Request $request): View
+    {
+        return $this->toolView($request, 'tools.errand-launch');
+    }
+
     public function providerShortlist(Request $request): View
     {
         return $this->toolView($request, 'tools.provider-shortlist');

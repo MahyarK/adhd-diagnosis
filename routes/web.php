@@ -32,6 +32,7 @@ Route::get('/tools/laundry-rescue', [AssessmentController::class, 'laundryRescue
 Route::get('/tools/digital-clutter', [AssessmentController::class, 'digitalClutter'])->name('tools.digital');
 Route::get('/tools/money-admin', [AssessmentController::class, 'moneyAdmin'])->name('tools.money');
 Route::get('/tools/lost-item', [AssessmentController::class, 'lostItem'])->name('tools.lost');
+Route::get('/tools/errand-launch', [AssessmentController::class, 'errandLaunch'])->name('tools.errand');
 Route::get('/tools/provider-shortlist', [AssessmentController::class, 'providerShortlist'])->name('tools.providers');
 Route::get('/tools/access-plan', [AssessmentController::class, 'accessPlan'])->name('tools.access');
 Route::get('/tools/task-breakdown', [AssessmentController::class, 'taskBreakdown'])->name('tools.task');

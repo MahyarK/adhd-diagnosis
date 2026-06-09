@@ -87,6 +87,7 @@ Features:
 - “If I fall off” recovery plan.
 - Home reset planner for cleaning, clutter, dishes, trash, and leaving-home routines.
 - Money/admin rescue planner for bills, forms, emails, appointments, and overdue tasks.
+- Errand launch planner for appointments, pharmacy trips, paperwork drop-offs, transport choices, late scripts, and backup plans.
 - Communication repair planner for late replies, conflict, boundaries, and asking for support.
 - Energy crash rescue planner for burnout, low-capacity days, and “I cannot do the whole day” moments.
 - Decision rescue planner for choosing one good-enough priority when everything feels urgent.
@@ -240,6 +241,7 @@ Downloads:
 - Work/school/home support request draft.
 - Home reset card.
 - Money/admin rescue card.
+- Errand launch card.
 - Communication repair draft.
 - Energy crash rescue card.
 - Decision rescue priority card.
@@ -370,14 +372,15 @@ Build this next:
 23. Add a digital clutter rescue tool for tabs, messages, files, notifications, and restart notes.
 24. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
 25. Add a lost item rescue tool for keys, wallet, phone, documents, medicine, and prevention spots.
-26. Add a morning/evening/leaving-home routine builder.
-27. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
-28. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
-29. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
-30. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
-31. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
-32. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
-33. Save goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/lost item rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+26. Add an errand launch tool for leaving, contacting, travel mode, what-to-bring lists, late scripts, and backup plans.
+27. Add a morning/evening/leaving-home routine builder.
+28. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
+29. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
+30. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
+31. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
+32. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
+33. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
+34. Save goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/lost item rescue/errand launch/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -407,6 +410,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a digital clutter rescue card and print/download it.
 - A user can create a money/admin rescue card and print/download it.
 - A user can create a lost item rescue card and print/download it.
+- A user can create an errand launch card and print/download it.
 - A user can prepare what to say to a clinician and print/download it.
 - A user can draft a practical support request for work, school, home, or a trusted helper.
 - A user can break an overwhelming task into tiny steps and print/download it.

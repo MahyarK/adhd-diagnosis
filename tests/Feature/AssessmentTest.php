@@ -168,6 +168,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Vind één kwijtgeraakt ding zonder de hele dag te verliezen.');
 
+        $this->get('/tools/errand-launch?lang=fr')
+            ->assertOk()
+            ->assertSee('Sortir ou prendre contact sans reconstruire toute la journée.');
+
         $this->get('/tools/communication-repair?lang=nl')
             ->assertOk()
             ->assertSee('Stuur het bericht zonder het de hele dag te herschrijven.');

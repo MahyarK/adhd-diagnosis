@@ -578,6 +578,10 @@ if (toolRoot) {
         initLostItem(tools);
     }
 
+    if (tool === 'errand') {
+        initErrandLaunch(tools);
+    }
+
     if (tool === 'providers') {
         initProviderShortlist(tools);
     }
@@ -2102,6 +2106,109 @@ function lostItemToText(tools, data) {
     ].join('\n');
 }
 
+function initErrandLaunch(tools) {
+    const form = document.getElementById('errandForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.errand') ?? '{}');
+    const fields = {
+        destination: document.getElementById('errandDestination'),
+        kind: document.getElementById('errandKind'),
+        travel: document.getElementById('errandTravel'),
+        deadline: document.getElementById('errandDeadline'),
+        blocker: document.getElementById('errandBlocker'),
+        bring: document.getElementById('errandBring'),
+    };
+
+    hydrateFields(fields, {
+        kind: 'appointment',
+        travel: 'unsure',
+        ...saved,
+    });
+    renderErrandLaunch(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.errand', JSON.stringify(data));
+        renderErrandLaunch(tools, data);
+    });
+
+    document.getElementById('errandPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('errandDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-errand-launch.txt', errandLaunchToText(tools, collectFields(fields)));
+    });
+    document.getElementById('errandClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.errand');
+        hydrateFields(fields, { kind: 'appointment', travel: 'unsure' });
+        renderErrandLaunch(tools, collectFields(fields));
+    });
+}
+
+function renderErrandLaunch(tools, data) {
+    const plan = errandLaunchPlan(tools.errand, data);
+
+    document.getElementById('errandOutputTitle').textContent = tools.errand.output_title.replace(':destination', plan.destination);
+    document.getElementById('errandFirstText').textContent = plan.first;
+    renderList('errandStepList', plan.steps, tools.errand.defaults.step);
+    renderList('errandBringList', plan.bring, tools.errand.defaults.bring_item);
+    document.getElementById('errandLateText').textContent = plan.late;
+    renderList('errandBackupList', plan.backup, tools.errand.defaults.backup);
+    document.getElementById('errandStopText').textContent = plan.stop;
+}
+
+function errandLaunchPlan(copy, data) {
+    const destination = data.destination?.trim() || copy.defaults.destination;
+    const kind = copy.kind_steps[data.kind] ? data.kind : 'unsure';
+    const travel = copy.travel_steps[data.travel] ? data.travel : 'unsure';
+    const deadline = data.deadline?.trim() || copy.defaults.deadline;
+    const bring = withDefault(lines(data.bring), copy.defaults.bring_item);
+    const steps = [
+        copy.deadline_step.replace(':deadline', deadline),
+        copy.travel_steps[travel],
+        ...copy.kind_steps[kind],
+    ];
+
+    if (data.blocker?.trim()) {
+        steps.push(copy.blocker_step.replace(':blocker', data.blocker.trim()));
+    }
+
+    return {
+        destination,
+        first: copy.first_action.replace(':destination', destination),
+        steps,
+        bring,
+        late: copy.late_script.replace(':destination', destination),
+        backup: copy.backup_steps,
+        stop: copy.stop_rule,
+    };
+}
+
+function errandLaunchToText(tools, data) {
+    const copy = tools.errand;
+    const plan = errandLaunchPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':destination', plan.destination),
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.bring,
+        ...plan.bring.map((item) => `- ${item}`),
+        '',
+        copy.sections.late,
+        plan.late,
+        '',
+        copy.sections.backup,
+        ...plan.backup.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
+}
+
 function initWeeklyReset(tools) {
     const form = document.getElementById('weeklyForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.weekly') ?? '{}');
@@ -3301,6 +3408,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.digital',
             'adhdSupport.money',
             'adhdSupport.lost',
+            'adhdSupport.errand',
             'adhdSupport.providers',
             'adhdSupport.access',
             'adhdSupport.task',
@@ -3341,6 +3449,7 @@ function readSupportKit(locale = 'en') {
         digital: readJson('adhdSupport.digital'),
         money: readJson('adhdSupport.money'),
         lost: readJson('adhdSupport.lost'),
+        errand: readJson('adhdSupport.errand'),
         providers: readProviders(),
         access: readJson('adhdSupport.access'),
         task: readJson('adhdSupport.task'),
@@ -3397,6 +3506,7 @@ function renderDashboard(copy, saved) {
         digital: saved.digital?.target || saved.digital?.mode,
         money: saved.money?.task || saved.money?.category,
         lost: saved.lost?.item || saved.lost?.type,
+        errand: saved.errand?.destination || saved.errand?.kind,
         providers: saved.providers?.length ? String(saved.providers.length) : '',
         access: saved.access?.barrier ? copy.cards.access.title : '',
         task: saved.task?.focus,
@@ -3556,6 +3666,10 @@ function dashboardNext(saved) {
 
     if (saved.lost?.item || saved.lost?.type) {
         return { key: 'lost' };
+    }
+
+    if (saved.errand?.destination || saved.errand?.kind) {
+        return { key: 'errand' };
     }
 
     if (saved.result?.title) {
@@ -3824,9 +3938,14 @@ function withDefault(items, fallback) {
 }
 
 function renderList(id, items, fallback) {
-    document.getElementById(id).innerHTML = withDefault(items, fallback)
-        .map((item) => `<li>${item}</li>`)
-        .join('');
+    const list = document.getElementById(id);
+
+    list.innerHTML = '';
+    withDefault(items, fallback).forEach((item) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = item;
+        list.appendChild(listItem);
+    });
 }
 
 function downloadText(filename, contents) {

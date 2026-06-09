@@ -81,6 +81,7 @@
                     <a class="primary-link" href="{{ route('tools.digital', ['lang' => $locale]) }}">{{ __('assessment.ui.digital_clutter') }}</a>
                     <a class="primary-link" href="{{ route('tools.money', ['lang' => $locale]) }}">{{ __('assessment.ui.money_admin') }}</a>
                     <a class="primary-link" href="{{ route('tools.lost', ['lang' => $locale]) }}">{{ __('assessment.ui.lost_item') }}</a>
+                    <a class="primary-link" href="{{ route('tools.errand', ['lang' => $locale]) }}">{{ __('assessment.ui.errand_launch') }}</a>
                     <a class="primary-link" href="{{ route('tools.providers', ['lang' => $locale]) }}">{{ __('assessment.ui.provider_shortlist') }}</a>
                     <a class="primary-link" href="{{ route('tools.access', ['lang' => $locale]) }}">{{ __('assessment.ui.access_plan') }}</a>
                     <a class="primary-link" href="{{ route('tools.task', ['lang' => $locale]) }}">{{ __('assessment.ui.break_task') }}</a>
