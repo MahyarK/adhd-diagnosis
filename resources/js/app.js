@@ -558,6 +558,10 @@ if (toolRoot) {
         initHomeReset(tools);
     }
 
+    if (tool === 'laundry') {
+        initLaundryRescue(tools);
+    }
+
     if (tool === 'money') {
         initMoneyAdmin(tools);
     }
@@ -1569,6 +1573,113 @@ function homeToText(tools, data) {
         '',
         copy.sections.kind,
         copy.kind,
+    ].join('\n');
+}
+
+function initLaundryRescue(tools) {
+    const form = document.getElementById('laundryForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.laundry') ?? '{}');
+    const fields = {
+        mode: document.getElementById('laundryMode'),
+        needed: document.getElementById('laundryNeeded'),
+        energy: document.getElementById('laundryEnergy'),
+        machine: document.getElementById('laundryMachine'),
+        blocker: document.getElementById('laundryBlocker'),
+        deadline: document.getElementById('laundryDeadline'),
+    };
+
+    hydrateFields(fields, {
+        mode: 'wearable',
+        energy: 'low',
+        machine: 'unknown',
+        ...saved,
+    });
+    renderLaundryRescue(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.laundry', JSON.stringify(data));
+        renderLaundryRescue(tools, data);
+    });
+
+    document.getElementById('laundryPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('laundryDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-laundry-rescue.txt', laundryRescueToText(tools, collectFields(fields)));
+    });
+    document.getElementById('laundryClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.laundry');
+        hydrateFields(fields, { mode: 'wearable', energy: 'low', machine: 'unknown' });
+        renderLaundryRescue(tools, collectFields(fields));
+    });
+}
+
+function renderLaundryRescue(tools, data) {
+    const copy = tools.laundry;
+    const plan = laundryRescuePlan(copy, data);
+
+    document.getElementById('laundryOutputTitle').textContent = copy.output_title;
+    document.getElementById('laundryFirstText').textContent = plan.first;
+    document.getElementById('laundryStepsList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('laundryDryingText').textContent = plan.drying;
+    document.getElementById('laundryEmergencyText').textContent = plan.emergency;
+    renderList('laundryMinimumsList', plan.minimums, copy.minimums[0]);
+    document.getElementById('laundryStopText').textContent = plan.stop;
+}
+
+function laundryRescuePlan(copy, data) {
+    const mode = data.mode || 'wearable';
+    const energy = data.energy || 'low';
+    const machine = data.machine || 'unknown';
+    const needed = data.needed?.trim() || copy.defaults.needed;
+    const deadline = data.deadline?.trim() || copy.defaults.deadline;
+    const blocker = data.blocker?.trim() || '';
+    const steps = [
+        ...(copy.mode_steps[mode] || copy.mode_steps.wearable),
+        copy.machine_steps[machine] || copy.machine_steps.unknown,
+        copy.energy_steps[energy] || copy.energy_steps.low,
+    ];
+
+    if (blocker) {
+        steps.push(copy.blocker_line.replace(':blocker', blocker));
+    }
+
+    return {
+        first: copy.first_action.replace(':needed', needed),
+        steps,
+        drying: copy.drying_plan.replace(':deadline', deadline),
+        emergency: copy.emergency_outfit.replace(':deadline', deadline),
+        minimums: copy.minimums,
+        stop: copy.stop_rule,
+    };
+}
+
+function laundryRescueToText(tools, data) {
+    const copy = tools.laundry;
+    const plan = laundryRescuePlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.drying,
+        plan.drying,
+        '',
+        copy.sections.emergency,
+        plan.emergency,
+        '',
+        copy.sections.minimums,
+        ...plan.minimums.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        plan.stop,
     ].join('\n');
 }
 
@@ -2969,6 +3080,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.care',
             'adhdSupport.support',
             'adhdSupport.home',
+            'adhdSupport.laundry',
             'adhdSupport.money',
             'adhdSupport.lost',
             'adhdSupport.providers',
@@ -3006,6 +3118,7 @@ function readSupportKit(locale = 'en') {
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
         home: readJson('adhdSupport.home'),
+        laundry: readJson('adhdSupport.laundry'),
         money: readJson('adhdSupport.money'),
         lost: readJson('adhdSupport.lost'),
         providers: readProviders(),
@@ -3059,6 +3172,7 @@ function renderDashboard(copy, saved) {
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
         home: saved.home?.space || saved.home?.mode,
+        laundry: saved.laundry?.needed || saved.laundry?.mode,
         money: saved.money?.task || saved.money?.category,
         lost: saved.lost?.item || saved.lost?.type,
         providers: saved.providers?.length ? String(saved.providers.length) : '',
@@ -3200,6 +3314,10 @@ function dashboardNext(saved) {
 
     if (saved.home?.space || saved.home?.mode) {
         return { key: 'home' };
+    }
+
+    if (saved.laundry?.needed || saved.laundry?.mode) {
+        return { key: 'laundry' };
     }
 
     if (saved.money?.task || saved.money?.category) {

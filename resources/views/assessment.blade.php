@@ -76,6 +76,7 @@
                     <a class="primary-link" href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
                     <a class="primary-link" href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>
                     <a class="primary-link" href="{{ route('tools.home', ['lang' => $locale]) }}">{{ __('assessment.ui.home_reset') }}</a>
+                    <a class="primary-link" href="{{ route('tools.laundry', ['lang' => $locale]) }}">{{ __('assessment.ui.laundry_rescue') }}</a>
                     <a class="primary-link" href="{{ route('tools.money', ['lang' => $locale]) }}">{{ __('assessment.ui.money_admin') }}</a>
                     <a class="primary-link" href="{{ route('tools.lost', ['lang' => $locale]) }}">{{ __('assessment.ui.lost_item') }}</a>
                     <a class="primary-link" href="{{ route('tools.providers', ['lang' => $locale]) }}">{{ __('assessment.ui.provider_shortlist') }}</a>

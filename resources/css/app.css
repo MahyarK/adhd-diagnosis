@@ -10,6 +10,7 @@
 
 /* ── Design tokens ── */
 :root {
+    --header-height: 52px;
     --bg: #f1f4f2;
     --surface: #ffffff;
     --surface-alt: #f7faf8;
@@ -52,7 +53,7 @@ body {
     font-size: 15px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    padding-top: 52px;
+    padding-top: var(--header-height);
 }
 
 button {
@@ -65,10 +66,10 @@ button {
     inset: 0 0 auto 0;
     z-index: 100;
     display: grid;
-    grid-template-columns: minmax(180px, 360px) 1fr auto auto;
+    grid-template-columns: minmax(0, 280px) minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 10px;
-    height: 52px;
+    height: var(--header-height);
     padding: 0 20px;
     background: rgb(255 255 255 / 94%);
     border-bottom: 1px solid var(--border);
@@ -83,6 +84,7 @@ button {
     justify-content: center;
     gap: 0;
     min-width: 0;
+    overflow: hidden;
     height: 100%;
     text-decoration: none;
     color: inherit;
@@ -141,8 +143,15 @@ button {
     color: var(--accent-hover);
 }
 
+.primary-nav a {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .tool-menu {
     position: relative;
+    z-index: 210;
 }
 
 .tool-menu details {
@@ -192,6 +201,7 @@ button {
     border-radius: 10px;
     background: var(--surface);
     box-shadow: var(--shadow-md);
+    z-index: 220;
 }
 
 .tool-menu-group {
@@ -233,6 +243,7 @@ button {
 /* ── Language dropdown ── */
 .lang-dropdown {
     position: relative;
+    z-index: 210;
 }
 
 .lang-dropdown details {
@@ -324,7 +335,7 @@ button {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     width: 100%;
-    height: calc(100dvh - 52px);
+    height: calc(100dvh - var(--header-height));
     padding: 20px;
     gap: 14px;
 }
@@ -782,7 +793,7 @@ h2 {
 /* ── Support tools ── */
 .tool-shell {
     width: min(1160px, 100%);
-    height: calc(100dvh - 52px);
+    height: calc(100dvh - var(--header-height));
     margin: 0 auto;
     padding: 20px;
     overflow: auto;
@@ -1603,8 +1614,13 @@ h2 {
 
 /* ── Responsive: mobile ── */
 @media (max-width: 620px) {
+    :root {
+        --header-height: 48px;
+    }
+
     .navbar {
         grid-template-columns: minmax(0, 1fr) auto auto;
+        padding-inline: 10px;
     }
 
     .navbar-eyebrow {
@@ -1616,16 +1632,18 @@ h2 {
     }
 
     .tool-menu-panel {
+        position: fixed;
+        top: 56px;
+        right: 8px;
         grid-template-columns: 1fr;
-        right: -76px;
-        width: min(340px, calc(100vw - 16px));
-        max-height: min(72vh, 520px);
+        width: calc(100vw - 16px);
+        max-height: calc(100dvh - 72px);
         gap: 8px;
     }
 
     [dir="rtl"] .tool-menu-panel {
-        right: auto;
-        left: -76px;
+        right: 8px;
+        left: auto;
     }
 
     .lang-dropdown summary,

@@ -24,6 +24,7 @@
                 ['route' => 'tools.transition', 'label' => __('assessment.ui.transition_rescue')],
                 ['route' => 'tools.communication', 'label' => __('assessment.ui.communication_repair')],
                 ['route' => 'tools.home', 'label' => __('assessment.ui.home_reset')],
+                ['route' => 'tools.laundry', 'label' => __('assessment.ui.laundry_rescue')],
                 ['route' => 'tools.money', 'label' => __('assessment.ui.money_admin')],
                 ['route' => 'tools.lost', 'label' => __('assessment.ui.lost_item')],
             ],

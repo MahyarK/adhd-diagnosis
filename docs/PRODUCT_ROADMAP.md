@@ -365,16 +365,17 @@ Build this next:
 18. Add a low-cost access plan for care barriers.
 19. Add care discussion notes and a support request builder.
 20. Add a home reset tool for cleaning and clutter overwhelm.
-21. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
-22. Add a lost item rescue tool for keys, wallet, phone, documents, medicine, and prevention spots.
-23. Add a morning/evening/leaving-home routine builder.
-24. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
-25. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
-26. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
-27. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
-28. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
-29. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
-30. Save goals/plans/time blocks/body needs/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/money-admin rescue/lost item rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+21. Add a laundry rescue tool for wearable clothes, wet loads, shared machines, and no-fold clean zones.
+22. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
+23. Add a lost item rescue tool for keys, wallet, phone, documents, medicine, and prevention spots.
+24. Add a morning/evening/leaving-home routine builder.
+25. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
+26. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
+27. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
+28. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
+29. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
+30. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
+31. Save goals/plans/time blocks/body needs/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/money-admin rescue/lost item rescue/appointment prep/care notes/support requests/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -399,6 +400,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create an emotional reset card and print/download it.
 - A user can create a transition rescue card and print/download it.
 - A user can create a small home reset plan and print/download it.
+- A user can create a laundry rescue card and print/download it.
 - A user can create a money/admin rescue card and print/download it.
 - A user can create a lost item rescue card and print/download it.
 - A user can prepare what to say to a clinician and print/download it.

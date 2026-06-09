@@ -148,6 +148,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Reset één plek zonder er een levensreorganisatie van te maken.');
 
+        $this->get('/tools/laundry-rescue?lang=fr')
+            ->assertOk()
+            ->assertSee('Protéger d’abord la prochaine tenue portable.');
+
         $this->get('/tools/money-admin?lang=en')
             ->assertOk()
             ->assertSee('Unstick one bill, form, message, or overdue admin task.');

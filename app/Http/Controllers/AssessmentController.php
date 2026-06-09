@@ -144,6 +144,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.home-reset');
     }
 
+    public function laundryRescue(Request $request): View
+    {
+        return $this->toolView($request, 'tools.laundry-rescue');
+    }
+
     public function moneyAdmin(Request $request): View
     {
         return $this->toolView($request, 'tools.money-admin');
