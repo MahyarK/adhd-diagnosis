@@ -64,6 +64,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.body-needs');
     }
 
+    public function medicationRefill(Request $request): View
+    {
+        return $this->toolView($request, 'tools.medication-refill');
+    }
+
     public function foodRescue(Request $request): View
     {
         return $this->toolView($request, 'tools.food-rescue');

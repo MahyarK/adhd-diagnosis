@@ -494,6 +494,10 @@ if (toolRoot) {
         initBodyNeeds(tools);
     }
 
+    if (tool === 'meds') {
+        initMedicationRefill(tools);
+    }
+
     if (tool === 'food') {
         initFoodRescue(tools);
     }
@@ -977,6 +981,107 @@ function bodyNeedsToText(tools, data) {
         '',
         copy.sections.stop,
         plan.stop,
+    ].join('\n');
+}
+
+function initMedicationRefill(tools) {
+    const form = document.getElementById('medsForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.meds') ?? '{}');
+    const fields = {
+        mode: document.getElementById('medsMode'),
+        medicine: document.getElementById('medsMedicine'),
+        supply: document.getElementById('medsSupply'),
+        blocker: document.getElementById('medsBlocker'),
+        contact: document.getElementById('medsContact'),
+        deadline: document.getElementById('medsDeadline'),
+    };
+
+    hydrateFields(fields, { mode: 'running_low', ...saved });
+    renderMedicationRefill(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.meds', JSON.stringify(data));
+        renderMedicationRefill(tools, data);
+    });
+
+    document.getElementById('medsPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('medsDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-medication-refill-rescue.txt', medicationRefillToText(tools, collectFields(fields)));
+    });
+    document.getElementById('medsClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.meds');
+        hydrateFields(fields, { mode: 'running_low' });
+        renderMedicationRefill(tools, collectFields(fields));
+    });
+}
+
+function renderMedicationRefill(tools, data) {
+    const copy = tools.meds;
+    const plan = medicationRefillPlan(copy, data);
+
+    document.getElementById('medsOutputTitle').textContent = copy.output_title;
+    document.getElementById('medsFirstText').textContent = plan.first;
+    document.getElementById('medsStepsList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('medsScriptText').textContent = plan.script;
+    renderList('medsQuestionsList', plan.questions, copy.questions[0]);
+    document.getElementById('medsSafetyText').textContent = copy.safety_note;
+    document.getElementById('medsStopText').textContent = copy.stop_rule;
+}
+
+function medicationRefillPlan(copy, data) {
+    const mode = data.mode || 'running_low';
+    const medicine = data.medicine?.trim() || copy.defaults.medicine;
+    const supply = data.supply?.trim() || copy.defaults.supply;
+    const contact = data.contact?.trim() || copy.defaults.contact;
+    const deadline = data.deadline?.trim() || copy.defaults.deadline;
+    const blocker = data.blocker?.trim() || '';
+    const steps = [...(copy.mode_steps[mode] || copy.mode_steps.running_low)];
+
+    if (blocker) {
+        steps.push(copy.blocker_line.replace(':blocker', blocker));
+    }
+
+    return {
+        first: copy.first_action
+            .replace(':medicine', medicine)
+            .replace(':supply', supply),
+        steps,
+        script: copy.script
+            .replace(':medicine', medicine)
+            .replace(':supply', supply)
+            .replace(':contact', contact),
+        questions: copy.questions.map((question) => question.replace(':deadline', deadline)),
+    };
+}
+
+function medicationRefillToText(tools, data) {
+    const copy = tools.meds;
+    const plan = medicationRefillPlan(copy, data);
+
+    return [
+        copy.output_title,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.questions,
+        ...plan.questions.map((item) => `- ${item}`),
+        '',
+        copy.sections.safety,
+        copy.safety_note,
+        '',
+        copy.sections.stop,
+        copy.stop_rule,
     ].join('\n');
 }
 
@@ -3175,6 +3280,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.planner',
             'adhdSupport.time',
             'adhdSupport.body',
+            'adhdSupport.meds',
             'adhdSupport.food',
             'adhdSupport.sleep',
             'adhdSupport.motivation',
@@ -3214,6 +3320,7 @@ function readSupportKit(locale = 'en') {
         planner: readJson('adhdSupport.planner'),
         time: readJson('adhdSupport.time'),
         body: readJson('adhdSupport.body'),
+        meds: readJson('adhdSupport.meds'),
         food: readJson('adhdSupport.food'),
         sleep: readJson('adhdSupport.sleep'),
         motivation: readJson('adhdSupport.motivation'),
@@ -3269,6 +3376,7 @@ function renderDashboard(copy, saved) {
         planner: firstLine(saved.planner?.must),
         time: firstLine(saved.time?.must) || saved.time?.start,
         body: saved.body?.task || saved.body?.food,
+        meds: saved.meds?.medicine || saved.meds?.mode,
         food: saved.food?.available || saved.food?.energy,
         sleep: saved.sleep?.wakeTime || saved.sleep?.mode,
         motivation: saved.motivation?.task || saved.motivation?.reward,
@@ -3364,6 +3472,10 @@ function dashboardNext(saved) {
 
     if (saved.body?.task || saved.body?.food) {
         return { key: 'body' };
+    }
+
+    if (saved.meds?.medicine || saved.meds?.mode) {
+        return { key: 'meds' };
     }
 
     if (saved.food?.available || saved.food?.energy) {

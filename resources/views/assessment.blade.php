@@ -72,6 +72,7 @@
                     <a class="primary-link" href="{{ route('tools.focus', ['lang' => $locale]) }}">{{ __('assessment.ui.focus_sprint') }}</a>
                     <a class="primary-link" href="{{ route('tools.emotion', ['lang' => $locale]) }}">{{ __('assessment.ui.emotional_reset') }}</a>
                     <a class="primary-link" href="{{ route('tools.transition', ['lang' => $locale]) }}">{{ __('assessment.ui.transition_rescue') }}</a>
+                    <a class="primary-link" href="{{ route('tools.meds', ['lang' => $locale]) }}">{{ __('assessment.ui.medication_refill') }}</a>
                     <a class="primary-link" href="{{ route('tools.appointment', ['lang' => $locale]) }}">{{ __('assessment.ui.prepare_appointment') }}</a>
                     <a class="primary-link" href="{{ route('tools.care', ['lang' => $locale]) }}">{{ __('assessment.ui.care_notes') }}</a>
                     <a class="primary-link" href="{{ route('tools.support', ['lang' => $locale]) }}">{{ __('assessment.ui.support_request') }}</a>

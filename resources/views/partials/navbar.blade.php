@@ -7,6 +7,7 @@
                 ['route' => 'tools.planner', 'label' => __('assessment.ui.daily_planner')],
                 ['route' => 'tools.time', 'label' => __('assessment.ui.time_block')],
                 ['route' => 'tools.body', 'label' => __('assessment.ui.body_needs')],
+                ['route' => 'tools.meds', 'label' => __('assessment.ui.medication_refill')],
                 ['route' => 'tools.food', 'label' => __('assessment.ui.food_rescue')],
                 ['route' => 'tools.sleep', 'label' => __('assessment.ui.sleep_wind_down')],
                 ['route' => 'tools.motivation', 'label' => __('assessment.ui.motivation_menu')],
