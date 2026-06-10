@@ -582,6 +582,10 @@ if (toolRoot) {
         initMoneyAdmin(tools);
     }
 
+    if (tool === 'aid') {
+        initAidApplication(tools);
+    }
+
     if (tool === 'lost') {
         initLostItem(tools);
     }
@@ -2013,6 +2017,120 @@ function moneyToText(tools, data) {
         '',
         copy.sections.stop,
         copy.stop_rule.replace(':outcome', outcome),
+    ].join('\n');
+}
+
+function initAidApplication(tools) {
+    const form = document.getElementById('aidForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.aid') ?? '{}');
+    const fields = {
+        program: document.getElementById('aidProgram'),
+        category: document.getElementById('aidCategory'),
+        urgency: document.getElementById('aidUrgency'),
+        deadline: document.getElementById('aidDeadline'),
+        blocker: document.getElementById('aidBlocker'),
+        contact: document.getElementById('aidContact'),
+        document: document.getElementById('aidDocument'),
+    };
+
+    hydrateFields(fields, {
+        category: 'unsure',
+        urgency: 'unsure',
+        ...saved,
+    });
+    renderAidApplication(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.aid', JSON.stringify(data));
+        renderAidApplication(tools, data);
+    });
+
+    document.getElementById('aidPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('aidDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-aid-application-helper.txt', aidApplicationToText(tools, collectFields(fields)));
+    });
+    document.getElementById('aidClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.aid');
+        hydrateFields(fields, { category: 'unsure', urgency: 'unsure' });
+        renderAidApplication(tools, collectFields(fields));
+    });
+}
+
+function renderAidApplication(tools, data) {
+    const copy = tools.aid;
+    const plan = aidApplicationPlan(copy, data);
+
+    document.getElementById('aidOutputTitle').textContent = copy.output_title.replace(':program', plan.program);
+    document.getElementById('aidFirstText').textContent = plan.first;
+    renderList('aidDocumentList', plan.documents, copy.documents.unsure[0]);
+    document.getElementById('aidScriptText').textContent = plan.script;
+    renderList('aidQuestionList', plan.questions, copy.questions.shared[0]);
+    renderList('aidStatusList', plan.status, copy.status_steps[0]);
+    document.getElementById('aidStopText').textContent = copy.stop_rule;
+}
+
+function aidApplicationPlan(copy, data) {
+    const category = copy.categories[data.category] ? data.category : 'unsure';
+    const urgency = copy.urgencies[data.urgency] ? data.urgency : 'unsure';
+    const program = data.program?.trim() || copy.defaults.program[category] || copy.defaults.program.unsure;
+    const contact = data.contact?.trim() || copy.defaults.contact[category] || copy.defaults.contact.unsure;
+    const deadline = data.deadline?.trim() || copy.defaults.deadline;
+    const blocker = data.blocker?.trim();
+    const documentName = data.document?.trim();
+    let documents = [...(copy.documents[category] || copy.documents.unsure)];
+
+    if (documentName) {
+        documents.unshift(documentName);
+    }
+
+    documents = [...new Set(documents)].slice(0, 5);
+
+    const urgencyNote = copy.urgency_notes[urgency] || copy.urgency_notes.unsure;
+    const blockerNote = blocker ? ` ${copy.blocker_note.replace(':blocker', blocker)}` : '';
+    const deadlineNote = deadline ? ` ${copy.deadline_note.replace(':deadline', deadline)}` : '';
+
+    return {
+        program,
+        first: `${copy.first_action.replace(':program', program)} ${urgencyNote}${blockerNote}`,
+        documents,
+        script: copy.script
+            .replace(':contact', contact)
+            .replace(':program', program)
+            .replace(':deadline_note', deadlineNote),
+        questions: [
+            ...(copy.questions[category] || copy.questions.unsure),
+            ...copy.questions.shared,
+        ],
+        status: copy.status_steps,
+    };
+}
+
+function aidApplicationToText(tools, data) {
+    const copy = tools.aid;
+    const plan = aidApplicationPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':program', plan.program),
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.documents,
+        ...plan.documents.map((item) => `- ${item}`),
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.questions,
+        ...plan.questions.map((item) => `- ${item}`),
+        '',
+        copy.sections.status,
+        ...plan.status.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        copy.stop_rule,
     ].join('\n');
 }
 
@@ -3522,6 +3640,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.laundry',
             'adhdSupport.digital',
             'adhdSupport.money',
+            'adhdSupport.aid',
             'adhdSupport.lost',
             'adhdSupport.errand',
             'adhdSupport.providers',
@@ -3565,6 +3684,7 @@ function readSupportKit(locale = 'en') {
         laundry: readJson('adhdSupport.laundry'),
         digital: readJson('adhdSupport.digital'),
         money: readJson('adhdSupport.money'),
+        aid: readJson('adhdSupport.aid'),
         lost: readJson('adhdSupport.lost'),
         errand: readJson('adhdSupport.errand'),
         providers: readProviders(),
@@ -3624,6 +3744,7 @@ function renderDashboard(copy, saved) {
         laundry: saved.laundry?.needed || saved.laundry?.mode,
         digital: saved.digital?.target || saved.digital?.mode,
         money: saved.money?.task || saved.money?.category,
+        aid: saved.aid?.program || saved.aid?.category,
         lost: saved.lost?.item || saved.lost?.type,
         errand: saved.errand?.destination || saved.errand?.kind,
         providers: saved.providers?.length ? String(saved.providers.length) : '',
@@ -3689,6 +3810,10 @@ function dashboardNext(saved) {
 
     if (saved.access?.barrier) {
         return { key: 'access' };
+    }
+
+    if (saved.aid?.program || saved.aid?.category) {
+        return { key: 'aid' };
     }
 
     if (saved.weekly?.must || saved.weekly?.loose) {

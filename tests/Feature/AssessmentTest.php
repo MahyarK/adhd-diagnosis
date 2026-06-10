@@ -172,6 +172,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Unstick one bill, form, message, or overdue admin task.');
 
+        $this->get('/tools/aid-application?lang=fr')
+            ->assertOk()
+            ->assertSee('Faire avancer les dossiers d’aide quand l’argent, les formulaires ou la honte pèsent lourd.');
+
         $this->get('/tools/lost-item?lang=nl')
             ->assertOk()
             ->assertSee('Vind één kwijtgeraakt ding zonder de hele dag te verliezen.');

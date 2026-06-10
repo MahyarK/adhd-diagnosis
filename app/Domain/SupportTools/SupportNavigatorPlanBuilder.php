@@ -10,7 +10,7 @@ final class SupportNavigatorPlanBuilder
     private const TOPIC_ROUTES = [
         'task' => ['task', 'focus', 'motivation'],
         'body' => ['body', 'food', 'sleep'],
-        'money' => ['money', 'reminders', 'access'],
+        'money' => ['money', 'aid', 'reminders', 'access'],
         'home' => ['home', 'laundry', 'lost'],
         'care' => ['appointment', 'care', 'providers'],
         'emotional' => ['emotion', 'energy', 'support'],

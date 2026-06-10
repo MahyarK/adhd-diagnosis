@@ -88,6 +88,7 @@ Features:
 - “If I fall off” recovery plan.
 - Home reset planner for cleaning, clutter, dishes, trash, and leaving-home routines.
 - Money/admin rescue planner for bills, forms, emails, appointments, and overdue tasks.
+- Aid application helper for financial assistance, charity care, public benefits, school/work support, debt hardship, and housing paperwork.
 - Errand launch planner for appointments, pharmacy trips, paperwork drop-offs, transport choices, late scripts, and backup plans.
 - Communication repair planner for late replies, conflict, boundaries, and asking for support.
 - Work/school support menu for choosing one practical adjustment to test around focus, deadlines, memory, overwhelm, transitions, or communication.
@@ -210,6 +211,7 @@ Categories:
 - Emotional regulation.
 - Procrastination.
 - Money/admin.
+- Aid applications and low-cost support paperwork.
 - Cleaning/home reset.
 - Relationships and communication.
 
@@ -245,6 +247,7 @@ Downloads:
 - Work/school support menu card.
 - Home reset card.
 - Money/admin rescue card.
+- Aid application helper card.
 - Errand launch card.
 - Communication repair draft.
 - Energy crash rescue card.
@@ -386,7 +389,8 @@ Build this next:
 33. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
 34. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
 35. Add a support navigator for choosing the best next tool when the user is unsure where to start.
-36. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+36. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
+37. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -416,6 +420,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a laundry rescue card and print/download it.
 - A user can create a digital clutter rescue card and print/download it.
 - A user can create a money/admin rescue card and print/download it.
+- A user can organize a low-cost aid/support application with documents, questions, contact script, and follow-up plan.
 - A user can create a lost item rescue card and print/download it.
 - A user can create an errand launch card and print/download it.
 - A user can prepare what to say to a clinician and print/download it.

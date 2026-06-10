@@ -44,6 +44,7 @@
                 ['route' => 'tools.workschool', 'label' => __('assessment.ui.work_school_support')],
                 ['route' => 'tools.providers', 'label' => __('assessment.ui.provider_shortlist')],
                 ['route' => 'tools.access', 'label' => __('assessment.ui.access_plan')],
+                ['route' => 'tools.aid', 'label' => __('assessment.ui.aid_application')],
                 ['route' => 'tools.weekly', 'label' => __('assessment.ui.weekly_reset')],
                 ['route' => 'tools.task', 'label' => __('assessment.ui.task_breakdown')],
                 ['route' => 'tools.reminders', 'label' => __('assessment.ui.reminders')],

@@ -10,6 +10,7 @@
         'money' => route('tools.money', ['lang' => $locale]),
         'reminders' => route('tools.reminders', ['lang' => $locale]),
         'access' => route('tools.access', ['lang' => $locale]),
+        'aid' => route('tools.aid', ['lang' => $locale]),
         'home' => route('tools.home', ['lang' => $locale]),
         'laundry' => route('tools.laundry', ['lang' => $locale]),
         'lost' => route('tools.lost', ['lang' => $locale]),

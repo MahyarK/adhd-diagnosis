@@ -18,7 +18,7 @@ class SupportNavigatorPlanBuilderTest extends TestCase
         ));
 
         $this->assertStringContainsString('open the bill', $plan->firstAction);
-        $this->assertSame(['planner', 'transition', 'money', 'reminders'], $plan->recommendations);
+        $this->assertSame(['planner', 'transition', 'money', 'aid'], $plan->recommendations);
         $this->assertStringContainsString('current problem', $plan->why);
         $this->assertStringContainsString('Stop after choosing one tool', $plan->stopRule);
     }
