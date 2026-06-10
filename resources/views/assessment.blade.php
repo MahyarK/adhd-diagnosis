@@ -56,6 +56,7 @@
                     <button type="button" class="secondary-button" id="printResultButton">{{ __('assessment.ui.print_result') }}</button>
                     <button type="button" class="secondary-button" id="downloadResultButton">{{ __('assessment.ui.download_result') }}</button>
                     <a class="primary-link" href="{{ route('dashboard', ['lang' => $locale]) }}">{{ __('assessment.ui.open_dashboard') }}</a>
+                    <a class="primary-link" href="{{ route('tools.navigator', ['lang' => $locale]) }}">{{ __('assessment.ui.support_navigator') }}</a>
                     <a class="primary-link" href="{{ route('tools.goal', ['lang' => $locale]) }}" id="createGoalLink">{{ __('assessment.ui.create_goal') }}</a>
                     <a class="primary-link" href="{{ route('tools.planner', ['lang' => $locale]) }}" id="buildPlanLink">{{ __('assessment.ui.build_plan') }}</a>
                     <a class="primary-link" href="{{ route('tools.time', ['lang' => $locale]) }}">{{ __('assessment.ui.time_block') }}</a>

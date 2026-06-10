@@ -3,6 +3,9 @@
         [
             'label' => __('assessment.ui.tools_group_start'),
             'links' => [
+                ['route' => 'dashboard', 'label' => __('assessment.ui.dashboard')],
+                ['route' => 'resources', 'label' => __('assessment.ui.resource_library')],
+                ['route' => 'tools.navigator', 'label' => __('assessment.ui.support_navigator')],
                 ['route' => 'tools.goal', 'label' => __('assessment.ui.goal_builder')],
                 ['route' => 'tools.planner', 'label' => __('assessment.ui.daily_planner')],
                 ['route' => 'tools.time', 'label' => __('assessment.ui.time_block')],

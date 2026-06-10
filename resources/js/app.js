@@ -482,6 +482,10 @@ if (toolRoot) {
         initGoalBuilder(tools);
     }
 
+    if (tool === 'navigator') {
+        initSupportNavigator(tools, JSON.parse(toolRoot.dataset.links || '{}'));
+    }
+
     if (tool === 'planner') {
         initDailyPlanner(tools);
     }
@@ -3492,6 +3496,7 @@ function initDashboard(tools, locale) {
         [
             'adhdSupport.latestResult',
             `adhdSupport.latestResult.${locale}`,
+            'adhdSupport.navigator',
             'adhdSupport.goal',
             'adhdSupport.planner',
             'adhdSupport.time',
@@ -3534,6 +3539,7 @@ function initDashboard(tools, locale) {
 function readSupportKit(locale = 'en') {
     return {
         result: localizedSavedResult(locale),
+        navigator: readJson('adhdSupport.navigator'),
         goal: readJson('adhdSupport.goal'),
         planner: readJson('adhdSupport.planner'),
         time: readJson('adhdSupport.time'),
@@ -3592,6 +3598,7 @@ function readJson(key) {
 function renderDashboard(copy, saved) {
     const summaries = {
         result: saved.result?.title,
+        navigator: saved.navigator?.topic || saved.navigator?.knownNext,
         goal: saved.goal?.goal,
         planner: firstLine(saved.planner?.must),
         time: firstLine(saved.time?.must) || saved.time?.start,
@@ -3660,6 +3667,10 @@ function renderDashboard(copy, saved) {
 }
 
 function dashboardNext(saved) {
+    if (saved.navigator?.topic || saved.navigator?.knownNext) {
+        return { key: 'navigator' };
+    }
+
     if (saved.task?.focus) {
         return { key: 'task' };
     }
@@ -4015,6 +4026,132 @@ function hydrateFields(fields, data) {
 
 function collectFields(fields) {
     return Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value]));
+}
+
+function initSupportNavigator(tools, links) {
+    const form = document.getElementById('navigatorForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.navigator') ?? '{}');
+    const fields = {
+        topic: document.getElementById('navigatorTopic'),
+        urgency: document.getElementById('navigatorUrgency'),
+        energy: document.getElementById('navigatorEnergy'),
+        knownNext: document.getElementById('navigatorKnownNext'),
+    };
+
+    hydrateFields(fields, {
+        topic: 'unsure',
+        urgency: 'soon',
+        energy: 'medium',
+        ...saved,
+    });
+    renderSupportNavigator(tools, links, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.navigator', JSON.stringify(data));
+        renderSupportNavigator(tools, links, data);
+    });
+
+    document.getElementById('navigatorPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('navigatorDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-support-navigator.txt', supportNavigatorToText(tools, collectFields(fields)));
+    });
+    document.getElementById('navigatorClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.navigator');
+        hydrateFields(fields, { topic: 'unsure', urgency: 'soon', energy: 'medium' });
+        renderSupportNavigator(tools, links, collectFields(fields));
+    });
+}
+
+function renderSupportNavigator(tools, links, data) {
+    const plan = supportNavigatorPlan(tools.navigator, data);
+
+    document.getElementById('navigatorOutputTitle').textContent = tools.navigator.output_title.replace(':topic', plan.topicLabel);
+    document.getElementById('navigatorFirstText').textContent = plan.first;
+    renderToolLinks('navigatorRecommendationList', plan.recommendations, tools.navigator.recommendations, links);
+    document.getElementById('navigatorWhyText').textContent = plan.why;
+    document.getElementById('navigatorStopText').textContent = plan.stop;
+}
+
+function supportNavigatorPlan(copy, data) {
+    const topic = copy.topic_routes[data.topic] ? data.topic : 'unsure';
+    const urgency = data.urgency || 'soon';
+    const energy = data.energy || 'medium';
+    const knownNext = data.knownNext?.trim() || '';
+    let recommendations = [...copy.topic_routes[topic]];
+
+    if (knownNext) {
+        recommendations.unshift('planner');
+    }
+
+    if (urgency === 'now') {
+        recommendations.splice(1, 0, 'transition');
+    }
+
+    if (energy === 'low') {
+        recommendations.push('energy');
+    }
+
+    recommendations = [...new Set(recommendations)].slice(0, 4);
+
+    return {
+        topicLabel: copy.topics[topic],
+        first: knownNext
+            ? copy.first_with_next.replace(':next', knownNext)
+            : copy.first_default,
+        recommendations,
+        why: copy.why
+            .replace(':topic', copy.topics[topic])
+            .replace(':urgency', copy.urgencies[urgency] || copy.urgencies.soon)
+            .replace(':energy', copy.energies[energy] || copy.energies.medium),
+        stop: copy.stop_rule,
+    };
+}
+
+function renderToolLinks(id, keys, copy, links) {
+    const container = document.getElementById(id);
+
+    container.innerHTML = '';
+    keys.forEach((key) => {
+        const item = copy[key];
+
+        if (! item || ! links[key]) {
+            return;
+        }
+
+        const link = document.createElement('a');
+        const title = document.createElement('strong');
+        const body = document.createElement('span');
+
+        link.className = 'tool-link-card';
+        link.href = links[key];
+        title.textContent = item.title;
+        body.textContent = item.body;
+        link.append(title, body);
+        container.appendChild(link);
+    });
+}
+
+function supportNavigatorToText(tools, data) {
+    const copy = tools.navigator;
+    const plan = supportNavigatorPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':topic', plan.topicLabel),
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.recommended,
+        ...plan.recommendations.map((key) => `- ${copy.recommendations[key]?.title || key}: ${copy.recommendations[key]?.body || ''}`),
+        '',
+        copy.sections.why,
+        plan.why,
+        '',
+        copy.sections.stop,
+        plan.stop,
+    ].join('\n');
 }
 
 function parseClock(value) {

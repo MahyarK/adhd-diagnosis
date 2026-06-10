@@ -80,6 +80,7 @@ Give users planning tools that work with ADHD instead of assuming perfect consis
 
 Features:
 
+- Support navigator for choosing the right tool from a short, shame-free set of prompts.
 - Daily “minimum viable day” planner.
 - Weekly reset planner.
 - Morning/evening routine builder.
@@ -232,6 +233,7 @@ Make the app useful even if the user leaves, loses internet, or needs paper.
 
 Downloads:
 
+- Support navigator path.
 - Screening result report.
 - Clinician appointment prep sheet.
 - Daily planner.
@@ -265,7 +267,7 @@ Create a gentle home base after screening.
 
 Current foundation:
 
-- Local dashboard that summarizes saved screening result, goal, plan, appointment prep, and task breakdown.
+- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, appointment prep, and task breakdown.
 - “Next tiny step” prompt based on what the user has saved.
 - Downloadable local support kit export.
 - Clear local support kit action.
@@ -383,7 +385,8 @@ Build this next:
 32. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
 33. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
 34. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
-35. Save goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+35. Add a support navigator for choosing the best next tool when the user is unsure where to start.
+36. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -408,6 +411,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a focus sprint card and print/download it.
 - A user can create an emotional reset card and print/download it.
 - A user can create a transition rescue card and print/download it.
+- A user can answer a few prompts and get a recommended support path with the right tools to open first.
 - A user can create a small home reset plan and print/download it.
 - A user can create a laundry rescue card and print/download it.
 - A user can create a digital clutter rescue card and print/download it.

@@ -92,6 +92,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Start with trustworthy help, not a research spiral.');
 
+        $this->get('/tools/support-navigator?lang=fa')
+            ->assertOk()
+            ->assertSee('به هاب بگو الان چه چیزی سخت است.');
+
         $this->get('/tools/goal-builder?lang=en')
             ->assertOk()
             ->assertSee('Make one goal small enough to start.');
