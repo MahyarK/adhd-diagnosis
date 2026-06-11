@@ -177,6 +177,7 @@ return [
             ],
             'buttons' => [
                 'build' => 'Get my next steps',
+                'ai' => 'Ask AI to make it more natural',
             ],
             'output_eyebrow' => 'Your check-in',
             'output_title' => 'Today feels: :feeling',
@@ -234,6 +235,17 @@ return [
                 'wins' => ['title' => 'Wins log', 'body' => 'Save tiny evidence that something worked.'],
             ],
             'ai_note' => 'This version uses a local rule-based guide so it works without an account or API key. A real AI layer can later use the same check-in fields, with clear consent and privacy controls.',
+            'ai_status' => [
+                'idle' => 'AI is optional. Nothing is sent unless you press the AI button.',
+                'loading' => 'Asking AI for a gentler wording...',
+                'ready' => 'AI wording added.',
+                'unavailable' => 'AI is not configured, so the local guide stayed in place.',
+                'error' => 'AI did not respond. The local guide is still available.',
+            ],
+            'ai_unavailable' => 'AI is not configured yet. The local check-in still gives you a private, useful next step.',
+            'ai_unavailable_first' => 'Use the local tiny action above, or ask the app owner to configure an OpenAI API key.',
+            'ai_error' => 'AI could not respond right now. You still have the local check-in plan.',
+            'ai_error_first' => 'Use the first local action and try AI again later if you want gentler wording.',
         ],
         'navigator' => [
             'eyebrow' => 'Support navigator',

@@ -177,6 +177,7 @@ return [
             ],
             'buttons' => [
                 'build' => 'Obtenir mes prochaines étapes',
+                'ai' => 'Demander à l’IA de rendre cela plus naturel',
             ],
             'output_eyebrow' => 'Votre check-in',
             'output_title' => 'Aujourd’hui ressemble à : :feeling',
@@ -234,6 +235,17 @@ return [
                 'wins' => ['title' => 'Journal des victoires', 'body' => 'Garder une petite preuve que quelque chose a marché.'],
             ],
             'ai_note' => 'Cette version utilise un guide local à règles, donc elle fonctionne sans compte ni clé API. Une vraie couche IA pourra plus tard utiliser les mêmes champs avec consentement clair et contrôles de confidentialité.',
+            'ai_status' => [
+                'idle' => 'L’IA est optionnelle. Rien n’est envoyé sauf si vous appuyez sur le bouton IA.',
+                'loading' => 'Demande à l’IA une formulation plus douce...',
+                'ready' => 'Formulation IA ajoutée.',
+                'unavailable' => 'L’IA n’est pas configurée, le guide local reste en place.',
+                'error' => 'L’IA n’a pas répondu. Le guide local reste disponible.',
+            ],
+            'ai_unavailable' => 'L’IA n’est pas encore configurée. Le check-in local donne quand même une prochaine étape privée et utile.',
+            'ai_unavailable_first' => 'Utilisez la petite action locale ci-dessus, ou demandez au propriétaire de l’app de configurer une clé API OpenAI.',
+            'ai_error' => 'L’IA ne peut pas répondre maintenant. Vous avez toujours le plan local du check-in.',
+            'ai_error_first' => 'Utilisez la première action locale et réessayez l’IA plus tard si vous voulez une formulation plus douce.',
         ],
         'navigator' => [
             'eyebrow' => 'Navigateur de soutien',

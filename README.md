@@ -15,7 +15,7 @@ This is a screening and preparation tool, not a medical diagnosis.
 - Clear next steps for clinician follow-up
 - Local support dashboard for saved results, tool outputs, quick “stuck now” triage, readable exports, print, and data backup
 - Support navigator that recommends the right tool when the user feels stuck or overloaded
-- Daily check-in that asks how the user feels and suggests tools in a more natural, AI-ready flow
+- Daily check-in that asks how the user feels and suggests tools in a more natural flow, with optional backend AI wording when configured
 - Goal builder, daily planner, time blocks, body needs check-in, medication refill rescue, food rescue, sleep wind-down, motivation menu, wins/evidence log, accountability check-in, routine builder, weekly reset, communication repair, energy crash rescue, decision rescue, focus sprint, emotional reset, safety pause, transition rescue, home reset, laundry rescue, digital clutter rescue, money/admin rescue, aid application helper, lost item rescue, errand launch, appointment prep with cost/access questions, care notes, support request, work/school support menu, job hunt rescue, task breakdown, and follow-up rescue worksheets
 - Follow-up reminder tool with downloadable calendar files
 - Symptom/context tracker for clinician-ready notes
@@ -80,6 +80,17 @@ Open:
 ```text
 http://127.0.0.1:8000
 ```
+
+## Optional AI
+
+The daily check-in works without AI. To enable the explicit AI wording button, set server-side OpenAI credentials:
+
+```bash
+OPENAI_API_KEY=your_server_side_key
+OPENAI_MODEL=gpt-4.1-mini
+```
+
+The browser never receives the API key, and check-in fields are sent only after the user clicks the AI button.
 
 ## Development
 

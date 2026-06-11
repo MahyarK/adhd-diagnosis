@@ -103,6 +103,7 @@ class AssessmentTest extends TestCase
         $this->get('/tools/daily-check-in?lang=en')
             ->assertOk()
             ->assertSee('A calmer way to start today.')
+            ->assertSee('Ask AI to make it more natural')
             ->assertSee('AI-ready note');
 
         $this->get('/tools/goal-builder?lang=en')
@@ -253,6 +254,21 @@ class AssessmentTest extends TestCase
         $this->get('/tools/symptom-tracker?lang=en')
             ->assertOk()
             ->assertSee('Track patterns without overthinking it.');
+    }
+
+    public function test_daily_check_in_ai_falls_back_when_not_configured(): void
+    {
+        config(['services.openai.key' => null]);
+
+        $this->postJson('/tools/daily-check-in/ai?lang=en', [
+            'feeling' => 'overwhelmed',
+            'energy' => 'low',
+            'pressure' => 'task',
+            'message' => 'I cannot start',
+        ])
+            ->assertOk()
+            ->assertJsonPath('available', false)
+            ->assertJsonPath('response', 'AI is not configured yet. The local check-in still gives you a private, useful next step.');
     }
 
     public function test_supported_translation_files_cover_result_and_tool_keys(): void

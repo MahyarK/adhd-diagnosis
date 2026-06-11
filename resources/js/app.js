@@ -4668,6 +4668,7 @@ function collectFields(fields) {
 
 function initDailyCheckIn(tools, links) {
     const form = document.getElementById('checkInForm');
+    const root = document.querySelector('[data-tool="checkin"]');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.checkin') ?? '{}');
     const fields = {
         feeling: document.getElementById('checkInFeeling'),
@@ -4691,6 +4692,45 @@ function initDailyCheckIn(tools, links) {
         renderDailyCheckIn(tools, links, data);
     });
 
+    document.getElementById('checkInAiButton').addEventListener('click', async () => {
+        const button = document.getElementById('checkInAiButton');
+        const status = document.getElementById('checkInAiStatus');
+        const data = collectFields(fields);
+
+        button.disabled = true;
+        status.textContent = tools.checkin.ai_status.loading;
+
+        try {
+            const response = await fetch(root.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+                body: JSON.stringify(data),
+            });
+
+            const payload = await response.json();
+
+            if (payload.response) {
+                document.getElementById('checkInResponseText').textContent = payload.response;
+            }
+
+            if (payload.first) {
+                document.getElementById('checkInFirstText').textContent = payload.first;
+            }
+
+            status.textContent = payload.available
+                ? tools.checkin.ai_status.ready
+                : tools.checkin.ai_status.unavailable;
+        } catch {
+            status.textContent = tools.checkin.ai_status.error;
+        } finally {
+            button.disabled = false;
+        }
+    });
+
     document.getElementById('checkInPrintButton').addEventListener('click', () => window.print());
     document.getElementById('checkInDownloadButton').addEventListener('click', () => {
         downloadText('adhd-daily-check-in.txt', dailyCheckInToText(tools, collectFields(fields)));
@@ -4710,6 +4750,7 @@ function renderDailyCheckIn(tools, links, data) {
     document.getElementById('checkInFirstText').textContent = plan.first;
     renderToolLinks('checkInToolList', plan.recommendations, tools.checkin.recommendations, links);
     document.getElementById('checkInAiNote').textContent = tools.checkin.ai_note;
+    document.getElementById('checkInAiStatus').textContent = tools.checkin.ai_status.idle;
 }
 
 function dailyCheckInPlan(copy, data) {

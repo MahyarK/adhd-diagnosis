@@ -31,13 +31,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('assessment.ui.daily_checkin') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     @include('partials.navbar')
 
-    <main class="tool-shell" data-tool="checkin" data-locale="{{ $locale }}" data-tools='@json($tools)' data-links='@json($checkInLinks)'>
+    <main class="tool-shell" data-tool="checkin" data-locale="{{ $locale }}" data-tools='@json($tools)' data-links='@json($checkInLinks)' data-ai-url="{{ route('tools.checkin.ai', ['lang' => $locale]) }}">
         <section class="tool-hero">
             <p class="eyebrow">{{ $tools['checkin']['eyebrow'] }}</p>
             <h1>{{ $tools['checkin']['title'] }}</h1>
@@ -76,6 +77,7 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['checkin']['buttons']['build'] }}</button>
+                    <button type="button" class="secondary-button" id="checkInAiButton">{{ $tools['checkin']['buttons']['ai'] }}</button>
                     <button type="button" class="secondary-button" id="checkInPrintButton">{{ $tools['shared']['print'] }}</button>
                     <button type="button" class="secondary-button" id="checkInDownloadButton">{{ $tools['shared']['download'] }}</button>
                     <button type="button" class="secondary-button" id="checkInClearButton">{{ $tools['shared']['clear'] }}</button>
@@ -101,6 +103,7 @@
                     <article class="wide">
                         <h3>{{ $tools['checkin']['sections']['ai_note'] }}</h3>
                         <p id="checkInAiNote"></p>
+                        <p class="map-note" id="checkInAiStatus"></p>
                     </article>
                 </div>
             </section>

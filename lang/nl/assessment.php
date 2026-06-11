@@ -177,6 +177,7 @@ return [
             ],
             'buttons' => [
                 'build' => 'Geef mijn volgende stappen',
+                'ai' => 'Vraag AI om het natuurlijker te maken',
             ],
             'output_eyebrow' => 'Je check-in',
             'output_title' => 'Vandaag voelt als: :feeling',
@@ -234,6 +235,17 @@ return [
                 'wins' => ['title' => 'Wins-log', 'body' => 'Bewaar klein bewijs dat iets werkte.'],
             ],
             'ai_note' => 'Deze versie gebruikt een lokale regelgebaseerde gids, dus hij werkt zonder account of API-sleutel. Een echte AI-laag kan later dezelfde check-invelden gebruiken met duidelijke toestemming en privacycontrole.',
+            'ai_status' => [
+                'idle' => 'AI is optioneel. Er wordt niets verstuurd tenzij je op de AI-knop drukt.',
+                'loading' => 'AI vragen om zachtere woorden...',
+                'ready' => 'AI-tekst toegevoegd.',
+                'unavailable' => 'AI is niet ingesteld, dus de lokale gids blijft actief.',
+                'error' => 'AI reageerde niet. De lokale gids is nog beschikbaar.',
+            ],
+            'ai_unavailable' => 'AI is nog niet ingesteld. De lokale check-in geeft nog steeds een privé en nuttige volgende stap.',
+            'ai_unavailable_first' => 'Gebruik de lokale kleine actie hierboven, of vraag de appbeheerder om een OpenAI API-sleutel in te stellen.',
+            'ai_error' => 'AI kon nu niet reageren. Je hebt nog steeds het lokale check-inplan.',
+            'ai_error_first' => 'Gebruik de eerste lokale actie en probeer AI later opnieuw als je zachtere woorden wilt.',
         ],
         'navigator' => [
             'eyebrow' => 'Steunnavigator',

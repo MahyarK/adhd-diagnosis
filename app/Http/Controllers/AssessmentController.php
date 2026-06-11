@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Support\AdhdAssessment;
+use App\Support\CheckInAiGuide;
 use Illuminate\Support\Facades\App;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,6 +53,23 @@ class AssessmentController extends Controller
     public function dailyCheckIn(Request $request): View
     {
         return $this->toolView($request, 'tools.daily-check-in');
+    }
+
+    public function dailyCheckInAi(Request $request, CheckInAiGuide $guide): JsonResponse
+    {
+        $locale = $this->setLocale($request);
+
+        $validated = $request->validate([
+            'feeling' => ['required', 'string', 'max:40'],
+            'energy' => ['required', 'string', 'max:40'],
+            'pressure' => ['required', 'string', 'max:40'],
+            'message' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        return response()->json($guide->guide([
+            ...$validated,
+            'locale' => $locale,
+        ]));
     }
 
     public function goalBuilder(Request $request): View
