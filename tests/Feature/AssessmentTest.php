@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AssessmentTest extends TestCase
@@ -276,6 +277,36 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertJsonPath('available', false)
             ->assertJsonPath('response', 'AI is not configured yet. The local check-in still gives you a private, useful next step.');
+    }
+
+    public function test_daily_check_in_ai_returns_configured_guidance(): void
+    {
+        config([
+            'services.openai.key' => 'test-key',
+            'services.openai.model' => 'test-model',
+        ]);
+
+        Http::fake([
+            'https://api.openai.com/v1/responses' => Http::response([
+                'output_text' => json_encode([
+                    'response' => 'That sounds heavy, so we will make it smaller and kinder.',
+                    'first' => 'Open the bill and look only for the due date.',
+                ]),
+            ]),
+        ]);
+
+        $this->postJson('/tools/daily-check-in/ai?lang=en', [
+            'feeling' => 'avoidant',
+            'energy' => 'medium',
+            'pressure' => 'money',
+            'message' => 'I avoided a bill',
+        ])
+            ->assertOk()
+            ->assertJsonPath('available', true)
+            ->assertJsonPath('response', 'That sounds heavy, so we will make it smaller and kinder.')
+            ->assertJsonPath('first', 'Open the bill and look only for the due date.');
+
+        Http::assertSentCount(1);
     }
 
     public function test_supported_translation_files_cover_result_and_tool_keys(): void

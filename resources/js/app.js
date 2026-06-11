@@ -3950,7 +3950,7 @@ function initDashboard(tools, locale, links = {}) {
     renderDashboard(copy, saved, tools, links);
 
     document.getElementById('dashboardExportButton').addEventListener('click', () => {
-        downloadText('adhd-support-kit.txt', dashboardSupportKitText(copy, readSupportKit(locale)));
+        downloadText('adhd-support-kit.txt', dashboardSupportKitText(copy, tools, readSupportKit(locale)));
     });
 
     document.getElementById('dashboardPrintButton').addEventListener('click', () => {
@@ -4123,12 +4123,13 @@ function dashboardSummaries(copy, saved) {
     return Object.fromEntries(Object.entries(summaries).filter(([, value]) => Boolean(value)));
 }
 
-function dashboardSupportKitText(copy, saved) {
+function dashboardSupportKitText(copy, tools, saved) {
     const summaries = dashboardSummaries(copy, saved);
     const next = dashboardNext(saved);
     const savedLines = Object.entries(summaries).map(([key, value]) => {
         return `- ${copy.summaries[key].replace(':value', value)}`;
     });
+    const checkInLines = dashboardCheckInExportLines(tools.checkin, saved.checkin);
 
     return [
         copy.export_text.title,
@@ -4140,9 +4141,29 @@ function dashboardSupportKitText(copy, saved) {
         '',
         copy.saved_title,
         savedLines.length ? savedLines.join('\n') : copy.export_text.empty,
+        ...checkInLines,
         '',
         copy.export_text.privacy,
     ].join('\n');
+}
+
+function dashboardCheckInExportLines(copy, data) {
+    if (! copy || (! data?.feeling && ! data?.message)) {
+        return [];
+    }
+
+    const plan = dailyCheckInPlan(copy, data);
+
+    return [
+        '',
+        copy.output_title.replace(':feeling', plan.feelingLabel),
+        copy.sections.response,
+        plan.response,
+        copy.sections.first,
+        plan.first,
+        copy.sections.tools,
+        ...plan.recommendations.map((key) => `- ${copy.recommendations[key].title}: ${copy.recommendations[key].body}`),
+    ];
 }
 
 function renderDashboard(copy, saved, tools = {}, links = {}) {
@@ -4728,18 +4749,20 @@ function initDailyCheckIn(tools, links) {
         message: document.getElementById('checkInMessage'),
     };
 
-    hydrateFields(fields, {
+    const initialData = {
         feeling: 'overwhelmed',
         energy: 'medium',
         pressure: 'unsure',
         ...saved,
-    });
+    };
+
+    hydrateFields(fields, initialData);
     initDailyCheckInWizard(tools.checkin);
-    renderDailyCheckIn(tools, links, collectFields(fields));
+    renderDailyCheckIn(tools, links, initialData);
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
-        const data = collectFields(fields);
+        const data = checkInBaseData(fields);
         supportStorage.setItem('adhdSupport.checkin', JSON.stringify(data));
         renderDailyCheckIn(tools, links, data);
     });
@@ -4747,7 +4770,7 @@ function initDailyCheckIn(tools, links) {
     document.getElementById('checkInAiButton').addEventListener('click', async () => {
         const button = document.getElementById('checkInAiButton');
         const status = document.getElementById('checkInAiStatus');
-        const data = collectFields(fields);
+        const data = checkInBaseData(fields);
 
         button.disabled = true;
         status.textContent = tools.checkin.ai_status.loading;
@@ -4774,6 +4797,17 @@ function initDailyCheckIn(tools, links) {
                 document.getElementById('checkInFirstText').textContent = payload.first;
             }
 
+            if (payload.available && (payload.response || payload.first)) {
+                const guided = {
+                    ...data,
+                    aiResponse: payload.response || '',
+                    aiFirst: payload.first || '',
+                    aiAvailable: Boolean(payload.available),
+                };
+
+                supportStorage.setItem('adhdSupport.checkin', JSON.stringify(guided));
+            }
+
             status.textContent = payload.available
                 ? tools.checkin.ai_status.ready
                 : tools.checkin.ai_status.unavailable;
@@ -4786,7 +4820,7 @@ function initDailyCheckIn(tools, links) {
 
     document.getElementById('checkInPrintButton').addEventListener('click', () => window.print());
     document.getElementById('checkInDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-daily-check-in.txt', dailyCheckInToText(tools, collectFields(fields)));
+        downloadText('adhd-daily-check-in.txt', dailyCheckInToText(tools, readJson('adhdSupport.checkin') || checkInBaseData(fields)));
     });
     document.getElementById('checkInClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.checkin');
@@ -4794,6 +4828,12 @@ function initDailyCheckIn(tools, links) {
         updateDailyCheckInStep(tools.checkin, 0);
         renderDailyCheckIn(tools, links, collectFields(fields));
     });
+}
+
+function checkInBaseData(fields) {
+    const { feeling, energy, pressure, message } = collectFields(fields);
+
+    return { feeling, energy, pressure, message };
 }
 
 function initDailyCheckInWizard(copy) {
@@ -4923,13 +4963,13 @@ function dailyCheckInPlan(copy, data) {
 
     return {
         feelingLabel: copy.feelings[feeling],
-        response: message
+        response: data.aiResponse || (message
             ? copy.response_with_message
                 .replace(':message', message)
                 .replace(':feeling', copy.feelings[feeling])
                 .replace(':energy', copy.energies[energy])
-            : copy.responses[feeling],
-        first: copy.first_steps[energy]
+            : copy.responses[feeling]),
+        first: data.aiFirst || copy.first_steps[energy]
             .replace(':pressure', copy.pressures[pressure])
             .replace(':tool', copy.recommendations[recommendations[0]].title),
         recommendations,
