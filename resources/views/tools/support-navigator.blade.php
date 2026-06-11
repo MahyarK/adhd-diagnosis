@@ -19,6 +19,7 @@
         'appointment' => route('tools.appointment', ['lang' => $locale]),
         'care' => route('tools.care', ['lang' => $locale]),
         'providers' => route('tools.providers', ['lang' => $locale]),
+        'safety' => route('tools.safety', ['lang' => $locale]),
         'emotion' => route('tools.emotion', ['lang' => $locale]),
         'energy' => route('tools.energy', ['lang' => $locale]),
         'support' => route('tools.support', ['lang' => $locale]),

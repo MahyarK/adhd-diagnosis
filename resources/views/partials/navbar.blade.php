@@ -26,6 +26,7 @@
                 ['route' => 'tools.energy', 'label' => __('assessment.ui.energy_crash')],
                 ['route' => 'tools.decision', 'label' => __('assessment.ui.decision_priority')],
                 ['route' => 'tools.emotion', 'label' => __('assessment.ui.emotional_reset')],
+                ['route' => 'tools.safety', 'label' => __('assessment.ui.safety_pause')],
                 ['route' => 'tools.transition', 'label' => __('assessment.ui.transition_rescue')],
                 ['route' => 'tools.communication', 'label' => __('assessment.ui.communication_repair')],
                 ['route' => 'tools.home', 'label' => __('assessment.ui.home_reset')],

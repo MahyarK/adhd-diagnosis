@@ -45,6 +45,6 @@ class SupportNavigatorPlanBuilderTest extends TestCase
             knownNext: '',
         ));
 
-        $this->assertSame(['emotion', 'wins', 'energy', 'support'], $plan->recommendations);
+        $this->assertSame(['safety', 'emotion', 'wins', 'energy'], $plan->recommendations);
     }
 }

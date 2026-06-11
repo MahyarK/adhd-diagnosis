@@ -208,6 +208,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Climb out of a shame spiral one gentle step at a time.');
 
+        $this->get('/tools/safety-pause?lang=fr')
+            ->assertOk()
+            ->assertSee('Ralentir le moment et choisir le bon type d’aide.');
+
         $this->get('/tools/transition-rescue?lang=nl')
             ->assertOk()
             ->assertSee('Kom uit wachtstand en naar de volgende beweging.');

@@ -134,6 +134,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.emotional-reset');
     }
 
+    public function safetyPause(Request $request): View
+    {
+        return $this->toolView($request, 'tools.safety-pause');
+    }
+
     public function transitionRescue(Request $request): View
     {
         return $this->toolView($request, 'tools.transition-rescue');

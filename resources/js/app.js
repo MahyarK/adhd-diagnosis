@@ -550,6 +550,10 @@ if (toolRoot) {
         initEmotionalReset(tools);
     }
 
+    if (tool === 'safety') {
+        initSafetyPause(tools);
+    }
+
     if (tool === 'transition') {
         initTransitionRescue(tools);
     }
@@ -2998,6 +3002,107 @@ function emotionToText(tools, data) {
     ].join('\n');
 }
 
+function initSafetyPause(tools) {
+    const form = document.getElementById('safetyForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.safety') ?? '{}');
+    const fields = {
+        state: document.getElementById('safetyState'),
+        intensity: document.getElementById('safetyIntensity'),
+        support: document.getElementById('safetySupport'),
+        location: document.getElementById('safetyLocation'),
+        nextStep: document.getElementById('safetyNextStep'),
+        barrier: document.getElementById('safetyBarrier'),
+    };
+
+    hydrateFields(fields, {
+        state: 'safe',
+        intensity: 'medium',
+        ...saved,
+    });
+    renderSafetyPause(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.safety', JSON.stringify(data));
+        renderSafetyPause(tools, data);
+    });
+
+    document.getElementById('safetyPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('safetyDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-safety-pause-card.txt', safetyPauseToText(tools, collectFields(fields)));
+    });
+    document.getElementById('safetyClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.safety');
+        hydrateFields(fields, { state: 'safe', intensity: 'medium' });
+        renderSafetyPause(tools, collectFields(fields));
+    });
+}
+
+function renderSafetyPause(tools, data) {
+    const plan = safetyPausePlan(tools.safety, data);
+
+    document.getElementById('safetyOutputTitle').textContent = plan.title;
+    document.getElementById('safetyImmediateText').textContent = plan.immediate;
+    document.getElementById('safetyFirstText').textContent = plan.first;
+    document.getElementById('safetyScriptText').textContent = plan.script;
+    renderList('safetyGroundList', plan.ground, plan.ground[0]);
+    renderList('safetyStepList', plan.steps, plan.steps[0]);
+    document.getElementById('safetyStopText').textContent = plan.stop;
+}
+
+function safetyPausePlan(copy, data) {
+    const state = copy.states[data.state] ? data.state : 'unsure';
+    const intensity = copy.intensities[data.intensity] ? data.intensity : 'medium';
+    const support = data.support?.trim() || copy.defaults.support;
+    const location = data.location?.trim() || copy.defaults.location;
+    const nextStep = data.nextStep?.trim() || copy.defaults.next_step;
+    const barrier = data.barrier?.trim();
+    const urgent = ['unsafe', 'unsure'].includes(state) || intensity === 'high';
+    const barrierLine = barrier ? ` ${copy.barrier_line.replace(':barrier', barrier)}` : '';
+
+    return {
+        title: copy.output_title.replace(':state', copy.states[state]),
+        immediate: urgent ? copy.immediate.urgent : copy.immediate.safe,
+        first: copy.first_action
+            .replace(':location', location)
+            .replace(':next', nextStep) + barrierLine,
+        script: copy.support_script.replace(':support', support),
+        ground: copy.grounding[intensity] || copy.grounding.medium,
+        steps: copy.next_steps[state] || copy.next_steps.unsure,
+        stop: copy.stop_rule,
+    };
+}
+
+function safetyPauseToText(tools, data) {
+    const copy = tools.safety;
+    const plan = safetyPausePlan(copy, data);
+
+    return [
+        plan.title,
+        '',
+        copy.sections.immediate,
+        plan.immediate,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.ground,
+        ...plan.ground.map((item) => `- ${item}`),
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        plan.stop,
+        '',
+        copy.disclaimer,
+    ].join('\n');
+}
+
 function initTransitionRescue(tools) {
     const form = document.getElementById('transitionForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.transition') ?? '{}');
@@ -3748,6 +3853,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.decision',
             'adhdSupport.focus',
             'adhdSupport.emotion',
+            'adhdSupport.safety',
             'adhdSupport.transition',
             'adhdSupport.appointment',
             'adhdSupport.care',
@@ -3794,6 +3900,7 @@ function readSupportKit(locale = 'en') {
         decision: readJson('adhdSupport.decision'),
         focus: readJson('adhdSupport.focus'),
         emotion: readJson('adhdSupport.emotion'),
+        safety: readJson('adhdSupport.safety'),
         transition: readJson('adhdSupport.transition'),
         appointment: readJson('adhdSupport.appointment'),
         care: readJson('adhdSupport.care'),
@@ -3856,6 +3963,7 @@ function renderDashboard(copy, saved) {
         decision: saved.decision?.relief || firstLine(saved.decision?.options),
         focus: saved.focus?.task || saved.focus?.mode,
         emotion: saved.emotion?.trigger || saved.emotion?.intensity,
+        safety: saved.safety?.state || saved.safety?.intensity,
         transition: saved.transition?.transition || saved.transition?.mode,
         appointment: saved.appointment?.provider,
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
@@ -4004,6 +4112,10 @@ function dashboardNext(saved) {
 
     if (saved.emotion?.trigger || saved.emotion?.intensity) {
         return { key: 'emotion' };
+    }
+
+    if (saved.safety?.state || saved.safety?.intensity) {
+        return { key: 'safety' };
     }
 
     if (saved.transition?.transition || saved.transition?.mode) {

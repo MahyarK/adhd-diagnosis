@@ -34,6 +34,7 @@ Current foundation:
 - Presentation result: inattentive, hyperactive/impulsive, combined, low signal, or needs more context.
 - Multilingual result explanations.
 - Nearby clinician map CTA.
+- Safety pause tool for urgent emotional moments, including 988/local crisis guidance, reach-out scripts, and a non-emergency stabilizing plan.
 
 Next improvements:
 
@@ -97,6 +98,7 @@ Features:
 - Decision rescue planner for choosing one good-enough priority when everything feels urgent.
 - Focus sprint planner with timer, body-double support, distraction parking, and reward.
 - Emotional reset planner for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
+- Safety pause planner for telling the difference between overwhelm, uncertain safety, immediate danger, and supporting someone else.
 - Wins/evidence log for saving tiny progress, supports that worked, and patterns to repeat.
 - Visual checklist mode.
 - Printable planner pages.
@@ -259,6 +261,7 @@ Downloads:
 - Decision rescue priority card.
 - Focus sprint card.
 - Emotional reset card.
+- Safety pause card.
 - Symptom tracker.
 - Sleep/stress tracker.
 
@@ -275,11 +278,11 @@ Create a gentle home base after screening.
 
 Current foundation:
 
-- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, task breakdown, and follow-up rescue.
+- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, task breakdown, safety pause, and follow-up rescue.
 - “Next tiny step” prompt based on what the user has saved.
 - Downloadable local support kit export.
 - Clear local support kit action.
-- Saved weekly reset, follow-up rescue, follow-up reminder, and symptom tracker summary.
+- Saved weekly reset, safety pause, follow-up rescue, follow-up reminder, and symptom tracker summary.
 
 Sections:
 
@@ -393,11 +396,12 @@ Build this next:
 32. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
 33. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
 34. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
-35. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
-36. Add a support navigator for choosing the best next tool when the user is unsure where to start.
-37. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
-38. Add a follow-up rescue tool for missed replies, referrals, applications, bookings, and status checks with a no-shame script and downloadable card.
-39. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/follow-up rescues/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+35. Add a safety pause tool for urgent emotional moments, uncertain safety, reaching out, crisis resources, and a non-emergency stabilizing plan.
+36. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
+37. Add a support navigator for choosing the best next tool when the user is unsure where to start.
+38. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
+39. Add a follow-up rescue tool for missed replies, referrals, applications, bookings, and status checks with a no-shame script and downloadable card.
+40. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/safety pause/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/follow-up rescues/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -422,6 +426,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a decision rescue priority card and print/download it.
 - A user can create a focus sprint card and print/download it.
 - A user can create an emotional reset card and print/download it.
+- A user can use a safety pause card to choose live help or a ten-minute stabilizing plan, then print/download it.
 - A user can create a transition rescue card and print/download it.
 - A user can answer a few prompts and get a recommended support path with the right tools to open first.
 - A user can create a small home reset plan and print/download it.

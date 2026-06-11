@@ -977,6 +977,44 @@ h2 {
     line-height: 1.45;
 }
 
+.crisis-links {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.crisis-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid color-mix(in srgb, var(--soft-red) 42%, var(--border));
+    border-radius: 8px;
+    background: var(--soft-red-bg);
+    color: #8f3f32;
+    font-size: 12px;
+    font-weight: 750;
+    text-align: center;
+    text-decoration: none;
+}
+
+.urgent-output {
+    border-color: color-mix(in srgb, var(--soft-red) 42%, var(--border-light));
+    background: linear-gradient(0deg, rgb(253 242 238 / 78%), var(--surface-alt));
+}
+
+.tool-disclaimer {
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    border-left: 3px solid var(--soft-red);
+    background: var(--soft-red-bg);
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 /* ── Dashboard ── */
 .dashboard-grid {
     display: grid;
@@ -1744,6 +1782,7 @@ h2 {
     .result-metrics,
     .clinician-list,
     .output-grid,
+    .crisis-links,
     .dashboard-cards,
     .resource-grid {
         grid-template-columns: 1fr;

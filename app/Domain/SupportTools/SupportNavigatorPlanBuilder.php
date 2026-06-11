@@ -13,7 +13,7 @@ final class SupportNavigatorPlanBuilder
         'money' => ['money', 'aid', 'followup', 'reminders'],
         'home' => ['home', 'laundry', 'lost'],
         'care' => ['followup', 'appointment', 'care', 'providers'],
-        'emotional' => ['emotion', 'wins', 'energy', 'support'],
+        'emotional' => ['safety', 'emotion', 'wins', 'energy'],
         'workschool' => ['workschool', 'support', 'communication'],
         'leaving' => ['errand', 'transition', 'lost'],
         'unsure' => ['task', 'body', 'decision'],
