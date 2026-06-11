@@ -179,6 +179,18 @@ return [
                 'build' => 'Geef mijn volgende stappen',
                 'ai' => 'Vraag AI om het natuurlijker te maken',
             ],
+            'wizard' => [
+                'label' => 'Stappen van de dagelijkse check-in',
+                'count' => 'Vraag :current van :total',
+                'previous' => 'Vorige',
+                'next' => 'Volgende',
+                'steps' => [
+                    'feeling' => 'Gevoel',
+                    'energy' => 'Energie',
+                    'pressure' => 'Druk',
+                    'message' => 'Woorden',
+                ],
+            ],
             'output_eyebrow' => 'Je check-in',
             'output_title' => 'Vandaag voelt als: :feeling',
             'empty_title' => 'Je dagelijkse check-in verschijnt hier.',

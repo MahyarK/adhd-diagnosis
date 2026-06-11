@@ -4734,6 +4734,7 @@ function initDailyCheckIn(tools, links) {
         pressure: 'unsure',
         ...saved,
     });
+    initDailyCheckInWizard(tools.checkin);
     renderDailyCheckIn(tools, links, collectFields(fields));
 
     form.addEventListener('submit', (event) => {
@@ -4790,8 +4791,74 @@ function initDailyCheckIn(tools, links) {
     document.getElementById('checkInClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.checkin');
         hydrateFields(fields, { feeling: 'overwhelmed', energy: 'medium', pressure: 'unsure', message: '' });
+        updateDailyCheckInStep(tools.checkin, 0);
         renderDailyCheckIn(tools, links, collectFields(fields));
     });
+}
+
+function initDailyCheckInWizard(copy) {
+    const stepButtons = Array.from(document.querySelectorAll('[data-checkin-step-button]'));
+    const previous = document.getElementById('checkInPrevStep');
+    const next = document.getElementById('checkInNextStep');
+
+    if (! stepButtons.length || ! previous || ! next) {
+        return;
+    }
+
+    let current = 0;
+
+    const setStep = (step) => {
+        current = Math.max(0, Math.min(stepButtons.length - 1, step));
+        updateDailyCheckInStep(copy, current);
+    };
+
+    stepButtons.forEach((button, index) => {
+        button.addEventListener('click', () => setStep(index));
+    });
+
+    previous.addEventListener('click', () => setStep(current - 1));
+    next.addEventListener('click', () => setStep(current + 1));
+    setStep(0);
+}
+
+function updateDailyCheckInStep(copy, step) {
+    const fields = Array.from(document.querySelectorAll('[data-checkin-step]'));
+    const buttons = Array.from(document.querySelectorAll('[data-checkin-step-button]'));
+    const previous = document.getElementById('checkInPrevStep');
+    const next = document.getElementById('checkInNextStep');
+    const build = document.getElementById('checkInBuildButton');
+    const count = document.getElementById('checkInStepCount');
+    const last = fields.length - 1;
+
+    fields.forEach((field, index) => {
+        field.hidden = index !== step;
+    });
+
+    buttons.forEach((button, index) => {
+        if (index === step) {
+            button.setAttribute('aria-current', 'step');
+        } else {
+            button.removeAttribute('aria-current');
+        }
+    });
+
+    if (previous) {
+        previous.disabled = step === 0;
+    }
+
+    if (next) {
+        next.hidden = step === last;
+    }
+
+    if (build) {
+        build.hidden = step !== last;
+    }
+
+    if (count) {
+        count.textContent = copy.wizard.count
+            .replace(':current', String(step + 1))
+            .replace(':total', String(fields.length));
+    }
 }
 
 function renderDailyCheckIn(tools, links, data) {

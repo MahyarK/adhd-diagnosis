@@ -47,7 +47,16 @@
 
         <section class="tool-layout">
             <form class="tool-form" id="checkInForm">
-                <label>
+                <div class="checkin-stepper" aria-label="{{ $tools['checkin']['wizard']['label'] }}">
+                    <button type="button" data-checkin-step-button="0" aria-current="step">{{ $tools['checkin']['wizard']['steps']['feeling'] }}</button>
+                    <button type="button" data-checkin-step-button="1">{{ $tools['checkin']['wizard']['steps']['energy'] }}</button>
+                    <button type="button" data-checkin-step-button="2">{{ $tools['checkin']['wizard']['steps']['pressure'] }}</button>
+                    <button type="button" data-checkin-step-button="3">{{ $tools['checkin']['wizard']['steps']['message'] }}</button>
+                </div>
+
+                <p class="checkin-step-count" id="checkInStepCount">{{ $tools['checkin']['wizard']['count'] }}</p>
+
+                <label class="checkin-field" data-checkin-step="0">
                     <span>{{ $tools['checkin']['fields']['feeling'] }}</span>
                     <select id="checkInFeeling">
                         @foreach ($tools['checkin']['feelings'] as $value => $label)
@@ -55,7 +64,7 @@
                         @endforeach
                     </select>
                 </label>
-                <label>
+                <label class="checkin-field" data-checkin-step="1">
                     <span>{{ $tools['checkin']['fields']['energy'] }}</span>
                     <select id="checkInEnergy">
                         @foreach ($tools['checkin']['energies'] as $value => $label)
@@ -63,7 +72,7 @@
                         @endforeach
                     </select>
                 </label>
-                <label>
+                <label class="checkin-field" data-checkin-step="2">
                     <span>{{ $tools['checkin']['fields']['pressure'] }}</span>
                     <select id="checkInPressure">
                         @foreach ($tools['checkin']['pressures'] as $value => $label)
@@ -71,12 +80,16 @@
                         @endforeach
                     </select>
                 </label>
-                <label>
+                <label class="checkin-field" data-checkin-step="3">
                     <span>{{ $tools['checkin']['fields']['message'] }}</span>
                     <textarea id="checkInMessage" rows="4" placeholder="{{ $tools['checkin']['placeholders']['message'] }}"></textarea>
                 </label>
+                <div class="checkin-wizard-actions">
+                    <button type="button" class="secondary-button" id="checkInPrevStep">{{ $tools['checkin']['wizard']['previous'] }}</button>
+                    <button type="button" class="primary-button" id="checkInNextStep">{{ $tools['checkin']['wizard']['next'] }}</button>
+                </div>
                 <div class="tool-actions">
-                    <button type="submit" class="primary-button">{{ $tools['checkin']['buttons']['build'] }}</button>
+                    <button type="submit" class="primary-button" id="checkInBuildButton">{{ $tools['checkin']['buttons']['build'] }}</button>
                     <button type="button" class="secondary-button" id="checkInAiButton">{{ $tools['checkin']['buttons']['ai'] }}</button>
                     <button type="button" class="secondary-button" id="checkInPrintButton">{{ $tools['shared']['print'] }}</button>
                     <button type="button" class="secondary-button" id="checkInDownloadButton">{{ $tools['shared']['download'] }}</button>

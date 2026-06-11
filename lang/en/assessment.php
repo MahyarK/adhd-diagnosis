@@ -179,6 +179,18 @@ return [
                 'build' => 'Get my next steps',
                 'ai' => 'Ask AI to make it more natural',
             ],
+            'wizard' => [
+                'label' => 'Daily check-in steps',
+                'count' => 'Question :current of :total',
+                'previous' => 'Previous',
+                'next' => 'Next',
+                'steps' => [
+                    'feeling' => 'Feeling',
+                    'energy' => 'Energy',
+                    'pressure' => 'Pressure',
+                    'message' => 'Words',
+                ],
+            ],
             'output_eyebrow' => 'Your check-in',
             'output_title' => 'Today feels: :feeling',
             'empty_title' => 'Your daily check-in will appear here.',

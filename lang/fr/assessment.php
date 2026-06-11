@@ -179,6 +179,18 @@ return [
                 'build' => 'Obtenir mes prochaines étapes',
                 'ai' => 'Demander à l’IA de rendre cela plus naturel',
             ],
+            'wizard' => [
+                'label' => 'Étapes du check-in du jour',
+                'count' => 'Question :current sur :total',
+                'previous' => 'Précédent',
+                'next' => 'Suivant',
+                'steps' => [
+                    'feeling' => 'Ressenti',
+                    'energy' => 'Énergie',
+                    'pressure' => 'Pression',
+                    'message' => 'Mots',
+                ],
+            ],
             'output_eyebrow' => 'Votre check-in',
             'output_title' => 'Aujourd’hui ressemble à : :feeling',
             'empty_title' => 'Votre check-in du jour apparaîtra ici.',

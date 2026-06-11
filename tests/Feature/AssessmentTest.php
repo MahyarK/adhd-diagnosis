@@ -106,6 +106,9 @@ class AssessmentTest extends TestCase
         $this->get('/tools/daily-check-in?lang=en')
             ->assertOk()
             ->assertSee('A calmer way to start today.')
+            ->assertSee('Question :current of :total')
+            ->assertSee('Feeling')
+            ->assertSee('Next')
             ->assertSee('Ask AI to make it more natural')
             ->assertSee('AI is optional. It sends only this check-in to the server when you press the AI button.')
             ->assertSee('AI-ready note');

@@ -179,6 +179,18 @@ return [
                 'build' => 'قدم‌های بعدی من را بده',
                 'ai' => 'از AI بخواه طبیعی‌ترش کند',
             ],
+            'wizard' => [
+                'label' => 'مرحله‌های چک روزانه',
+                'count' => 'سؤال :current از :total',
+                'previous' => 'قبلی',
+                'next' => 'بعدی',
+                'steps' => [
+                    'feeling' => 'حس',
+                    'energy' => 'انرژی',
+                    'pressure' => 'فشار',
+                    'message' => 'کلمات',
+                ],
+            ],
             'output_eyebrow' => 'چک تو',
             'output_title' => 'امروز این‌طور حس می‌شود: :feeling',
             'empty_title' => 'چک روزانه تو اینجا ظاهر می‌شود.',
