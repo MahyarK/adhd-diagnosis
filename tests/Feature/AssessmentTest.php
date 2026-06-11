@@ -86,7 +86,9 @@ class AssessmentTest extends TestCase
     {
         $this->get('/dashboard?lang=en')
             ->assertOk()
-            ->assertSee('Your local ADHD support kit.');
+            ->assertSee('Your local ADHD support kit.')
+            ->assertSee('Pick the closest problem.')
+            ->assertSee('/tools/money-admin?lang=en', false);
 
         $this->get('/resources?lang=en')
             ->assertOk()

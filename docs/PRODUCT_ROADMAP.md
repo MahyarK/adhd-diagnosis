@@ -282,6 +282,7 @@ Current foundation:
 
 - Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, task breakdown, job hunt rescue, safety pause, and follow-up rescue.
 - “Next tiny step” prompt based on what the user has saved.
+- “Stuck right now?” triage shortcuts for overwhelm, starting, forgotten follow-up, body needs, admin stress, and finding help.
 - Downloadable local support kit export.
 - Clear local support kit action.
 - Saved weekly reset, job hunt rescue, safety pause, follow-up rescue, follow-up reminder, and symptom tracker summary.
@@ -289,6 +290,7 @@ Current foundation:
 Sections:
 
 - Today’s tiny next step.
+- Stuck-now route picker.
 - Saved goals.
 - Current plan.
 - Upcoming reminders.

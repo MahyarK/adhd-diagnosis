@@ -3039,6 +3039,19 @@ return [
             'clear' => 'Clear local kit',
             'privacy' => 'Everything on this dashboard is read from this browser only. Export before clearing or switching devices.',
             'cleared' => 'Local support kit cleared.',
+            'triage' => [
+                'eyebrow' => 'Stuck right now?',
+                'title' => 'Pick the closest problem.',
+                'intro' => 'No need to know the perfect tool. Choose what feels most true and start with the smallest possible next action.',
+                'items' => [
+                    ['label' => 'Too much', 'action' => 'Choose one good-enough priority', 'route' => 'tools.decision'],
+                    ['label' => 'Can’t start', 'action' => 'Launch a short focus sprint', 'route' => 'tools.focus'],
+                    ['label' => 'Forgot or late', 'action' => 'Recover a follow-up without shame', 'route' => 'tools.followup'],
+                    ['label' => 'Body low', 'action' => 'Check food, water, meds, and rest', 'route' => 'tools.body'],
+                    ['label' => 'Admin stress', 'action' => 'Unstick one bill, form, or message', 'route' => 'tools.money'],
+                    ['label' => 'Need help', 'action' => 'Find the right support route', 'route' => 'tools.navigator'],
+                ],
+            ],
             'cards' => [
                 'result' => [
                     'title' => 'Screening result',

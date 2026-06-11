@@ -3039,6 +3039,19 @@ return [
             'clear' => 'Lokale kit leegmaken',
             'privacy' => 'Alles op dit dashboard wordt alleen uit deze browser gelezen. Exporteer voordat je wist of van apparaat wisselt.',
             'cleared' => 'Lokale supportkit leeggemaakt.',
+            'triage' => [
+                'eyebrow' => 'Nu vastgelopen?',
+                'title' => 'Kies wat het dichtstbij komt.',
+                'intro' => 'Je hoeft het perfecte hulpmiddel niet te weten. Kies wat het meest klopt en begin met de kleinst mogelijke volgende actie.',
+                'items' => [
+                    ['label' => 'Te veel', 'action' => 'Kies één goed-genoeg prioriteit', 'route' => 'tools.decision'],
+                    ['label' => 'Kan niet starten', 'action' => 'Start een korte focussprint', 'route' => 'tools.focus'],
+                    ['label' => 'Vergeten of laat', 'action' => 'Pak een follow-up op zonder schaamte', 'route' => 'tools.followup'],
+                    ['label' => 'Lichaam laag', 'action' => 'Check eten, water, medicatie en rust', 'route' => 'tools.body'],
+                    ['label' => 'Adminstress', 'action' => 'Maak één rekening, formulier of bericht los', 'route' => 'tools.money'],
+                    ['label' => 'Hulp nodig', 'action' => 'Vind de juiste steunroute', 'route' => 'tools.navigator'],
+                ],
+            ],
             'cards' => [
                 'result' => [
                     'title' => 'Screeningsresultaat',

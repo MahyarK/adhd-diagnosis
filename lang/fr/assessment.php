@@ -3039,6 +3039,19 @@ return [
             'clear' => 'Effacer le kit local',
             'privacy' => 'Tout sur ce tableau est lu uniquement depuis ce navigateur. Exportez avant d’effacer ou de changer d’appareil.',
             'cleared' => 'Kit local effacé.',
+            'triage' => [
+                'eyebrow' => 'Bloqué maintenant ?',
+                'title' => 'Choisissez le problème le plus proche.',
+                'intro' => 'Pas besoin de connaître l’outil parfait. Choisissez ce qui ressemble le plus à la situation et commencez par la plus petite action possible.',
+                'items' => [
+                    ['label' => 'Trop de choses', 'action' => 'Choisir une priorité assez bonne', 'route' => 'tools.decision'],
+                    ['label' => 'Impossible de commencer', 'action' => 'Lancer un court sprint de focus', 'route' => 'tools.focus'],
+                    ['label' => 'Oublié ou en retard', 'action' => 'Reprendre un suivi sans honte', 'route' => 'tools.followup'],
+                    ['label' => 'Corps à plat', 'action' => 'Vérifier nourriture, eau, médicaments et repos', 'route' => 'tools.body'],
+                    ['label' => 'Stress administratif', 'action' => 'Débloquer une facture, un formulaire ou un message', 'route' => 'tools.money'],
+                    ['label' => 'Besoin d’aide', 'action' => 'Trouver le bon chemin de soutien', 'route' => 'tools.navigator'],
+                ],
+            ],
             'cards' => [
                 'result' => [
                     'title' => 'Résultat de dépistage',

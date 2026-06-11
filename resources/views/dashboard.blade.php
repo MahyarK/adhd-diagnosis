@@ -28,6 +28,22 @@
                 </div>
             </article>
 
+            <section class="dashboard-triage" aria-labelledby="dashboardTriageTitle">
+                <div>
+                    <p class="eyebrow">{{ $tools['dashboard']['triage']['eyebrow'] }}</p>
+                    <h2 id="dashboardTriageTitle">{{ $tools['dashboard']['triage']['title'] }}</h2>
+                    <p>{{ $tools['dashboard']['triage']['intro'] }}</p>
+                </div>
+                <div class="dashboard-triage-grid">
+                    @foreach ($tools['dashboard']['triage']['items'] as $item)
+                        <a href="{{ route($item['route'], ['lang' => $locale]) }}">
+                            <span>{{ $item['label'] }}</span>
+                            <strong>{{ $item['action'] }}</strong>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+
             <section class="dashboard-cards" aria-label="{{ $tools['dashboard']['saved_title'] }}">
                 @foreach ($tools['dashboard']['cards'] as $key => $card)
                     <article class="dashboard-card" data-dashboard-card="{{ $key }}">
