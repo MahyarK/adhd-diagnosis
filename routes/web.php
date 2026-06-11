@@ -8,6 +8,7 @@ Route::post('/assessment/score', [AssessmentController::class, 'score'])->name('
 Route::get('/dashboard', [AssessmentController::class, 'dashboard'])->name('dashboard');
 Route::get('/resources', [AssessmentController::class, 'resources'])->name('resources');
 Route::get('/tools/support-navigator', [AssessmentController::class, 'supportNavigator'])->name('tools.navigator');
+Route::get('/tools/daily-check-in', [AssessmentController::class, 'dailyCheckIn'])->name('tools.checkin');
 Route::get('/tools/goal-builder', [AssessmentController::class, 'goalBuilder'])->name('tools.goal');
 Route::get('/tools/daily-planner', [AssessmentController::class, 'dailyPlanner'])->name('tools.planner');
 Route::get('/tools/time-block', [AssessmentController::class, 'timeBlock'])->name('tools.time');

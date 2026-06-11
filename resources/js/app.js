@@ -486,6 +486,10 @@ if (toolRoot) {
         initSupportNavigator(tools, JSON.parse(toolRoot.dataset.links || '{}'));
     }
 
+    if (tool === 'checkin') {
+        initDailyCheckIn(tools, JSON.parse(toolRoot.dataset.links || '{}'));
+    }
+
     if (tool === 'planner') {
         initDailyPlanner(tools);
     }
@@ -3962,6 +3966,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.latestResult',
             `adhdSupport.latestResult.${locale}`,
             'adhdSupport.navigator',
+            'adhdSupport.checkin',
             'adhdSupport.goal',
             'adhdSupport.planner',
             'adhdSupport.time',
@@ -4010,6 +4015,7 @@ function readSupportKit(locale = 'en') {
     return {
         result: localizedSavedResult(locale),
         navigator: readJson('adhdSupport.navigator'),
+        checkin: readJson('adhdSupport.checkin'),
         goal: readJson('adhdSupport.goal'),
         planner: readJson('adhdSupport.planner'),
         time: readJson('adhdSupport.time'),
@@ -4074,6 +4080,7 @@ function dashboardSummaries(copy, saved) {
     const summaries = {
         result: saved.result?.title,
         navigator: saved.navigator?.topic || saved.navigator?.knownNext,
+        checkin: saved.checkin?.feeling || firstLine(saved.checkin?.message),
         goal: saved.goal?.goal,
         planner: firstLine(saved.planner?.must),
         time: firstLine(saved.time?.must) || saved.time?.start,
@@ -4177,6 +4184,10 @@ function renderDashboard(copy, saved) {
 function dashboardNext(saved) {
     if (saved.navigator?.topic || saved.navigator?.knownNext) {
         return { key: 'navigator' };
+    }
+
+    if (saved.checkin?.feeling || saved.checkin?.message) {
+        return { key: 'checkin' };
     }
 
     if (saved.task?.focus) {
@@ -4653,6 +4664,117 @@ function hydrateFields(fields, data) {
 
 function collectFields(fields) {
     return Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value]));
+}
+
+function initDailyCheckIn(tools, links) {
+    const form = document.getElementById('checkInForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.checkin') ?? '{}');
+    const fields = {
+        feeling: document.getElementById('checkInFeeling'),
+        energy: document.getElementById('checkInEnergy'),
+        pressure: document.getElementById('checkInPressure'),
+        message: document.getElementById('checkInMessage'),
+    };
+
+    hydrateFields(fields, {
+        feeling: 'overwhelmed',
+        energy: 'medium',
+        pressure: 'unsure',
+        ...saved,
+    });
+    renderDailyCheckIn(tools, links, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.checkin', JSON.stringify(data));
+        renderDailyCheckIn(tools, links, data);
+    });
+
+    document.getElementById('checkInPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('checkInDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-daily-check-in.txt', dailyCheckInToText(tools, collectFields(fields)));
+    });
+    document.getElementById('checkInClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.checkin');
+        hydrateFields(fields, { feeling: 'overwhelmed', energy: 'medium', pressure: 'unsure', message: '' });
+        renderDailyCheckIn(tools, links, collectFields(fields));
+    });
+}
+
+function renderDailyCheckIn(tools, links, data) {
+    const plan = dailyCheckInPlan(tools.checkin, data);
+
+    document.getElementById('checkInOutputTitle').textContent = tools.checkin.output_title.replace(':feeling', plan.feelingLabel);
+    document.getElementById('checkInResponseText').textContent = plan.response;
+    document.getElementById('checkInFirstText').textContent = plan.first;
+    renderToolLinks('checkInToolList', plan.recommendations, tools.checkin.recommendations, links);
+    document.getElementById('checkInAiNote').textContent = tools.checkin.ai_note;
+}
+
+function dailyCheckInPlan(copy, data) {
+    const feeling = copy.feelings[data.feeling] ? data.feeling : 'overwhelmed';
+    const energy = copy.energies[data.energy] ? data.energy : 'medium';
+    const pressure = copy.pressures[data.pressure] ? data.pressure : 'unsure';
+    const message = data.message?.trim() || '';
+    let recommendations = [...copy.routes[feeling]];
+
+    if (energy === 'low') {
+        recommendations.unshift('body', 'energy');
+    }
+
+    if (pressure === 'money') {
+        recommendations.unshift('money');
+    }
+
+    if (pressure === 'late') {
+        recommendations.unshift('followup');
+    }
+
+    if (pressure === 'home') {
+        recommendations.unshift('home');
+    }
+
+    if (pressure === 'unsafe') {
+        recommendations.unshift('safety');
+    }
+
+    recommendations = [...new Set(recommendations)].slice(0, 4);
+
+    return {
+        feelingLabel: copy.feelings[feeling],
+        response: message
+            ? copy.response_with_message
+                .replace(':message', message)
+                .replace(':feeling', copy.feelings[feeling])
+                .replace(':energy', copy.energies[energy])
+            : copy.responses[feeling],
+        first: copy.first_steps[energy]
+            .replace(':pressure', copy.pressures[pressure])
+            .replace(':tool', copy.recommendations[recommendations[0]].title),
+        recommendations,
+    };
+}
+
+function dailyCheckInToText(tools, data) {
+    const copy = tools.checkin;
+    const plan = dailyCheckInPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':feeling', plan.feelingLabel),
+        '',
+        copy.sections.response,
+        plan.response,
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.tools,
+        ...plan.recommendations.map((key) => `- ${copy.recommendations[key].title}: ${copy.recommendations[key].body}`),
+        '',
+        copy.sections.ai_note,
+        copy.ai_note,
+    ].join('\n');
 }
 
 function initSupportNavigator(tools, links) {

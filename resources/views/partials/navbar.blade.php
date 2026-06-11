@@ -6,6 +6,7 @@
                 ['route' => 'dashboard', 'label' => __('assessment.ui.dashboard')],
                 ['route' => 'resources', 'label' => __('assessment.ui.resource_library')],
                 ['route' => 'tools.navigator', 'label' => __('assessment.ui.support_navigator')],
+                ['route' => 'tools.checkin', 'label' => __('assessment.ui.daily_checkin')],
                 ['route' => 'tools.goal', 'label' => __('assessment.ui.goal_builder')],
                 ['route' => 'tools.planner', 'label' => __('assessment.ui.daily_planner')],
                 ['route' => 'tools.time', 'label' => __('assessment.ui.time_block')],

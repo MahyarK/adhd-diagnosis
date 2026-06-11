@@ -82,6 +82,7 @@ Give users planning tools that work with ADHD instead of assuming perfect consis
 Features:
 
 - Support navigator for choosing the right tool from a short, shame-free set of prompts.
+- Daily conversational check-in for asking how the user feels, naming energy/pressure, and routing to a few matched tools.
 - Daily “minimum viable day” planner.
 - Weekly reset planner.
 - Morning/evening routine builder.
@@ -291,6 +292,7 @@ Current foundation:
 Sections:
 
 - Today’s tiny next step.
+- Daily check-in entry point.
 - Stuck-now route picker.
 - Saved goals.
 - Current plan.
@@ -406,6 +408,7 @@ Build this next:
 36. Add a safety pause tool for urgent emotional moments, uncertain safety, reaching out, crisis resources, and a non-emergency stabilizing plan.
 37. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
 38. Add a support navigator for choosing the best next tool when the user is unsure where to start.
+38a. Add a daily check-in that feels more conversational and can later be backed by an AI model with consent and privacy controls.
 39. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
 40. Add a follow-up rescue tool for missed replies, referrals, applications, bookings, and status checks with a no-shame script and downloadable card.
 41. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/safety pause/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/follow-up rescues/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/job hunt rescues/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
@@ -436,6 +439,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can use a safety pause card to choose live help or a ten-minute stabilizing plan, then print/download it.
 - A user can create a transition rescue card and print/download it.
 - A user can answer a few prompts and get a recommended support path with the right tools to open first.
+- A user can complete a daily check-in and receive a natural response, one tiny next action, and matched tools.
 - A user can create a small home reset plan and print/download it.
 - A user can create a laundry rescue card and print/download it.
 - A user can create a digital clutter rescue card and print/download it.

@@ -1042,6 +1042,7 @@ h2 {
 }
 
 .dashboard-next,
+.dashboard-checkin,
 .dashboard-triage,
 .dashboard-card {
     border: 1px solid var(--border);
@@ -1062,6 +1063,26 @@ h2 {
 }
 
 .dashboard-next p {
+    margin-bottom: 0;
+    color: var(--text-secondary);
+}
+
+.dashboard-checkin {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    background: var(--accent-light);
+}
+
+.dashboard-checkin h2 {
+    margin-bottom: 4px;
+    font-size: 22px;
+}
+
+.dashboard-checkin p {
     margin-bottom: 0;
     color: var(--text-secondary);
 }
@@ -1189,6 +1210,11 @@ h2 {
     margin: 14px 0 0;
     color: var(--text-muted);
     font-size: 12px;
+}
+
+.conversation-card {
+    border-color: rgb(91 138 121 / 38%);
+    background: linear-gradient(135deg, var(--surface), var(--accent-light));
 }
 
 /* ── Resources ── */
@@ -1788,6 +1814,11 @@ h2 {
         grid-template-columns: 1fr;
     }
 
+    .dashboard-checkin {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .action-buttons {
         justify-content: flex-start;
     }
@@ -1938,6 +1969,7 @@ h2 {
     .tool-hero,
     .tool-form,
     .dashboard-next .tool-actions,
+    .dashboard-checkin .primary-link,
     .dashboard-note {
         display: none !important;
     }
@@ -1954,6 +1986,7 @@ h2 {
     .results-panel,
     .tool-output,
     .dashboard-next,
+    .dashboard-checkin,
     .dashboard-triage,
     .dashboard-card {
         display: block !important;
@@ -1968,6 +2001,7 @@ h2 {
     .score-details,
     .explain-card,
     .output-grid article,
+    .dashboard-checkin,
     .dashboard-triage,
     .dashboard-card,
     .resource-card,

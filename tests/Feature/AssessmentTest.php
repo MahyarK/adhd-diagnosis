@@ -100,6 +100,11 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('به هاب بگو الان چه چیزی سخت است.');
 
+        $this->get('/tools/daily-check-in?lang=en')
+            ->assertOk()
+            ->assertSee('A calmer way to start today.')
+            ->assertSee('AI-ready note');
+
         $this->get('/tools/goal-builder?lang=en')
             ->assertOk()
             ->assertSee('Make one goal small enough to start.');

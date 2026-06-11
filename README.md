@@ -15,6 +15,7 @@ This is a screening and preparation tool, not a medical diagnosis.
 - Clear next steps for clinician follow-up
 - Local support dashboard for saved results, tool outputs, quick “stuck now” triage, readable exports, print, and data backup
 - Support navigator that recommends the right tool when the user feels stuck or overloaded
+- Daily check-in that asks how the user feels and suggests tools in a more natural, AI-ready flow
 - Goal builder, daily planner, time blocks, body needs check-in, medication refill rescue, food rescue, sleep wind-down, motivation menu, wins/evidence log, accountability check-in, routine builder, weekly reset, communication repair, energy crash rescue, decision rescue, focus sprint, emotional reset, safety pause, transition rescue, home reset, laundry rescue, digital clutter rescue, money/admin rescue, aid application helper, lost item rescue, errand launch, appointment prep with cost/access questions, care notes, support request, work/school support menu, job hunt rescue, task breakdown, and follow-up rescue worksheets
 - Follow-up reminder tool with downloadable calendar files
 - Symptom/context tracker for clinician-ready notes

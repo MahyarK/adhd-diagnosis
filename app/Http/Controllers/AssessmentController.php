@@ -49,6 +49,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.support-navigator');
     }
 
+    public function dailyCheckIn(Request $request): View
+    {
+        return $this->toolView($request, 'tools.daily-check-in');
+    }
+
     public function goalBuilder(Request $request): View
     {
         return $this->toolView($request, 'tools.goal-builder');

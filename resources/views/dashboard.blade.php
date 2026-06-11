@@ -30,6 +30,15 @@
                 </div>
             </article>
 
+            <section class="dashboard-checkin" aria-labelledby="dashboardCheckInTitle">
+                <div>
+                    <p class="eyebrow">{{ $tools['dashboard']['checkin']['eyebrow'] }}</p>
+                    <h2 id="dashboardCheckInTitle">{{ $tools['dashboard']['checkin']['title'] }}</h2>
+                    <p>{{ $tools['dashboard']['checkin']['body'] }}</p>
+                </div>
+                <a class="primary-link" href="{{ route('tools.checkin', ['lang' => $locale]) }}">{{ $tools['dashboard']['checkin']['action'] }}</a>
+            </section>
+
             <section class="dashboard-triage" aria-labelledby="dashboardTriageTitle">
                 <div>
                     <p class="eyebrow">{{ $tools['dashboard']['triage']['eyebrow'] }}</p>
