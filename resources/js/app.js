@@ -627,7 +627,7 @@ if (toolRoot) {
     }
 
     if (tool === 'dashboard') {
-        initDashboard(tools, activeToolLocale);
+        initDashboard(tools, activeToolLocale, JSON.parse(toolRoot.dataset.links || '{}'));
     }
 
     if (tool === 'reminders') {
@@ -3943,11 +3943,11 @@ function taskToText(tools, data) {
     ].join('\n');
 }
 
-function initDashboard(tools, locale) {
+function initDashboard(tools, locale, links = {}) {
     const copy = tools.dashboard;
     const saved = readSupportKit(locale);
 
-    renderDashboard(copy, saved);
+    renderDashboard(copy, saved, tools, links);
 
     document.getElementById('dashboardExportButton').addEventListener('click', () => {
         downloadText('adhd-support-kit.txt', dashboardSupportKitText(copy, readSupportKit(locale)));
@@ -4006,7 +4006,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.tracker',
         ].forEach((key) => supportStorage.removeItem(key));
 
-        renderDashboard(copy, readSupportKit(locale));
+        renderDashboard(copy, readSupportKit(locale), tools, links);
         document.getElementById('dashboardNextBody').textContent = copy.cleared;
     });
 }
@@ -4145,7 +4145,7 @@ function dashboardSupportKitText(copy, saved) {
     ].join('\n');
 }
 
-function renderDashboard(copy, saved) {
+function renderDashboard(copy, saved, tools = {}, links = {}) {
     const summaries = dashboardSummaries(copy, saved);
 
     Object.entries(copy.cards).forEach(([key, card]) => {
@@ -4166,6 +4166,8 @@ function renderDashboard(copy, saved) {
     const nextBody = document.getElementById('dashboardNextBody');
     const nextLink = document.getElementById('dashboardNextLink');
 
+    renderDashboardCheckIn(copy, tools.checkin, links, saved.checkin);
+
     if (! next) {
         nextTitle.textContent = copy.empty_title;
         nextBody.textContent = copy.empty_body;
@@ -4179,6 +4181,55 @@ function renderDashboard(copy, saved) {
     nextBody.textContent = copy.next[next.key];
     nextLink.href = document.querySelector(`[data-dashboard-card="${next.key}"] a`).href;
     nextLink.textContent = copy.cards[next.key].action;
+}
+
+function renderDashboardCheckIn(copy, checkInCopy, links, data) {
+    const state = document.getElementById('dashboardCheckInState');
+    const mood = document.getElementById('dashboardCheckInMood');
+    const first = document.getElementById('dashboardCheckInFirst');
+    const toolList = document.getElementById('dashboardCheckInTools');
+    const action = document.getElementById('dashboardCheckInLink');
+
+    if (! state || ! mood || ! first || ! toolList || ! action || ! checkInCopy) {
+        return;
+    }
+
+    toolList.replaceChildren();
+
+    if (! data?.feeling && ! data?.message) {
+        state.textContent = copy.checkin.today.empty_state;
+        mood.textContent = copy.checkin.today.empty_mood;
+        first.textContent = copy.checkin.today.empty_first;
+        action.textContent = copy.checkin.action;
+
+        return;
+    }
+
+    const plan = dailyCheckInPlan(checkInCopy, data);
+    const feeling = checkInCopy.feelings[data.feeling] || checkInCopy.feelings.overwhelmed;
+    const energy = checkInCopy.energies[data.energy] || checkInCopy.energies.medium;
+    const pressure = checkInCopy.pressures[data.pressure] || checkInCopy.pressures.unsure;
+
+    state.textContent = copy.checkin.today.saved_state;
+    mood.textContent = copy.checkin.today.mood_line
+        .replace(':feeling', feeling)
+        .replace(':energy', energy)
+        .replace(':pressure', pressure);
+    first.textContent = plan.first;
+    action.textContent = copy.checkin.today.action_saved;
+
+    plan.recommendations.slice(0, 3).forEach((key) => {
+        const recommendation = checkInCopy.recommendations[key];
+
+        if (! recommendation || ! links[key]) {
+            return;
+        }
+
+        const link = document.createElement('a');
+        link.href = links[key];
+        link.textContent = recommendation.title;
+        toolList.append(link);
+    });
 }
 
 function dashboardNext(saved) {

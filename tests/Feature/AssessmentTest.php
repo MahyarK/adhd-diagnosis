@@ -88,8 +88,11 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Your local ADHD support kit.')
             ->assertSee('Pick the closest problem.')
+            ->assertSee('No check-in saved yet')
+            ->assertSee('After you check in, this space will show one tiny action and a few matched tools.')
             ->assertSee('Download readable kit')
             ->assertSee('Download data backup')
+            ->assertSee('/tools/daily-check-in?lang=en', false)
             ->assertSee('/tools/money-admin?lang=en', false);
 
         $this->get('/resources?lang=en')

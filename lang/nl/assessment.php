@@ -3172,6 +3172,15 @@ return [
                 'title' => 'Vertel de app hoe vandaag voelt.',
                 'body' => 'Een korte, natuurlijke check-in kan je naar het juiste hulpmiddel sturen zonder alles te bekijken.',
                 'action' => 'Start check-in',
+                'today' => [
+                    'empty_state' => 'Nog geen check-in opgeslagen',
+                    'empty_mood' => 'Begin met hoe vandaag voelt.',
+                    'empty_first' => 'Na je check-in toont deze plek één kleine actie en een paar passende hulpmiddelen.',
+                    'saved_state' => 'Check-in van vandaag',
+                    'mood_line' => ':feeling · :energy · :pressure',
+                    'tools' => 'Hulpmiddelen die vandaag passen',
+                    'action_saved' => 'Check-in bijwerken',
+                ],
             ],
             'export_text' => [
                 'title' => 'ADHD-supportkit',

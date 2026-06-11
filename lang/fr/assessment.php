@@ -3172,6 +3172,15 @@ return [
                 'title' => 'Dites à l’app comment se sent aujourd’hui.',
                 'body' => 'Un court check-in naturel peut vous orienter vers le bon outil sans tout parcourir.',
                 'action' => 'Commencer le check-in',
+                'today' => [
+                    'empty_state' => 'Aucun check-in enregistré',
+                    'empty_mood' => 'Commencez par dire comment se sent aujourd’hui.',
+                    'empty_first' => 'Après le check-in, cet espace montrera une petite action et quelques outils adaptés.',
+                    'saved_state' => 'Check-in d’aujourd’hui',
+                    'mood_line' => ':feeling · :energy · :pressure',
+                    'tools' => 'Outils adaptés à aujourd’hui',
+                    'action_saved' => 'Mettre à jour le check-in',
+                ],
             ],
             'export_text' => [
                 'title' => 'Kit de soutien TDAH',

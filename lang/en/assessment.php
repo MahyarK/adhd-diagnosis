@@ -3172,6 +3172,15 @@ return [
                 'title' => 'Tell the app how today feels.',
                 'body' => 'A short, natural check-in can route you to the right tool without browsing everything.',
                 'action' => 'Start check-in',
+                'today' => [
+                    'empty_state' => 'No check-in saved yet',
+                    'empty_mood' => 'Start with how today feels.',
+                    'empty_first' => 'After you check in, this space will show one tiny action and a few matched tools.',
+                    'saved_state' => 'Today’s check-in',
+                    'mood_line' => ':feeling · :energy · :pressure',
+                    'tools' => 'Tools that fit today',
+                    'action_saved' => 'Update check-in',
+                ],
             ],
             'export_text' => [
                 'title' => 'ADHD support kit',

@@ -1,3 +1,31 @@
+@php
+    $checkInLinks = [
+        'planner' => route('tools.planner', ['lang' => $locale]),
+        'body' => route('tools.body', ['lang' => $locale]),
+        'food' => route('tools.food', ['lang' => $locale]),
+        'sleep' => route('tools.sleep', ['lang' => $locale]),
+        'task' => route('tools.task', ['lang' => $locale]),
+        'focus' => route('tools.focus', ['lang' => $locale]),
+        'motivation' => route('tools.motivation', ['lang' => $locale]),
+        'accountability' => route('tools.accountability', ['lang' => $locale]),
+        'decision' => route('tools.decision', ['lang' => $locale]),
+        'energy' => route('tools.energy', ['lang' => $locale]),
+        'emotion' => route('tools.emotion', ['lang' => $locale]),
+        'safety' => route('tools.safety', ['lang' => $locale]),
+        'money' => route('tools.money', ['lang' => $locale]),
+        'followup' => route('tools.followup', ['lang' => $locale]),
+        'home' => route('tools.home', ['lang' => $locale]),
+        'transition' => route('tools.transition', ['lang' => $locale]),
+        'time' => route('tools.time', ['lang' => $locale]),
+        'digital' => route('tools.digital', ['lang' => $locale]),
+        'communication' => route('tools.communication', ['lang' => $locale]),
+        'goal' => route('tools.goal', ['lang' => $locale]),
+        'routine' => route('tools.routine', ['lang' => $locale]),
+        'wins' => route('tools.wins', ['lang' => $locale]),
+        'navigator' => route('tools.navigator', ['lang' => $locale]),
+    ];
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
 <head>
@@ -9,7 +37,7 @@
 <body>
     @include('partials.navbar')
 
-    <main class="tool-shell dashboard-shell" data-tool="dashboard" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+    <main class="tool-shell dashboard-shell" data-tool="dashboard" data-locale="{{ $locale }}" data-tools='@json($tools)' data-links='@json($checkInLinks)'>
         <section class="tool-hero">
             <p class="eyebrow">{{ $tools['dashboard']['eyebrow'] }}</p>
             <h1>{{ $tools['dashboard']['title'] }}</h1>
@@ -36,7 +64,13 @@
                     <h2 id="dashboardCheckInTitle">{{ $tools['dashboard']['checkin']['title'] }}</h2>
                     <p>{{ $tools['dashboard']['checkin']['body'] }}</p>
                 </div>
-                <a class="primary-link" href="{{ route('tools.checkin', ['lang' => $locale]) }}">{{ $tools['dashboard']['checkin']['action'] }}</a>
+                <div class="dashboard-checkin-panel" aria-live="polite">
+                    <span id="dashboardCheckInState">{{ $tools['dashboard']['checkin']['today']['empty_state'] }}</span>
+                    <strong id="dashboardCheckInMood">{{ $tools['dashboard']['checkin']['today']['empty_mood'] }}</strong>
+                    <p id="dashboardCheckInFirst">{{ $tools['dashboard']['checkin']['today']['empty_first'] }}</p>
+                    <div class="dashboard-checkin-tools" id="dashboardCheckInTools" aria-label="{{ $tools['dashboard']['checkin']['today']['tools'] }}"></div>
+                    <a class="primary-link" id="dashboardCheckInLink" href="{{ route('tools.checkin', ['lang' => $locale]) }}">{{ $tools['dashboard']['checkin']['action'] }}</a>
+                </div>
             </section>
 
             <section class="dashboard-triage" aria-labelledby="dashboardTriageTitle">

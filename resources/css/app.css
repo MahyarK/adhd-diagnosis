@@ -1076,10 +1076,10 @@ h2 {
 }
 
 .dashboard-checkin {
-    display: flex;
+    display: grid;
     grid-column: 1 / -1;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
     align-items: center;
-    justify-content: space-between;
     gap: 14px;
     padding: 16px;
     background: var(--accent-light);
@@ -1093,6 +1093,56 @@ h2 {
 .dashboard-checkin p {
     margin-bottom: 0;
     color: var(--text-secondary);
+}
+
+.dashboard-checkin-panel {
+    display: grid;
+    gap: 9px;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid rgb(91 138 121 / 28%);
+    border-radius: 10px;
+    background: rgb(255 255 255 / 72%);
+}
+
+.dashboard-checkin-panel span {
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.dashboard-checkin-panel strong {
+    color: var(--text-primary);
+    font-size: 18px;
+    line-height: 1.25;
+}
+
+.dashboard-checkin-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.dashboard-checkin-tools a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    max-width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    background: var(--surface);
+    color: var(--accent-hover);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.dashboard-checkin-panel .primary-link {
+    justify-self: start;
 }
 
 .dashboard-triage {
@@ -1866,8 +1916,8 @@ h2 {
     }
 
     .dashboard-checkin {
-        align-items: flex-start;
-        flex-direction: column;
+        align-items: stretch;
+        grid-template-columns: 1fr;
     }
 
     .action-buttons {
