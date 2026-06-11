@@ -40,5 +40,6 @@ Route::get('/tools/errand-launch', [AssessmentController::class, 'errandLaunch']
 Route::get('/tools/provider-shortlist', [AssessmentController::class, 'providerShortlist'])->name('tools.providers');
 Route::get('/tools/access-plan', [AssessmentController::class, 'accessPlan'])->name('tools.access');
 Route::get('/tools/task-breakdown', [AssessmentController::class, 'taskBreakdown'])->name('tools.task');
+Route::get('/tools/follow-up-rescue', [AssessmentController::class, 'followUpRescue'])->name('tools.followup');
 Route::get('/tools/reminders', [AssessmentController::class, 'reminders'])->name('tools.reminders');
 Route::get('/tools/symptom-tracker', [AssessmentController::class, 'symptomTracker'])->name('tools.tracker');

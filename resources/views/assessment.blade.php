@@ -87,6 +87,7 @@
                     <a class="primary-link" href="{{ route('tools.providers', ['lang' => $locale]) }}">{{ __('assessment.ui.provider_shortlist') }}</a>
                     <a class="primary-link" href="{{ route('tools.access', ['lang' => $locale]) }}">{{ __('assessment.ui.access_plan') }}</a>
                     <a class="primary-link" href="{{ route('tools.task', ['lang' => $locale]) }}">{{ __('assessment.ui.break_task') }}</a>
+                    <a class="primary-link" href="{{ route('tools.followup', ['lang' => $locale]) }}">{{ __('assessment.ui.follow_up_rescue') }}</a>
                     <a class="primary-link" href="{{ route('tools.reminders', ['lang' => $locale]) }}">{{ __('assessment.ui.set_reminder') }}</a>
                     <a class="primary-link" href="{{ route('tools.tracker', ['lang' => $locale]) }}">{{ __('assessment.ui.track_symptoms') }}</a>
                 </div>

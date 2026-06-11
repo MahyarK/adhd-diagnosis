@@ -224,6 +224,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('یک کار سنگین را به قدم‌های کوچک و قابل دیدن تبدیل کن.');
 
+        $this->get('/tools/follow-up-rescue?lang=nl')
+            ->assertOk()
+            ->assertSee('Pak één vergeten follow-up op zonder schaamtespiraal.');
+
         $this->get('/tools/reminders?lang=en')
             ->assertOk()
             ->assertSee('Make the next step harder to forget.');

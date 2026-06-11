@@ -66,9 +66,9 @@ button {
     inset: 0 0 auto 0;
     z-index: 100;
     display: grid;
-    grid-template-columns: minmax(170px, 280px) minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(150px, 240px) minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
     height: var(--header-height);
     padding: 0 clamp(12px, 2.2vw, 28px);
@@ -87,7 +87,8 @@ button {
     min-width: 0;
     overflow: hidden;
     height: 100%;
-    padding-inline-end: 8px;
+    max-width: 100%;
+    padding-inline-end: 6px;
     text-decoration: none;
     color: inherit;
     isolation: isolate;
@@ -100,6 +101,9 @@ button {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .navbar-title {
@@ -128,7 +132,7 @@ button {
     align-items: center;
     justify-content: center;
     min-height: 34px;
-    padding: 0 11px;
+    padding: 0 10px;
     border-radius: 99px;
     color: var(--text-secondary);
     font-size: 12px;
@@ -151,7 +155,7 @@ button {
 }
 
 .primary-nav a {
-    max-width: 134px;
+    max-width: 128px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -197,11 +201,11 @@ button {
 .tool-menu-panel {
     position: fixed;
     top: calc(var(--header-height) + 8px);
-    right: clamp(8px, 2vw, 28px);
+    right: clamp(12px, 2.2vw, 28px);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    width: min(820px, calc(100vw - 24px));
+    width: min(820px, calc(100vw - 32px));
     max-height: calc(100dvh - var(--header-height) - 24px);
     padding: 12px;
     overflow-y: auto;
@@ -305,7 +309,7 @@ button {
 .lang-menu {
     position: fixed;
     top: calc(var(--header-height) + 8px);
-    right: clamp(8px, 2vw, 28px);
+    right: clamp(12px, 2.2vw, 28px);
     min-width: 160px;
     padding: 6px;
     background: var(--surface);
@@ -1684,6 +1688,10 @@ h2 {
         gap: 6px;
     }
 
+    .primary-nav {
+        display: none;
+    }
+
     .navbar-eyebrow {
         display: none;
     }
@@ -1752,6 +1760,36 @@ h2 {
     .action-buttons .primary-link,
     .action-buttons .secondary-button {
         width: 100%;
+    }
+}
+
+@media (min-width: 621px) and (max-width: 900px) {
+    .navbar {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+
+    .primary-nav {
+        display: none;
+    }
+
+    .tool-menu-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 420px) {
+    .navbar-title {
+        font-size: 12px;
+    }
+
+    .lang-dropdown summary span,
+    .tool-menu summary span {
+        max-width: 56px;
+    }
+
+    .tool-menu-panel {
+        grid-template-columns: 1fr;
+        padding: 10px;
     }
 }
 

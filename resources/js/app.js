@@ -610,6 +610,10 @@ if (toolRoot) {
         initTaskBreakdown(tools);
     }
 
+    if (tool === 'followup') {
+        initFollowUpRescue(tools);
+    }
+
     if (tool === 'dashboard') {
         initDashboard(tools, activeToolLocale);
     }
@@ -3759,6 +3763,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.providers',
             'adhdSupport.access',
             'adhdSupport.task',
+            'adhdSupport.followup',
             'adhdSupport.reminders',
             'adhdSupport.tracker',
         ].forEach((key) => supportStorage.removeItem(key));
@@ -3804,6 +3809,7 @@ function readSupportKit(locale = 'en') {
         providers: readProviders(),
         access: readJson('adhdSupport.access'),
         task: readJson('adhdSupport.task'),
+        followup: readJson('adhdSupport.followup'),
         reminders: readJson('adhdSupport.reminders'),
         tracker: readJson('adhdSupport.tracker'),
     };
@@ -3865,6 +3871,7 @@ function renderDashboard(copy, saved) {
         providers: saved.providers?.length ? String(saved.providers.length) : '',
         access: saved.access?.barrier ? copy.cards.access.title : '',
         task: saved.task?.focus,
+        followup: saved.followup?.thing || saved.followup?.kind,
         reminders: reminderSummary(saved.reminders),
         tracker: saved.tracker?.date,
     };
@@ -3909,6 +3916,10 @@ function dashboardNext(saved) {
 
     if (saved.task?.focus) {
         return { key: 'task' };
+    }
+
+    if (saved.followup?.thing || saved.followup?.kind) {
+        return { key: 'followup' };
     }
 
     if (saved.reminders?.date) {
@@ -4052,6 +4063,105 @@ function dashboardNext(saved) {
 
 function firstLine(value) {
     return lines(value)[0] || '';
+}
+
+function initFollowUpRescue(tools) {
+    const form = document.getElementById('followupForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.followup') ?? '{}');
+    const fields = {
+        thing: document.getElementById('followupThing'),
+        kind: document.getElementById('followupKind'),
+        lateness: document.getElementById('followupLateness'),
+        person: document.getElementById('followupPerson'),
+        blocker: document.getElementById('followupBlocker'),
+        nextDate: document.getElementById('followupNextDate'),
+    };
+
+    hydrateFields(fields, {
+        kind: 'unsure',
+        lateness: 'unsure',
+        ...saved,
+    });
+    renderFollowUpRescue(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.followup', JSON.stringify(data));
+        renderFollowUpRescue(tools, data);
+    });
+
+    document.getElementById('followupPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('followupDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-follow-up-rescue.txt', followUpRescueToText(tools, collectFields(fields)));
+    });
+    document.getElementById('followupClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.followup');
+        hydrateFields(fields, { kind: 'unsure', lateness: 'unsure' });
+        renderFollowUpRescue(tools, collectFields(fields));
+    });
+}
+
+function renderFollowUpRescue(tools, data) {
+    const copy = tools.followup;
+    const plan = followUpRescuePlan(copy, data);
+
+    document.getElementById('followupOutputTitle').textContent = copy.output_title.replace(':thing', plan.thing);
+    document.getElementById('followupFirstText').textContent = plan.first;
+    document.getElementById('followupScriptText').textContent = plan.script;
+    renderList('followupStepList', plan.steps, copy.steps.unsure[0]);
+    renderList('followupQuestionList', plan.questions, copy.questions.shared[0]);
+    document.getElementById('followupStopText').textContent = copy.stop_rule;
+}
+
+function followUpRescuePlan(copy, data) {
+    const kind = copy.kinds[data.kind] ? data.kind : 'unsure';
+    const lateness = copy.lateness[data.lateness] ? data.lateness : 'unsure';
+    const thing = data.thing?.trim() || copy.defaults.thing[kind] || copy.defaults.thing.unsure;
+    const person = data.person?.trim() || copy.defaults.person[kind] || copy.defaults.person.unsure;
+    const blocker = data.blocker?.trim();
+    const nextDate = data.nextDate?.trim() || copy.defaults.next_date;
+    const blockerLine = blocker ? ` ${copy.blocker_line.replace(':blocker', blocker)}` : '';
+
+    return {
+        thing,
+        first: `${copy.first_action.replace(':thing', thing)} ${copy.lateness_notes[lateness]}${blockerLine}`,
+        script: copy.script
+            .replace(':person', person)
+            .replace(':thing', thing),
+        steps: [
+            ...(copy.steps[kind] || copy.steps.unsure),
+            copy.next_date_step.replace(':date', nextDate),
+        ],
+        questions: [
+            ...(copy.questions[kind] || copy.questions.unsure),
+            ...copy.questions.shared,
+        ],
+    };
+}
+
+function followUpRescueToText(tools, data) {
+    const copy = tools.followup;
+    const plan = followUpRescuePlan(copy, data);
+
+    return [
+        copy.output_title.replace(':thing', plan.thing),
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.questions,
+        ...plan.questions.map((item) => `- ${item}`),
+        '',
+        copy.sections.stop,
+        copy.stop_rule,
+    ].join('\n');
 }
 
 function initReminders(tools) {

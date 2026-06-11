@@ -209,6 +209,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.task-breakdown');
     }
 
+    public function followUpRescue(Request $request): View
+    {
+        return $this->toolView($request, 'tools.follow-up-rescue');
+    }
+
     public function reminders(Request $request): View
     {
         return $this->toolView($request, 'tools.reminders');

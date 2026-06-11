@@ -48,6 +48,7 @@
                 ['route' => 'tools.aid', 'label' => __('assessment.ui.aid_application')],
                 ['route' => 'tools.weekly', 'label' => __('assessment.ui.weekly_reset')],
                 ['route' => 'tools.task', 'label' => __('assessment.ui.task_breakdown')],
+                ['route' => 'tools.followup', 'label' => __('assessment.ui.follow_up_rescue')],
                 ['route' => 'tools.reminders', 'label' => __('assessment.ui.reminders')],
                 ['route' => 'tools.tracker', 'label' => __('assessment.ui.symptom_tracker')],
             ],

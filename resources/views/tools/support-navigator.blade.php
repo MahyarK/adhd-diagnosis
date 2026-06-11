@@ -9,6 +9,7 @@
         'food' => route('tools.food', ['lang' => $locale]),
         'sleep' => route('tools.sleep', ['lang' => $locale]),
         'money' => route('tools.money', ['lang' => $locale]),
+        'followup' => route('tools.followup', ['lang' => $locale]),
         'reminders' => route('tools.reminders', ['lang' => $locale]),
         'access' => route('tools.access', ['lang' => $locale]),
         'aid' => route('tools.aid', ['lang' => $locale]),

@@ -89,6 +89,7 @@ Features:
 - Home reset planner for cleaning, clutter, dishes, trash, and leaving-home routines.
 - Money/admin rescue planner for bills, forms, emails, appointments, and overdue tasks.
 - Aid application helper for financial assistance, charity care, public benefits, school/work support, debt hardship, and housing paperwork.
+- Follow-up rescue planner for missed replies, referrals, applications, bookings, and status checks without shame.
 - Errand launch planner for appointments, pharmacy trips, paperwork drop-offs, transport choices, late scripts, and backup plans.
 - Communication repair planner for late replies, conflict, boundaries, and asking for support.
 - Work/school support menu for choosing one practical adjustment to test around focus, deadlines, memory, overwhelm, transitions, or communication.
@@ -139,6 +140,7 @@ Help users remember help-seeking and self-support steps.
 
 Current foundation:
 
+- Follow-up rescue worksheet that creates a two-minute re-entry action, no-shame contact script, status questions, stop rule, and downloadable card.
 - Reminder worksheet with common follow-up types.
 - Local saved reminder shown on the dashboard.
 - Downloadable `.ics` calendar reminder.
@@ -250,6 +252,7 @@ Downloads:
 - Home reset card.
 - Money/admin rescue card.
 - Aid application helper card.
+- Follow-up rescue card.
 - Errand launch card.
 - Communication repair draft.
 - Energy crash rescue card.
@@ -272,11 +275,11 @@ Create a gentle home base after screening.
 
 Current foundation:
 
-- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, and task breakdown.
+- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, task breakdown, and follow-up rescue.
 - “Next tiny step” prompt based on what the user has saved.
 - Downloadable local support kit export.
 - Clear local support kit action.
-- Saved weekly reset, follow-up reminder, and symptom tracker summary.
+- Saved weekly reset, follow-up rescue, follow-up reminder, and symptom tracker summary.
 
 Sections:
 
@@ -393,7 +396,8 @@ Build this next:
 35. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
 36. Add a support navigator for choosing the best next tool when the user is unsure where to start.
 37. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
-38. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+38. Add a follow-up rescue tool for missed replies, referrals, applications, bookings, and status checks with a no-shame script and downloadable card.
+39. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/follow-up rescues/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -425,6 +429,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a digital clutter rescue card and print/download it.
 - A user can create a money/admin rescue card and print/download it.
 - A user can organize a low-cost aid/support application with documents, questions, contact script, and follow-up plan.
+- A user can recover a missed follow-up with a two-minute action, no-shame script, status questions, and print/download.
 - A user can create a lost item rescue card and print/download it.
 - A user can create an errand launch card and print/download it.
 - A user can prepare what to say to a clinician and print/download it.
