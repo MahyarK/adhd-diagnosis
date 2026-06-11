@@ -47,4 +47,16 @@ class SupportNavigatorPlanBuilderTest extends TestCase
 
         $this->assertSame(['safety', 'emotion', 'wins', 'energy'], $plan->recommendations);
     }
+
+    public function test_it_prioritizes_job_rescue_for_work_school_support(): void
+    {
+        $plan = (new SupportNavigatorPlanBuilder)->build(new SupportNavigatorInput(
+            topic: 'workschool',
+            urgency: 'soon',
+            energy: 'medium',
+            knownNext: '',
+        ));
+
+        $this->assertSame(['job', 'workschool', 'support', 'communication'], $plan->recommendations);
+    }
 }

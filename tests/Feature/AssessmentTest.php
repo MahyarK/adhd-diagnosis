@@ -156,6 +156,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Kies één praktische steun om te testen, geen hele nieuwe persoonlijkheid.');
 
+        $this->get('/tools/job-hunt?lang=en')
+            ->assertOk()
+            ->assertSee('Move one job or income step without rebuilding your whole life.');
+
         $this->get('/tools/home-reset?lang=nl')
             ->assertOk()
             ->assertSee('Reset één plek zonder er een levensreorganisatie van te maken.');

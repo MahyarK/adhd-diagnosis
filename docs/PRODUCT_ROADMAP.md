@@ -94,6 +94,7 @@ Features:
 - Errand launch planner for appointments, pharmacy trips, paperwork drop-offs, transport choices, late scripts, and backup plans.
 - Communication repair planner for late replies, conflict, boundaries, and asking for support.
 - Work/school support menu for choosing one practical adjustment to test around focus, deadlines, memory, overwhelm, transitions, or communication.
+- Job hunt rescue planner for resumes, applications, interviews, follow-ups, urgent income steps, and shame-free restart points.
 - Energy crash rescue planner for burnout, low-capacity days, and “I cannot do the whole day” moments.
 - Decision rescue planner for choosing one good-enough priority when everything feels urgent.
 - Focus sprint planner with timer, body-double support, distraction parking, and reward.
@@ -251,6 +252,7 @@ Downloads:
 - Medication/therapy discussion notes.
 - Work/school/home support request draft.
 - Work/school support menu card.
+- Job hunt rescue card.
 - Home reset card.
 - Money/admin rescue card.
 - Aid application helper card.
@@ -278,11 +280,11 @@ Create a gentle home base after screening.
 
 Current foundation:
 
-- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, task breakdown, safety pause, and follow-up rescue.
+- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, task breakdown, job hunt rescue, safety pause, and follow-up rescue.
 - “Next tiny step” prompt based on what the user has saved.
 - Downloadable local support kit export.
 - Clear local support kit action.
-- Saved weekly reset, safety pause, follow-up rescue, follow-up reminder, and symptom tracker summary.
+- Saved weekly reset, job hunt rescue, safety pause, follow-up rescue, follow-up reminder, and symptom tracker summary.
 
 Sections:
 
@@ -384,24 +386,25 @@ Build this next:
 20. Add a low-cost access plan for care barriers.
 21. Add care discussion notes and a support request builder.
 22. Add a work/school support menu for practical adjustments, scripts, trial periods, and review notes.
-23. Add a home reset tool for cleaning and clutter overwhelm.
-24. Add a laundry rescue tool for wearable clothes, wet loads, shared machines, and no-fold clean zones.
-25. Add a digital clutter rescue tool for tabs, messages, files, notifications, and restart notes.
-26. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
-27. Add a lost item rescue tool for keys, wallet, phone, documents, medicine, and prevention spots.
-28. Add an errand launch tool for leaving, contacting, travel mode, what-to-bring lists, late scripts, and backup plans.
-29. Add a morning/evening/leaving-home routine builder.
-30. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
-31. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
-32. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
-33. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
-34. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
-35. Add a safety pause tool for urgent emotional moments, uncertain safety, reaching out, crisis resources, and a non-emergency stabilizing plan.
-36. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
-37. Add a support navigator for choosing the best next tool when the user is unsure where to start.
-38. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
-39. Add a follow-up rescue tool for missed replies, referrals, applications, bookings, and status checks with a no-shame script and downloadable card.
-40. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/safety pause/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/follow-up rescues/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+23. Add a job hunt rescue tool for resumes, applications, interviews, follow-ups, urgent income steps, and restart points.
+24. Add a home reset tool for cleaning and clutter overwhelm.
+25. Add a laundry rescue tool for wearable clothes, wet loads, shared machines, and no-fold clean zones.
+26. Add a digital clutter rescue tool for tabs, messages, files, notifications, and restart notes.
+27. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
+28. Add a lost item rescue tool for keys, wallet, phone, documents, medicine, and prevention spots.
+29. Add an errand launch tool for leaving, contacting, travel mode, what-to-bring lists, late scripts, and backup plans.
+30. Add a morning/evening/leaving-home routine builder.
+31. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
+32. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
+33. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
+34. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
+35. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
+36. Add a safety pause tool for urgent emotional moments, uncertain safety, reaching out, crisis resources, and a non-emergency stabilizing plan.
+37. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
+38. Add a support navigator for choosing the best next tool when the user is unsure where to start.
+39. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
+40. Add a follow-up rescue tool for missed replies, referrals, applications, bookings, and status checks with a no-shame script and downloadable card.
+41. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/safety pause/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/follow-up rescues/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/job hunt rescues/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -440,6 +443,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can prepare what to say to a clinician and print/download it.
 - A user can draft a practical support request for work, school, home, or a trusted helper.
 - A user can create a work/school support menu and print/download it.
+- A user can move one job or income step forward with a printable/downloadable rescue card.
 - A user can break an overwhelming task into tiny steps and print/download it.
 - A user can create a calendar reminder for follow-up.
 - A user can track symptoms, sleep, stress, and context for a clinician-ready snapshot.

@@ -14,7 +14,7 @@ final class SupportNavigatorPlanBuilder
         'home' => ['home', 'laundry', 'lost'],
         'care' => ['followup', 'appointment', 'care', 'providers'],
         'emotional' => ['safety', 'emotion', 'wins', 'energy'],
-        'workschool' => ['workschool', 'support', 'communication'],
+        'workschool' => ['job', 'workschool', 'support', 'communication'],
         'leaving' => ['errand', 'transition', 'lost'],
         'unsure' => ['task', 'body', 'decision'],
     ];

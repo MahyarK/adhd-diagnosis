@@ -24,6 +24,7 @@
         'energy' => route('tools.energy', ['lang' => $locale]),
         'support' => route('tools.support', ['lang' => $locale]),
         'workschool' => route('tools.workschool', ['lang' => $locale]),
+        'job' => route('tools.job', ['lang' => $locale]),
         'communication' => route('tools.communication', ['lang' => $locale]),
         'errand' => route('tools.errand', ['lang' => $locale]),
         'transition' => route('tools.transition', ['lang' => $locale]),

@@ -44,6 +44,7 @@
                 ['route' => 'tools.care', 'label' => __('assessment.ui.care_notes')],
                 ['route' => 'tools.support', 'label' => __('assessment.ui.support_request')],
                 ['route' => 'tools.workschool', 'label' => __('assessment.ui.work_school_support')],
+                ['route' => 'tools.job', 'label' => __('assessment.ui.job_hunt')],
                 ['route' => 'tools.providers', 'label' => __('assessment.ui.provider_shortlist')],
                 ['route' => 'tools.access', 'label' => __('assessment.ui.access_plan')],
                 ['route' => 'tools.aid', 'label' => __('assessment.ui.aid_application')],
@@ -58,7 +59,7 @@
 @endphp
 
 <header class="navbar" role="banner">
-    <a class="navbar-brand" href="{{ route('assessment.show') }}">
+    <a class="navbar-brand" href="{{ route('assessment.show', ['lang' => $locale]) }}">
         <span class="navbar-eyebrow">{{ __('assessment.meta.eyebrow') }}</span>
         <span class="navbar-title">{{ __('assessment.meta.heading') }}</span>
     </a>
@@ -68,7 +69,7 @@
     </nav>
     <nav class="tool-menu" aria-label="{{ __('assessment.ui.tools') }}">
         <details>
-            <summary @class(['active' => request()->routeIs('tools.*')])>
+            <summary @class(['active' => request()->routeIs('tools.*')]) aria-label="{{ __('assessment.ui.tools') }}">
                 <span>{{ __('assessment.ui.tools') }}</span>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -88,7 +89,7 @@
     </nav>
     <nav class="lang-dropdown" aria-label="{{ __('assessment.ui.language') }}">
         <details>
-            <summary>
+            <summary aria-label="{{ __('assessment.ui.language') }}">
                 <span>{{ $locales[$locale] }}</span>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

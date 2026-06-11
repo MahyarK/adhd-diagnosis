@@ -164,6 +164,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.work-school-support');
     }
 
+    public function jobHunt(Request $request): View
+    {
+        return $this->toolView($request, 'tools.job-hunt');
+    }
+
     public function homeReset(Request $request): View
     {
         return $this->toolView($request, 'tools.home-reset');

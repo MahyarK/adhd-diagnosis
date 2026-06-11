@@ -66,9 +66,9 @@ button {
     inset: 0 0 auto 0;
     z-index: 100;
     display: grid;
-    grid-template-columns: minmax(150px, 240px) minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(168px, 240px) minmax(0, 1fr) max-content max-content;
     align-items: center;
-    gap: 8px;
+    gap: clamp(6px, 1vw, 12px);
     width: 100%;
     height: var(--header-height);
     padding: 0 clamp(12px, 2.2vw, 28px);
@@ -76,6 +76,10 @@ button {
     border-bottom: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(14px);
+}
+
+.navbar > * {
+    min-width: 0;
 }
 
 .navbar-brand {
@@ -88,7 +92,7 @@ button {
     overflow: hidden;
     height: 100%;
     max-width: 100%;
-    padding-inline-end: 6px;
+    padding-inline-end: clamp(4px, 1vw, 12px);
     text-decoration: none;
     color: inherit;
     isolation: isolate;
@@ -119,7 +123,7 @@ button {
 .primary-nav {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: 4px;
     min-width: 0;
     overflow: hidden;
@@ -142,6 +146,19 @@ button {
     transition: background 160ms ease, color 160ms ease;
 }
 
+.tool-menu summary,
+.lang-dropdown summary {
+    max-width: 100%;
+}
+
+.tool-menu summary span,
+.lang-dropdown summary span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .primary-nav a:hover,
 .tool-menu summary:hover {
     background: var(--accent-light);
@@ -155,7 +172,7 @@ button {
 }
 
 .primary-nav a {
-    max-width: 128px;
+    max-width: clamp(92px, 11vw, 148px);
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -205,7 +222,7 @@ button {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    width: min(820px, calc(100vw - 32px));
+    width: min(860px, calc(100vw - 32px));
     max-height: calc(100dvh - var(--header-height) - 24px);
     padding: 12px;
     overflow-y: auto;
@@ -268,6 +285,7 @@ button {
     align-items: center;
     gap: 6px;
     min-height: 34px;
+    max-width: 138px;
     padding: 0 12px;
     border: 1px solid var(--border);
     border-radius: 99px;
@@ -1504,23 +1522,24 @@ h2 {
 
 @media (max-width: 1120px) {
     .navbar {
-        grid-template-columns: minmax(120px, 1fr) auto auto auto;
+        grid-template-columns: minmax(128px, 1fr) auto auto;
         gap: 8px;
     }
 
-    .navbar-title {
+    .primary-nav {
         display: none;
     }
 
-    .primary-nav a {
-        max-width: 116px;
+    .navbar-title {
+        display: block;
+        font-size: 13px;
     }
 }
 
 /* ── Responsive: tablet ── */
 @media (max-width: 860px) {
     .navbar {
-        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-columns: minmax(118px, 1fr) max-content max-content;
         padding: 0 12px;
         gap: 8px;
     }
@@ -1721,7 +1740,7 @@ h2 {
     }
 
     .navbar {
-        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-columns: minmax(92px, 1fr) max-content max-content;
         padding-inline: 10px;
         gap: 6px;
     }
@@ -1770,7 +1789,7 @@ h2 {
 
     .lang-dropdown summary span,
     .tool-menu summary span {
-        max-width: 72px;
+        max-width: 74px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -1823,7 +1842,7 @@ h2 {
 
     .lang-dropdown summary span,
     .tool-menu summary span {
-        max-width: 56px;
+        max-width: 58px;
     }
 
     .tool-menu-panel {

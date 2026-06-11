@@ -574,6 +574,10 @@ if (toolRoot) {
         initWorkSchoolSupport(tools);
     }
 
+    if (tool === 'job') {
+        initJobHunt(tools);
+    }
+
     if (tool === 'home') {
         initHomeReset(tools);
     }
@@ -3565,6 +3569,102 @@ function workSchoolSupportToText(tools, data) {
     ].join('\n');
 }
 
+function initJobHunt(tools) {
+    const form = document.getElementById('jobForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.job') ?? '{}');
+    const fields = {
+        target: document.getElementById('jobTarget'),
+        stage: document.getElementById('jobStage'),
+        energy: document.getElementById('jobEnergy'),
+        blocker: document.getElementById('jobBlocker'),
+        contact: document.getElementById('jobContact'),
+        deadline: document.getElementById('jobDeadline'),
+    };
+
+    hydrateFields(fields, {
+        stage: 'unsure',
+        energy: 'medium',
+        ...saved,
+    });
+    renderJobHunt(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.job', JSON.stringify(data));
+        renderJobHunt(tools, data);
+    });
+
+    document.getElementById('jobPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('jobDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-job-hunt-rescue.txt', jobHuntToText(tools, collectFields(fields)));
+    });
+    document.getElementById('jobClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.job');
+        hydrateFields(fields, { stage: 'unsure', energy: 'medium' });
+        renderJobHunt(tools, collectFields(fields));
+    });
+}
+
+function renderJobHunt(tools, data) {
+    const copy = tools.job;
+    const plan = jobHuntPlan(copy, data);
+
+    document.getElementById('jobOutputTitle').textContent = copy.output_title.replace(':target', plan.target);
+    document.getElementById('jobFirstText').textContent = plan.first;
+    renderList('jobStepList', plan.steps, copy.steps.unsure[0]);
+    renderList('jobMaterialList', plan.materials, copy.materials.unsure[0]);
+    document.getElementById('jobScriptText').textContent = plan.script;
+    document.getElementById('jobStopText').textContent = copy.stop_rule;
+}
+
+function jobHuntPlan(copy, data) {
+    const stage = copy.stages[data.stage] ? data.stage : 'unsure';
+    const energy = copy.energies[data.energy] ? data.energy : 'medium';
+    const target = data.target?.trim() || copy.defaults.target;
+    const contact = data.contact?.trim() || copy.defaults.contact;
+    const deadline = data.deadline?.trim() || copy.defaults.deadline;
+    const blocker = data.blocker?.trim();
+    const blockerLine = blocker ? ` ${copy.blocker_line.replace(':blocker', blocker)}` : '';
+
+    return {
+        target,
+        first: `${copy.first_action.replace(':target', target)} ${copy.energy_lines[energy]}${blockerLine}`,
+        script: copy.script
+            .replace(':contact', contact)
+            .replace(':target', target),
+        steps: [
+            ...(copy.steps[stage] || copy.steps.unsure),
+            copy.deadline_step.replace(':deadline', deadline),
+        ],
+        materials: copy.materials[stage] || copy.materials.unsure,
+    };
+}
+
+function jobHuntToText(tools, data) {
+    const copy = tools.job;
+    const plan = jobHuntPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':target', plan.target),
+        '',
+        copy.sections.first,
+        plan.first,
+        '',
+        copy.sections.steps,
+        ...plan.steps.map((item) => `- ${item}`),
+        '',
+        copy.sections.materials,
+        ...plan.materials.map((item) => `- ${item}`),
+        '',
+        copy.sections.script,
+        plan.script,
+        '',
+        copy.sections.stop,
+        copy.stop_rule,
+    ].join('\n');
+}
+
 function initProviderShortlist(tools) {
     const form = document.getElementById('providerForm');
     const fields = {
@@ -3859,6 +3959,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.care',
             'adhdSupport.support',
             'adhdSupport.workschool',
+            'adhdSupport.job',
             'adhdSupport.home',
             'adhdSupport.laundry',
             'adhdSupport.digital',
@@ -3906,6 +4007,7 @@ function readSupportKit(locale = 'en') {
         care: readJson('adhdSupport.care'),
         support: readJson('adhdSupport.support'),
         workschool: readJson('adhdSupport.workschool'),
+        job: readJson('adhdSupport.job'),
         home: readJson('adhdSupport.home'),
         laundry: readJson('adhdSupport.laundry'),
         digital: readJson('adhdSupport.digital'),
@@ -3969,6 +4071,7 @@ function renderDashboard(copy, saved) {
         care: firstLine(saved.care?.main) || firstLine(saved.care?.help),
         support: saved.support?.situation || saved.support?.request,
         workschool: saved.workschool?.challenge || saved.workschool?.setting,
+        job: saved.job?.target || saved.job?.stage,
         home: saved.home?.space || saved.home?.mode,
         laundry: saved.laundry?.needed || saved.laundry?.mode,
         digital: saved.digital?.target || saved.digital?.mode,
@@ -4140,6 +4243,10 @@ function dashboardNext(saved) {
 
     if (saved.workschool?.challenge || saved.workschool?.setting) {
         return { key: 'workschool' };
+    }
+
+    if (saved.job?.target || saved.job?.stage) {
+        return { key: 'job' };
     }
 
     if (saved.home?.space || saved.home?.mode) {
