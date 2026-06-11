@@ -16,6 +16,7 @@ Route::get('/tools/medication-refill', [AssessmentController::class, 'medication
 Route::get('/tools/food-rescue', [AssessmentController::class, 'foodRescue'])->name('tools.food');
 Route::get('/tools/sleep-wind-down', [AssessmentController::class, 'sleepWindDown'])->name('tools.sleep');
 Route::get('/tools/motivation-menu', [AssessmentController::class, 'motivationMenu'])->name('tools.motivation');
+Route::get('/tools/wins-log', [AssessmentController::class, 'winsLog'])->name('tools.wins');
 Route::get('/tools/accountability', [AssessmentController::class, 'accountability'])->name('tools.accountability');
 Route::get('/tools/routine-builder', [AssessmentController::class, 'routineBuilder'])->name('tools.routine');
 Route::get('/tools/weekly-reset', [AssessmentController::class, 'weeklyReset'])->name('tools.weekly');

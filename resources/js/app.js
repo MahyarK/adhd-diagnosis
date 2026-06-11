@@ -514,6 +514,10 @@ if (toolRoot) {
         initMotivationMenu(tools);
     }
 
+    if (tool === 'wins') {
+        initWinsLog(tools);
+    }
+
     if (tool === 'accountability') {
         initAccountability(tools);
     }
@@ -1396,6 +1400,114 @@ function motivationToText(tools, data) {
         '',
         copy.sections.rules,
         ...plan.rules.map((item) => `- ${item}`),
+    ].join('\n');
+}
+
+function initWinsLog(tools) {
+    const form = document.getElementById('winsForm');
+    const saved = JSON.parse(supportStorage.getItem('adhdSupport.wins') ?? '{}');
+    const fields = {
+        win: document.getElementById('winsWin'),
+        category: document.getElementById('winsCategory'),
+        effort: document.getElementById('winsEffort'),
+        support: document.getElementById('winsSupport'),
+        pattern: document.getElementById('winsPattern'),
+        next: document.getElementById('winsNext'),
+    };
+
+    hydrateFields(fields, {
+        category: 'started',
+        effort: 'any',
+        ...saved,
+    });
+    renderWinsLog(tools, collectFields(fields));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = collectFields(fields);
+        supportStorage.setItem('adhdSupport.wins', JSON.stringify(data));
+        renderWinsLog(tools, data);
+    });
+
+    document.getElementById('winsPrintButton').addEventListener('click', () => window.print());
+    document.getElementById('winsDownloadButton').addEventListener('click', () => {
+        downloadText('adhd-wins-evidence-log.txt', winsLogToText(tools, collectFields(fields)));
+    });
+    document.getElementById('winsClearButton').addEventListener('click', () => {
+        supportStorage.removeItem('adhdSupport.wins');
+        hydrateFields(fields, { category: 'started', effort: 'any' });
+        renderWinsLog(tools, collectFields(fields));
+    });
+}
+
+function renderWinsLog(tools, data) {
+    const copy = tools.wins;
+    const plan = winsLogPlan(copy, data);
+
+    document.getElementById('winsOutputTitle').textContent = copy.output_title.replace(':win', plan.win);
+    document.getElementById('winsReframeText').textContent = plan.reframe;
+    renderList('winsEvidenceList', plan.evidence, copy.defaults.evidence);
+    document.getElementById('winsRepeatText').textContent = plan.repeat;
+    document.getElementById('winsShareText').textContent = plan.share;
+    document.getElementById('winsNextText').textContent = plan.next;
+}
+
+function winsLogPlan(copy, data) {
+    const category = copy.category_reframes[data.category] ? data.category : 'started';
+    const effort = copy.effort_lines[data.effort] ? data.effort : 'any';
+    const win = data.win?.trim() || copy.defaults.win;
+    const support = data.support?.trim();
+    const pattern = data.pattern?.trim();
+    const next = data.next?.trim() || copy.defaults.next;
+    const evidence = [
+        copy.evidence_templates.win.replace(':win', win),
+        copy.category_reframes[category],
+        copy.effort_lines[effort],
+    ];
+
+    if (support) {
+        evidence.push(copy.evidence_templates.support.replace(':support', support));
+    }
+
+    if (pattern) {
+        evidence.push(copy.evidence_templates.pattern.replace(':pattern', pattern));
+    }
+
+    return {
+        win,
+        reframe: copy.reframe.replace(':win', win),
+        evidence,
+        repeat: support
+            ? copy.repeat_with_support.replace(':support', support)
+            : copy.repeat_default,
+        share: copy.share_script
+            .replace(':win', win)
+            .replace(':clue', support || pattern || copy.defaults.clue),
+        next: copy.next_action.replace(':next', next),
+    };
+}
+
+function winsLogToText(tools, data) {
+    const copy = tools.wins;
+    const plan = winsLogPlan(copy, data);
+
+    return [
+        copy.output_title.replace(':win', plan.win),
+        '',
+        copy.sections.reframe,
+        plan.reframe,
+        '',
+        copy.sections.evidence,
+        ...plan.evidence.map((item) => `- ${item}`),
+        '',
+        copy.sections.repeat,
+        plan.repeat,
+        '',
+        copy.sections.share,
+        plan.share,
+        '',
+        copy.sections.next,
+        plan.next,
     ].join('\n');
 }
 
@@ -3623,6 +3735,7 @@ function initDashboard(tools, locale) {
             'adhdSupport.food',
             'adhdSupport.sleep',
             'adhdSupport.motivation',
+            'adhdSupport.wins',
             'adhdSupport.accountability',
             'adhdSupport.routine',
             'adhdSupport.weekly',
@@ -3667,6 +3780,7 @@ function readSupportKit(locale = 'en') {
         food: readJson('adhdSupport.food'),
         sleep: readJson('adhdSupport.sleep'),
         motivation: readJson('adhdSupport.motivation'),
+        wins: readJson('adhdSupport.wins'),
         accountability: readJson('adhdSupport.accountability'),
         routine: readJson('adhdSupport.routine'),
         weekly: readJson('adhdSupport.weekly'),
@@ -3727,6 +3841,7 @@ function renderDashboard(copy, saved) {
         food: saved.food?.available || saved.food?.energy,
         sleep: saved.sleep?.wakeTime || saved.sleep?.mode,
         motivation: saved.motivation?.task || saved.motivation?.reward,
+        wins: saved.wins?.win || saved.wins?.category,
         accountability: saved.accountability?.task || saved.accountability?.person,
         routine: saved.routine?.kind || firstLine(saved.routine?.must),
         weekly: firstLine(saved.weekly?.must) || firstLine(saved.weekly?.loose),
@@ -3846,6 +3961,10 @@ function dashboardNext(saved) {
 
     if (saved.motivation?.task || saved.motivation?.reward) {
         return { key: 'motivation' };
+    }
+
+    if (saved.wins?.win || saved.wins?.category) {
+        return { key: 'wins' };
     }
 
     if (saved.accountability?.task || saved.accountability?.person) {

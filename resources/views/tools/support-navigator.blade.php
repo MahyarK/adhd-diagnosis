@@ -4,6 +4,7 @@
         'task' => route('tools.task', ['lang' => $locale]),
         'focus' => route('tools.focus', ['lang' => $locale]),
         'motivation' => route('tools.motivation', ['lang' => $locale]),
+        'wins' => route('tools.wins', ['lang' => $locale]),
         'body' => route('tools.body', ['lang' => $locale]),
         'food' => route('tools.food', ['lang' => $locale]),
         'sleep' => route('tools.sleep', ['lang' => $locale]),

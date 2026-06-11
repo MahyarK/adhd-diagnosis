@@ -96,6 +96,7 @@ Features:
 - Decision rescue planner for choosing one good-enough priority when everything feels urgent.
 - Focus sprint planner with timer, body-double support, distraction parking, and reward.
 - Emotional reset planner for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
+- Wins/evidence log for saving tiny progress, supports that worked, and patterns to repeat.
 - Visual checklist mode.
 - Printable planner pages.
 - Downloadable weekly plan.
@@ -241,6 +242,7 @@ Downloads:
 - Daily planner.
 - Weekly reset planner.
 - Goal card.
+- Wins/evidence card.
 - Task breakdown sheet.
 - Medication/therapy discussion notes.
 - Work/school/home support request draft.
@@ -270,7 +272,7 @@ Create a gentle home base after screening.
 
 Current foundation:
 
-- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, appointment prep, and task breakdown.
+- Local dashboard that summarizes saved screening result, support navigator path, goal, plan, wins/evidence, appointment prep, and task breakdown.
 - “Next tiny step” prompt based on what the user has saved.
 - Downloadable local support kit export.
 - Clear local support kit action.
@@ -364,33 +366,34 @@ Build this next:
 8. Add a food rescue tool for low-energy, low-appetite, low-money, and forgot-to-eat moments.
 9. Add a sleep wind-down tool for bedtime procrastination, racing thoughts, screen boundaries, and tomorrow launch pads.
 10. Add a motivation menu for free/low-cost rewards, safe stimulation, and boring-task activation.
-11. Add an accountability check-in for body doubling, proof of progress, and missed-check-in recovery.
-12. Add an appointment prep page with scripts and a checklist.
-13. Add a task breakdown page with brain dump and microsteps.
-14. Add follow-up reminders with downloadable `.ics` files.
-15. Add a weekly reset planner for recovering from falling behind.
-16. Add a symptom/context tracker for clinician-ready notes.
-17. Add a starter resource library for trustworthy low-friction next steps.
-18. Add a provider shortlist for possible clinicians, clinics, and support offices.
-19. Add a low-cost access plan for care barriers.
-20. Add care discussion notes and a support request builder.
-21. Add a work/school support menu for practical adjustments, scripts, trial periods, and review notes.
-22. Add a home reset tool for cleaning and clutter overwhelm.
-23. Add a laundry rescue tool for wearable clothes, wet loads, shared machines, and no-fold clean zones.
-24. Add a digital clutter rescue tool for tabs, messages, files, notifications, and restart notes.
-25. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
-26. Add a lost item rescue tool for keys, wallet, phone, documents, medicine, and prevention spots.
-27. Add an errand launch tool for leaving, contacting, travel mode, what-to-bring lists, late scripts, and backup plans.
-28. Add a morning/evening/leaving-home routine builder.
-29. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
-30. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
-31. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
-32. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
-33. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
-34. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
-35. Add a support navigator for choosing the best next tool when the user is unsure where to start.
-36. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
-37. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
+11. Add a wins/evidence log for tiny progress, supports that worked, and patterns worth repeating.
+12. Add an accountability check-in for body doubling, proof of progress, and missed-check-in recovery.
+13. Add an appointment prep page with scripts and a checklist.
+14. Add a task breakdown page with brain dump and microsteps.
+15. Add follow-up reminders with downloadable `.ics` files.
+16. Add a weekly reset planner for recovering from falling behind.
+17. Add a symptom/context tracker for clinician-ready notes.
+18. Add a starter resource library for trustworthy low-friction next steps.
+19. Add a provider shortlist for possible clinicians, clinics, and support offices.
+20. Add a low-cost access plan for care barriers.
+21. Add care discussion notes and a support request builder.
+22. Add a work/school support menu for practical adjustments, scripts, trial periods, and review notes.
+23. Add a home reset tool for cleaning and clutter overwhelm.
+24. Add a laundry rescue tool for wearable clothes, wet loads, shared machines, and no-fold clean zones.
+25. Add a digital clutter rescue tool for tabs, messages, files, notifications, and restart notes.
+26. Add a money/admin rescue tool for bills, forms, messages, appointments, insurance/cost questions, and overdue tasks.
+27. Add a lost item rescue tool for keys, wallet, phone, documents, medicine, and prevention spots.
+28. Add an errand launch tool for leaving, contacting, travel mode, what-to-bring lists, late scripts, and backup plans.
+29. Add a morning/evening/leaving-home routine builder.
+30. Add a communication repair tool for late replies, conflict, boundaries, and support asks.
+31. Add an energy crash rescue tool for burnout, overwhelm, and low-capacity days.
+32. Add a decision rescue tool for choosing one good-enough priority and parking the rest.
+33. Add a focus sprint tool for starting work with a timer, body-double support, distraction parking, and a reward.
+34. Add an emotional reset tool for shame spirals, rejection sensitivity, guilt, conflict, and overwhelm.
+35. Add a transition rescue tool for waiting mode, leaving home, switching tasks, bedtime, and frozen-before-start moments.
+36. Add a support navigator for choosing the best next tool when the user is unsure where to start.
+37. Add an aid application helper for charity care, public benefits, school/work support, debt hardship, housing help, and other low-cost support paperwork.
+38. Save support navigator paths/goals/plans/time blocks/body needs/medication refill rescues/food rescues/sleep wind-downs/motivation menus/wins-evidence logs/accountability check-ins/routines/weekly reset/communication repair/energy crash rescue/decision rescue/focus sprint/emotional reset/transition rescue/home reset/laundry rescue/digital clutter rescue/money-admin rescue/aid application helpers/lost item rescue/errand launch/appointment prep/care notes/support requests/work-school support/provider shortlist/access plan/task breakdown/reminders/tracker to local storage.
 
 This slice directly supports users who procrastinate, forget, or cannot afford immediate professional support.
 
@@ -406,6 +409,7 @@ This slice directly supports users who procrastinate, forget, or cannot afford i
 - A user can create a food rescue card and print/download it.
 - A user can create a sleep wind-down card and print/download it.
 - A user can create a motivation menu and print/download it.
+- A user can save a wins/evidence card that makes tiny progress easier to remember and repeat.
 - A user can create an accountability check-in card and print/download it.
 - A user can create a small routine card and print/download it.
 - A user can create a weekly reset plan and print/download it.

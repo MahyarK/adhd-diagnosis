@@ -89,6 +89,11 @@ class AssessmentController extends Controller
         return $this->toolView($request, 'tools.motivation-menu');
     }
 
+    public function winsLog(Request $request): View
+    {
+        return $this->toolView($request, 'tools.wins-log');
+    }
+
     public function accountability(Request $request): View
     {
         return $this->toolView($request, 'tools.accountability');

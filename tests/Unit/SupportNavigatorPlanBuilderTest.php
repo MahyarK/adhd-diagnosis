@@ -35,4 +35,16 @@ class SupportNavigatorPlanBuilderTest extends TestCase
         $this->assertSame(['task', 'body', 'decision'], $plan->recommendations);
         $this->assertStringContainsString('first recommended card', $plan->firstAction);
     }
+
+    public function test_it_includes_wins_log_for_emotional_support(): void
+    {
+        $plan = (new SupportNavigatorPlanBuilder)->build(new SupportNavigatorInput(
+            topic: 'emotional',
+            urgency: 'soon',
+            energy: 'medium',
+            knownNext: '',
+        ));
+
+        $this->assertSame(['emotion', 'wins', 'energy', 'support'], $plan->recommendations);
+    }
 }

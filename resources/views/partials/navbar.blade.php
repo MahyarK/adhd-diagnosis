@@ -14,6 +14,7 @@
                 ['route' => 'tools.food', 'label' => __('assessment.ui.food_rescue')],
                 ['route' => 'tools.sleep', 'label' => __('assessment.ui.sleep_wind_down')],
                 ['route' => 'tools.motivation', 'label' => __('assessment.ui.motivation_menu')],
+                ['route' => 'tools.wins', 'label' => __('assessment.ui.wins_log')],
                 ['route' => 'tools.accountability', 'label' => __('assessment.ui.accountability')],
                 ['route' => 'tools.routine', 'label' => __('assessment.ui.routine_builder')],
                 ['route' => 'tools.focus', 'label' => __('assessment.ui.focus_sprint')],

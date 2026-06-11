@@ -124,6 +124,10 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('Build a free reward menu for boring tasks.');
 
+        $this->get('/tools/wins-log?lang=fa')
+            ->assertOk()
+            ->assertSee('مدرک نگه دار که چیزی کار کرده، حتی اگر خیلی کوچک بوده.');
+
         $this->get('/tools/accountability?lang=fr')
             ->assertOk()
             ->assertSee('Demandez à quelqu’un de témoigner du départ, pas de surveiller la fin.');
