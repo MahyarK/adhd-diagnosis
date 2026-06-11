@@ -4715,6 +4715,7 @@ function initDailyCheckIn(tools, links) {
 
             if (payload.response) {
                 document.getElementById('checkInResponseText').textContent = payload.response;
+                document.getElementById('checkInGuideText').textContent = payload.response;
             }
 
             if (payload.first) {
@@ -4747,10 +4748,30 @@ function renderDailyCheckIn(tools, links, data) {
 
     document.getElementById('checkInOutputTitle').textContent = tools.checkin.output_title.replace(':feeling', plan.feelingLabel);
     document.getElementById('checkInResponseText').textContent = plan.response;
+    document.getElementById('checkInUserText').textContent = checkInUserSummary(tools.checkin, data);
+    document.getElementById('checkInGuideText').textContent = plan.response;
     document.getElementById('checkInFirstText').textContent = plan.first;
     renderToolLinks('checkInToolList', plan.recommendations, tools.checkin.recommendations, links);
     document.getElementById('checkInAiNote').textContent = tools.checkin.ai_note;
     document.getElementById('checkInAiStatus').textContent = tools.checkin.ai_status.idle;
+}
+
+function checkInUserSummary(copy, data) {
+    const feeling = copy.feelings[data.feeling] || copy.feelings.overwhelmed;
+    const energy = copy.energies[data.energy] || copy.energies.medium;
+    const pressure = copy.pressures[data.pressure] || copy.pressures.unsure;
+    const message = data.message?.trim();
+
+    return message
+        ? copy.conversation.summary_with_message
+            .replace(':feeling', feeling)
+            .replace(':energy', energy)
+            .replace(':pressure', pressure)
+            .replace(':message', message)
+        : copy.conversation.summary
+            .replace(':feeling', feeling)
+            .replace(':energy', energy)
+            .replace(':pressure', pressure);
 }
 
 function dailyCheckInPlan(copy, data) {

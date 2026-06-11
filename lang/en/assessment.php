@@ -183,10 +183,17 @@ return [
             'output_title' => 'Today feels: :feeling',
             'empty_title' => 'Your daily check-in will appear here.',
             'sections' => [
+                'conversation' => 'Check-in conversation',
                 'response' => 'What the app heard',
                 'first' => 'Tiny next action',
                 'tools' => 'Matched tools',
                 'ai_note' => 'AI-ready note',
+            ],
+            'conversation' => [
+                'you' => 'You',
+                'guide' => 'Guide',
+                'summary' => 'I feel :feeling, my energy is :energy, and the pressure is :pressure.',
+                'summary_with_message' => 'I feel :feeling, my energy is :energy, and the pressure is :pressure. I wrote: “:message”',
             ],
             'responses' => [
                 'overwhelmed' => 'This sounds like a too-many-tabs-in-the-brain moment. You do not need the perfect plan; you need one next reduction in pressure.',
@@ -235,6 +242,7 @@ return [
                 'wins' => ['title' => 'Wins log', 'body' => 'Save tiny evidence that something worked.'],
             ],
             'ai_note' => 'This version uses a local rule-based guide so it works without an account or API key. A real AI layer can later use the same check-in fields, with clear consent and privacy controls.',
+            'ai_consent' => 'AI is optional. It sends only this check-in to the server when you press the AI button.',
             'ai_status' => [
                 'idle' => 'AI is optional. Nothing is sent unless you press the AI button.',
                 'loading' => 'Asking AI for a gentler wording...',

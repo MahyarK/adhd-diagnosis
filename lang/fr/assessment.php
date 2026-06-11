@@ -183,10 +183,17 @@ return [
             'output_title' => 'Aujourd’hui ressemble à : :feeling',
             'empty_title' => 'Votre check-in du jour apparaîtra ici.',
             'sections' => [
+                'conversation' => 'Conversation de check-in',
                 'response' => 'Ce que l’app a entendu',
                 'first' => 'Toute petite action',
                 'tools' => 'Outils adaptés',
                 'ai_note' => 'Note prête pour l’IA',
+            ],
+            'conversation' => [
+                'you' => 'Vous',
+                'guide' => 'Guide',
+                'summary' => 'Je me sens :feeling, mon énergie est :energy, et la pression est :pressure.',
+                'summary_with_message' => 'Je me sens :feeling, mon énergie est :energy, et la pression est :pressure. J’ai écrit : « :message »',
             ],
             'responses' => [
                 'overwhelmed' => 'Cela ressemble à trop d’onglets ouverts dans la tête. Pas besoin d’un plan parfait : seulement d’une prochaine baisse de pression.',
@@ -235,6 +242,7 @@ return [
                 'wins' => ['title' => 'Journal des victoires', 'body' => 'Garder une petite preuve que quelque chose a marché.'],
             ],
             'ai_note' => 'Cette version utilise un guide local à règles, donc elle fonctionne sans compte ni clé API. Une vraie couche IA pourra plus tard utiliser les mêmes champs avec consentement clair et contrôles de confidentialité.',
+            'ai_consent' => 'L’IA est optionnelle. Seul ce check-in est envoyé au serveur lorsque vous appuyez sur le bouton IA.',
             'ai_status' => [
                 'idle' => 'L’IA est optionnelle. Rien n’est envoyé sauf si vous appuyez sur le bouton IA.',
                 'loading' => 'Demande à l’IA une formulation plus douce...',

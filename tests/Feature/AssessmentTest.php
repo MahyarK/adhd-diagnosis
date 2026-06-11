@@ -104,6 +104,7 @@ class AssessmentTest extends TestCase
             ->assertOk()
             ->assertSee('A calmer way to start today.')
             ->assertSee('Ask AI to make it more natural')
+            ->assertSee('AI is optional. It sends only this check-in to the server when you press the AI button.')
             ->assertSee('AI-ready note');
 
         $this->get('/tools/goal-builder?lang=en')

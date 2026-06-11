@@ -57,6 +57,17 @@
             ],
         ],
     ];
+
+    $activeToolLabel = __('assessment.ui.tools');
+
+    foreach ($toolGroups as $group) {
+        foreach ($group['links'] as $link) {
+            if (request()->routeIs($link['route'])) {
+                $activeToolLabel = $link['label'];
+                break 2;
+            }
+        }
+    }
 @endphp
 
 <header class="navbar" role="banner">
@@ -71,7 +82,7 @@
     <nav class="tool-menu" aria-label="{{ __('assessment.ui.tools') }}">
         <details>
             <summary @class(['active' => request()->routeIs('tools.*')]) aria-label="{{ __('assessment.ui.tools') }}">
-                <span>{{ __('assessment.ui.tools') }}</span>
+                <span>{{ $activeToolLabel }}</span>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>

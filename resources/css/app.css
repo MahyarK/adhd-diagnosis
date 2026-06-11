@@ -66,9 +66,9 @@ button {
     inset: 0 0 auto 0;
     z-index: 100;
     display: grid;
-    grid-template-columns: minmax(168px, 240px) minmax(0, 1fr) max-content max-content;
+    grid-template-columns: minmax(132px, 190px) minmax(0, 1fr) minmax(128px, 240px) max-content;
     align-items: center;
-    gap: clamp(6px, 1vw, 12px);
+    gap: clamp(8px, 1.2vw, 16px);
     width: 100%;
     height: var(--header-height);
     padding: 0 clamp(12px, 2.2vw, 28px);
@@ -111,6 +111,7 @@ button {
 }
 
 .navbar-title {
+    display: none;
     font-family: 'Lora', Georgia, serif;
     font-size: 14px;
     font-weight: 500;
@@ -151,6 +152,10 @@ button {
     max-width: 100%;
 }
 
+.tool-menu summary {
+    width: 100%;
+}
+
 .tool-menu summary span,
 .lang-dropdown summary span {
     min-width: 0;
@@ -172,7 +177,7 @@ button {
 }
 
 .primary-nav a {
-    max-width: clamp(92px, 11vw, 148px);
+    max-width: clamp(104px, 12vw, 160px);
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -180,6 +185,7 @@ button {
 .tool-menu {
     position: relative;
     z-index: 210;
+    min-width: 0;
 }
 
 .tool-menu details {
@@ -260,6 +266,7 @@ button {
     font-size: 13px;
     font-weight: 650;
     text-decoration: none;
+    line-height: 1.25;
     overflow-wrap: anywhere;
     transition: background 160ms ease, color 160ms ease;
 }
@@ -274,6 +281,7 @@ button {
 .lang-dropdown {
     position: relative;
     z-index: 210;
+    min-width: 0;
 }
 
 .lang-dropdown details {
@@ -1217,6 +1225,46 @@ h2 {
     background: linear-gradient(135deg, var(--surface), var(--accent-light));
 }
 
+.conversation-thread {
+    display: grid;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.conversation-bubble {
+    display: grid;
+    gap: 5px;
+    max-width: min(680px, 100%);
+    padding: 12px 14px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+}
+
+.conversation-bubble span {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.conversation-bubble p {
+    margin: 0;
+    color: var(--text-primary);
+    line-height: 1.55;
+}
+
+.conversation-bubble.user {
+    justify-self: end;
+    background: var(--surface-alt);
+}
+
+.conversation-bubble.guide {
+    justify-self: start;
+    border-color: rgb(91 138 121 / 36%);
+    background: var(--accent-light);
+}
+
 /* ── Resources ── */
 .resource-grid {
     display: grid;
@@ -1608,7 +1656,7 @@ h2 {
 
 @media (max-width: 1120px) {
     .navbar {
-        grid-template-columns: minmax(128px, 1fr) auto auto;
+        grid-template-columns: minmax(124px, 1fr) minmax(112px, 220px) max-content;
         gap: 8px;
     }
 
@@ -1617,15 +1665,19 @@ h2 {
     }
 
     .navbar-title {
-        display: block;
+        display: none;
         font-size: 13px;
+    }
+
+    .tool-menu summary {
+        max-width: 100%;
     }
 }
 
 /* ── Responsive: tablet ── */
 @media (max-width: 860px) {
     .navbar {
-        grid-template-columns: minmax(118px, 1fr) max-content max-content;
+        grid-template-columns: minmax(116px, 1fr) minmax(104px, 190px) max-content;
         padding: 0 12px;
         gap: 8px;
     }
@@ -1635,8 +1687,7 @@ h2 {
     }
 
     .navbar-title {
-        display: block;
-        font-size: 14px;
+        display: none;
     }
 
     .tool-menu-panel {
@@ -1835,7 +1886,7 @@ h2 {
     }
 
     .navbar {
-        grid-template-columns: minmax(92px, 1fr) max-content max-content;
+        grid-template-columns: minmax(92px, 1fr) minmax(86px, 132px) max-content;
         padding-inline: 10px;
         gap: 6px;
     }
@@ -1845,10 +1896,12 @@ h2 {
     }
 
     .navbar-eyebrow {
-        display: none;
+        display: block;
+        font-size: 9px;
     }
 
     .navbar-title {
+        display: none;
         max-width: 100%;
         font-size: 13px;
     }
@@ -1919,7 +1972,7 @@ h2 {
 
 @media (min-width: 621px) and (max-width: 900px) {
     .navbar {
-        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-columns: minmax(116px, 1fr) minmax(104px, 190px) max-content;
     }
 
     .primary-nav {

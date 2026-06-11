@@ -183,10 +183,17 @@ return [
             'output_title' => 'Vandaag voelt als: :feeling',
             'empty_title' => 'Je dagelijkse check-in verschijnt hier.',
             'sections' => [
+                'conversation' => 'Check-in gesprek',
                 'response' => 'Wat de app hoorde',
                 'first' => 'Kleine volgende actie',
                 'tools' => 'Passende hulpmiddelen',
                 'ai_note' => 'AI-ready notitie',
+            ],
+            'conversation' => [
+                'you' => 'Jij',
+                'guide' => 'Gids',
+                'summary' => 'Ik voel me :feeling, mijn energie is :energy, en de druk is :pressure.',
+                'summary_with_message' => 'Ik voel me :feeling, mijn energie is :energy, en de druk is :pressure. Ik schreef: “:message”',
             ],
             'responses' => [
                 'overwhelmed' => 'Dit klinkt als te veel open tabbladen in je hoofd. Je hebt geen perfect plan nodig, maar één stap die druk verlaagt.',
@@ -235,6 +242,7 @@ return [
                 'wins' => ['title' => 'Wins-log', 'body' => 'Bewaar klein bewijs dat iets werkte.'],
             ],
             'ai_note' => 'Deze versie gebruikt een lokale regelgebaseerde gids, dus hij werkt zonder account of API-sleutel. Een echte AI-laag kan later dezelfde check-invelden gebruiken met duidelijke toestemming en privacycontrole.',
+            'ai_consent' => 'AI is optioneel. Alleen deze check-in wordt naar de server gestuurd wanneer je op de AI-knop drukt.',
             'ai_status' => [
                 'idle' => 'AI is optioneel. Er wordt niets verstuurd tenzij je op de AI-knop drukt.',
                 'loading' => 'AI vragen om zachtere woorden...',

@@ -87,8 +87,18 @@
             <section class="tool-output printable-tool" aria-live="polite">
                 <p class="eyebrow">{{ $tools['checkin']['output_eyebrow'] }}</p>
                 <h2 id="checkInOutputTitle">{{ $tools['checkin']['empty_title'] }}</h2>
+                <div class="conversation-thread" aria-label="{{ $tools['checkin']['sections']['conversation'] }}">
+                    <article class="conversation-bubble user">
+                        <span>{{ $tools['checkin']['conversation']['you'] }}</span>
+                        <p id="checkInUserText"></p>
+                    </article>
+                    <article class="conversation-bubble guide">
+                        <span>{{ $tools['checkin']['conversation']['guide'] }}</span>
+                        <p id="checkInGuideText"></p>
+                    </article>
+                </div>
                 <div class="output-grid">
-                    <article class="wide conversation-card">
+                    <article class="wide conversation-card" hidden>
                         <h3>{{ $tools['checkin']['sections']['response'] }}</h3>
                         <p id="checkInResponseText"></p>
                     </article>
@@ -103,6 +113,7 @@
                     <article class="wide">
                         <h3>{{ $tools['checkin']['sections']['ai_note'] }}</h3>
                         <p id="checkInAiNote"></p>
+                        <p class="map-note">{{ $tools['checkin']['ai_consent'] }}</p>
                         <p class="map-note" id="checkInAiStatus"></p>
                     </article>
                 </div>
