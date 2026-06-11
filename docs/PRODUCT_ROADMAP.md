@@ -284,6 +284,7 @@ Current foundation:
 - “Next tiny step” prompt based on what the user has saved.
 - “Stuck right now?” triage shortcuts for overwhelm, starting, forgotten follow-up, body needs, admin stress, and finding help.
 - Downloadable local support kit export.
+- Human-readable `.txt` support kit export and dashboard print action for appointments or restart moments.
 - Clear local support kit action.
 - Saved weekly reset, job hunt rescue, safety pause, follow-up rescue, follow-up reminder, and symptom tracker summary.
 
@@ -301,6 +302,7 @@ Sections:
 MVP:
 
 - Local-storage dashboard with saved plans before adding accounts.
+- Readable export, printable dashboard, and JSON backup before adding accounts.
 
 ### 10. Accounts, Data, And Privacy
 

@@ -3928,7 +3928,15 @@ function initDashboard(tools, locale) {
     renderDashboard(copy, saved);
 
     document.getElementById('dashboardExportButton').addEventListener('click', () => {
-        downloadText('adhd-support-kit.json', JSON.stringify(readSupportKit(locale), null, 2));
+        downloadText('adhd-support-kit.txt', dashboardSupportKitText(copy, readSupportKit(locale)));
+    });
+
+    document.getElementById('dashboardPrintButton').addEventListener('click', () => {
+        window.print();
+    });
+
+    document.getElementById('dashboardJsonButton').addEventListener('click', () => {
+        downloadText('adhd-support-kit-data.json', JSON.stringify(readSupportKit(locale), null, 2));
     });
 
     document.getElementById('dashboardClearButton').addEventListener('click', () => {
@@ -4044,7 +4052,7 @@ function readJson(key) {
     }
 }
 
-function renderDashboard(copy, saved) {
+function dashboardSummaries(copy, saved) {
     const summaries = {
         result: saved.result?.title,
         navigator: saved.navigator?.topic || saved.navigator?.knownNext,
@@ -4086,6 +4094,34 @@ function renderDashboard(copy, saved) {
         reminders: reminderSummary(saved.reminders),
         tracker: saved.tracker?.date,
     };
+
+    return Object.fromEntries(Object.entries(summaries).filter(([, value]) => Boolean(value)));
+}
+
+function dashboardSupportKitText(copy, saved) {
+    const summaries = dashboardSummaries(copy, saved);
+    const next = dashboardNext(saved);
+    const savedLines = Object.entries(summaries).map(([key, value]) => {
+        return `- ${copy.summaries[key].replace(':value', value)}`;
+    });
+
+    return [
+        copy.export_text.title,
+        '',
+        copy.export_text.note,
+        '',
+        copy.next_eyebrow,
+        next ? `${copy.cards[next.key].title}: ${copy.next[next.key]}` : copy.empty_body,
+        '',
+        copy.saved_title,
+        savedLines.length ? savedLines.join('\n') : copy.export_text.empty,
+        '',
+        copy.export_text.privacy,
+    ].join('\n');
+}
+
+function renderDashboard(copy, saved) {
+    const summaries = dashboardSummaries(copy, saved);
 
     Object.entries(copy.cards).forEach(([key, card]) => {
         const value = summaries[key];

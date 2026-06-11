@@ -1937,6 +1937,7 @@ h2 {
     #restartButton,
     .tool-hero,
     .tool-form,
+    .dashboard-next .tool-actions,
     .dashboard-note {
         display: none !important;
     }
@@ -1953,6 +1954,7 @@ h2 {
     .results-panel,
     .tool-output,
     .dashboard-next,
+    .dashboard-triage,
     .dashboard-card {
         display: block !important;
         width: 100%;
@@ -1966,6 +1968,7 @@ h2 {
     .score-details,
     .explain-card,
     .output-grid article,
+    .dashboard-triage,
     .dashboard-card,
     .resource-card,
     #nextSteps li {
@@ -1978,6 +1981,7 @@ h2 {
     #nextSteps,
     .output-grid,
     .dashboard-grid,
+    .dashboard-triage-grid,
     .dashboard-cards,
     .resource-grid {
         grid-template-columns: 1fr;

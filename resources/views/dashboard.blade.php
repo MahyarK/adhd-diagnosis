@@ -24,6 +24,8 @@
                 <div class="tool-actions">
                     <a class="primary-link" id="dashboardNextLink" href="{{ route('tools.goal', ['lang' => $locale]) }}">{{ $tools['dashboard']['start_link'] }}</a>
                     <button type="button" class="secondary-button" id="dashboardExportButton">{{ $tools['dashboard']['export'] }}</button>
+                    <button type="button" class="secondary-button" id="dashboardPrintButton">{{ $tools['dashboard']['print'] }}</button>
+                    <button type="button" class="secondary-button" id="dashboardJsonButton">{{ $tools['dashboard']['json_export'] }}</button>
                     <button type="button" class="secondary-button" id="dashboardClearButton">{{ $tools['dashboard']['clear'] }}</button>
                 </div>
             </article>
