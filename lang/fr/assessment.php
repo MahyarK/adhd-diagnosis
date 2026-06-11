@@ -2572,6 +2572,7 @@ return [
                 'symptoms' => 'Quels schémas voulez-vous mentionner ?',
                 'impact' => 'Où cela affecte-t-il votre vie ?',
                 'questions' => 'Que voulez-vous demander ?',
+                'access' => 'Des inquiétudes sur coût, assurance, transport, attente ou papiers ?',
                 'contact' => 'De quel script avez-vous besoin ?',
             ],
             'placeholders' => [
@@ -2579,6 +2580,7 @@ return [
                 'symptoms' => 'Exemple : objets perdus, délais manqués, agitation, interruptions, surcharge',
                 'impact' => 'Exemple : travail, école, argent, maison, relations, sommeil, confiance',
                 'questions' => 'Une question par ligne. Exemple : Évaluez-vous le TDAH chez les adultes ?',
+                'access' => 'Exemple : pas assuré, petit budget, pas de transport, longue attente, documents nécessaires, appels difficiles',
             ],
             'contact' => [
                 'call' => 'Appel téléphonique',
@@ -2594,6 +2596,7 @@ return [
                 'bring' => 'Apporter ou mentionner',
                 'say' => 'Script simple',
                 'questions' => 'Questions à poser',
+                'access' => 'Questions coût et accès',
                 'notes' => 'Rappel important',
             ],
             'defaults' => [
@@ -2604,6 +2607,13 @@ return [
                     'Évaluez-vous le TDAH, ou pouvez-vous m’orienter vers quelqu’un qui le fait ?',
                     'Quelles informations dois-je apporter au rendez-vous ?',
                     'Quels sont les coûts, options d’assurance, délais d’attente ou alternatives peu coûteuses ?',
+                ],
+                'access_intro' => 'Mes préoccupations d’accès sont : :concerns.',
+                'access_questions' => [
+                    'Combien coûte le premier rendez-vous ou l’évaluation avant assurance ou réduction ?',
+                    'Proposez-vous tarif réduit, plan de paiement, options publiques, service étudiant, aide financière ou orientations moins coûteuses ?',
+                    'Quels documents dois-je préparer pour éviter de perdre du temps ou de l’argent ?',
+                    'Si l’attente est longue, existe-t-il une liste d’annulation, une option de groupe, téléconsultation ou soutien provisoire ?',
                 ],
                 'bring' => [
                     'Votre résultat de dépistage ou vos notes de cette application.',

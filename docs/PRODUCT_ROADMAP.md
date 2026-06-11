@@ -172,7 +172,7 @@ Current foundation:
 - Browser location CTA.
 - OpenStreetMap/Overpass provider listings.
 - Google Maps fallback.
-- Appointment prep worksheet with print/download.
+- Appointment prep worksheet with print/download, simple contact scripts, and cost/access questions.
 - Call, email, and in-person scripts for asking about ADHD evaluation.
 - Provider shortlist with cost/access/status notes and download.
 - Low-cost access plan for cost, waitlists, referrals, and fallback options.

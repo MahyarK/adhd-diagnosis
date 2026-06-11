@@ -2572,6 +2572,7 @@ return [
                 'symptoms' => 'What patterns do you want them to know about?',
                 'impact' => 'Where does it affect your life?',
                 'questions' => 'What do you want to ask?',
+                'access' => 'Any cost, insurance, transport, waitlist, or paperwork worries?',
                 'contact' => 'What kind of script do you need?',
             ],
             'placeholders' => [
@@ -2579,6 +2580,7 @@ return [
                 'symptoms' => 'Example: losing things, missing deadlines, restless, interrupting, overwhelmed',
                 'impact' => 'Example: work, school, money, home, relationships, sleep, self-trust',
                 'questions' => 'One question per line. Example: Do you evaluate ADHD in adults?',
+                'access' => 'Example: uninsured, low budget, no transport, long waitlist, need documents, phone calls are hard',
             ],
             'contact' => [
                 'call' => 'Phone call',
@@ -2594,6 +2596,7 @@ return [
                 'bring' => 'Bring or mention',
                 'say' => 'Simple script',
                 'questions' => 'Questions to ask',
+                'access' => 'Cost and access questions',
                 'notes' => 'Important reminder',
             ],
             'defaults' => [
@@ -2604,6 +2607,13 @@ return [
                     'Do you evaluate ADHD, or can you refer me to someone who does?',
                     'What information should I bring to the appointment?',
                     'What are the costs, insurance options, wait times, or low-cost alternatives?',
+                ],
+                'access_intro' => 'My access concerns are: :concerns.',
+                'access_questions' => [
+                    'What will the first appointment or evaluation cost before insurance or discounts?',
+                    'Do you offer sliding scale, payment plans, public options, student services, charity care, or lower-cost referrals?',
+                    'Which documents should I prepare so I do not lose time or money?',
+                    'If the waitlist is long, is there a cancellation list, group option, telehealth option, or interim support I can use?',
                 ],
                 'bring' => [
                     'Your screening result or notes from this app.',

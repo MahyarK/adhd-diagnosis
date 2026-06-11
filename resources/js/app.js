@@ -3219,6 +3219,7 @@ function initAppointmentPrep(tools) {
         symptoms: document.getElementById('appointmentSymptoms'),
         impact: document.getElementById('appointmentImpact'),
         questions: document.getElementById('appointmentQuestions'),
+        access: document.getElementById('appointmentAccess'),
         contact: document.getElementById('appointmentContact'),
     };
 
@@ -3254,6 +3255,7 @@ function renderAppointmentPrep(tools, data) {
     renderList('appointmentBringList', copy.defaults.bring, copy.defaults.bring[0]);
     document.getElementById('appointmentScript').textContent = buildAppointmentScript(copy, contact, symptoms, impact);
     renderList('appointmentQuestionList', withDefault(lines(data.questions), copy.defaults.questions[0]), copy.defaults.questions[0]);
+    renderList('appointmentAccessList', appointmentAccessQuestions(copy, data.access), copy.defaults.access_questions[0]);
     document.getElementById('appointmentNotes').textContent = copy.defaults.note;
 }
 
@@ -3261,6 +3263,19 @@ function buildAppointmentScript(copy, contact, symptoms, impact) {
     const template = copy.scripts[contact] || copy.scripts.call;
 
     return `${template} ${copy.fields.symptoms}: ${symptoms}. ${copy.fields.impact}: ${impact}.`;
+}
+
+function appointmentAccessQuestions(copy, access) {
+    const concerns = access?.trim();
+
+    if (! concerns) {
+        return copy.defaults.access_questions;
+    }
+
+    return [
+        copy.defaults.access_intro.replace(':concerns', concerns),
+        ...copy.defaults.access_questions,
+    ];
 }
 
 function appointmentToText(tools, data) {
@@ -3278,6 +3293,9 @@ function appointmentToText(tools, data) {
         '',
         copy.sections.questions,
         ...withDefault(lines(data.questions), copy.defaults.questions[0]).map((item) => `- ${item}`),
+        '',
+        copy.sections.access,
+        ...appointmentAccessQuestions(copy, data.access).map((item) => `- ${item}`),
         '',
         copy.sections.notes,
         copy.defaults.note,

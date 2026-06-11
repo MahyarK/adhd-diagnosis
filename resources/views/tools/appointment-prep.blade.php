@@ -35,6 +35,10 @@
                     <textarea id="appointmentQuestions" rows="3" placeholder="{{ $tools['appointment']['placeholders']['questions'] }}"></textarea>
                 </label>
                 <label>
+                    <span>{{ $tools['appointment']['fields']['access'] }}</span>
+                    <textarea id="appointmentAccess" rows="3" placeholder="{{ $tools['appointment']['placeholders']['access'] }}"></textarea>
+                </label>
+                <label>
                     <span>{{ $tools['appointment']['fields']['contact'] }}</span>
                     <select id="appointmentContact">
                         @foreach ($tools['appointment']['contact'] as $value => $label)
@@ -65,6 +69,10 @@
                     <article>
                         <h3>{{ $tools['appointment']['sections']['questions'] }}</h3>
                         <ul id="appointmentQuestionList"></ul>
+                    </article>
+                    <article>
+                        <h3>{{ $tools['appointment']['sections']['access'] }}</h3>
+                        <ul id="appointmentAccessList"></ul>
                     </article>
                     <article class="wide">
                         <h3>{{ $tools['appointment']['sections']['notes'] }}</h3>

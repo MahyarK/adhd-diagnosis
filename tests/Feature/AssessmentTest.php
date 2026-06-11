@@ -146,7 +146,8 @@ class AssessmentTest extends TestCase
 
         $this->get('/tools/appointment-prep?lang=fr')
             ->assertOk()
-            ->assertSee('Rendre la demande d’aide plus facile.');
+            ->assertSee('Rendre la demande d’aide plus facile.')
+            ->assertSee('Questions coût et accès');
 
         $this->get('/tools/care-notes?lang=nl')
             ->assertOk()

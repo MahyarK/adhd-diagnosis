@@ -2572,6 +2572,7 @@ return [
                 'symptoms' => 'Welke patronen wil je benoemen?',
                 'impact' => 'Waar beïnvloedt het je leven?',
                 'questions' => 'Wat wil je vragen?',
+                'access' => 'Zorgen over kosten, verzekering, vervoer, wachtlijst of papierwerk?',
                 'contact' => 'Welke tekst heb je nodig?',
             ],
             'placeholders' => [
@@ -2579,6 +2580,7 @@ return [
                 'symptoms' => 'Voorbeeld: spullen kwijt, deadlines missen, rusteloos, onderbreken, overweldigd',
                 'impact' => 'Voorbeeld: werk, school, geld, thuis, relaties, slaap, zelfvertrouwen',
                 'questions' => 'Eén vraag per regel. Voorbeeld: Evalueert u ADHD bij volwassenen?',
+                'access' => 'Voorbeeld: niet verzekerd, laag budget, geen vervoer, lange wachtlijst, documenten nodig, bellen is moeilijk',
             ],
             'contact' => [
                 'call' => 'Telefoongesprek',
@@ -2594,6 +2596,7 @@ return [
                 'bring' => 'Meenemen of benoemen',
                 'say' => 'Eenvoudige tekst',
                 'questions' => 'Vragen om te stellen',
+                'access' => 'Vragen over kosten en toegang',
                 'notes' => 'Belangrijke herinnering',
             ],
             'defaults' => [
@@ -2604,6 +2607,13 @@ return [
                     'Evalueert u ADHD, of kunt u mij doorverwijzen naar iemand die dat doet?',
                     'Welke informatie moet ik meenemen naar de afspraak?',
                     'Wat zijn de kosten, verzekeringsopties, wachttijden of goedkope alternatieven?',
+                ],
+                'access_intro' => 'Mijn zorgen over toegang zijn: :concerns.',
+                'access_questions' => [
+                    'Wat kost het eerste gesprek of de evaluatie vóór verzekering of korting?',
+                    'Biedt u sociaal tarief, betalingsplannen, publieke opties, studentenhulp, financiële hulp of goedkopere doorverwijzingen?',
+                    'Welke documenten moet ik voorbereiden zodat ik geen tijd of geld verlies?',
+                    'Als de wachtlijst lang is, is er een annulatielijst, groepsoptie, online optie of tijdelijke steun die ik kan gebruiken?',
                 ],
                 'bring' => [
                     'Je screeningsresultaat of notities uit deze app.',
