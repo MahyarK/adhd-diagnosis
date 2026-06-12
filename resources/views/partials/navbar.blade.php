@@ -60,11 +60,13 @@
 
     $activeToolLabel = __('assessment.ui.tools');
 
-    foreach ($toolGroups as $group) {
-        foreach ($group['links'] as $link) {
-            if (request()->routeIs($link['route'])) {
-                $activeToolLabel = $link['label'];
-                break 2;
+    if (request()->routeIs('tools.*')) {
+        foreach ($toolGroups as $group) {
+            foreach ($group['links'] as $link) {
+                if (request()->routeIs($link['route'])) {
+                    $activeToolLabel = $link['label'];
+                    break 2;
+                }
             }
         }
     }
