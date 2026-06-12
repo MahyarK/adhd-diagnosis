@@ -1104,6 +1104,7 @@ h2 {
 .dashboard-next,
 .dashboard-checkin,
 .dashboard-triage,
+.dashboard-guide,
 .dashboard-card {
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -1254,6 +1255,88 @@ h2 {
     color: var(--accent-hover);
     font-size: 13px;
     line-height: 1.35;
+}
+
+.dashboard-guide {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1.05fr);
+    gap: 14px;
+    align-items: stretch;
+    padding: 16px;
+}
+
+.dashboard-guide h2 {
+    margin-bottom: 6px;
+    font-size: 22px;
+}
+
+.dashboard-guide p {
+    color: var(--text-secondary);
+}
+
+.dashboard-guide label {
+    display: grid;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.dashboard-guide label span {
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.dashboard-guide textarea {
+    width: 100%;
+    min-height: 92px;
+    padding: 10px 11px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    resize: vertical;
+}
+
+.dashboard-guide textarea:focus {
+    outline: 2px solid rgb(91 138 121 / 22%);
+    border-color: var(--accent);
+    background: var(--surface);
+}
+
+.dashboard-guide-output {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    background: var(--surface-alt);
+}
+
+.dashboard-guide-output span {
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.dashboard-guide-output strong {
+    color: var(--text-primary);
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+.dashboard-guide-output p {
+    margin-bottom: 0;
+}
+
+.dashboard-guide-output .primary-link {
+    justify-self: start;
 }
 
 .dashboard-cards {
@@ -1963,7 +2046,8 @@ h2 {
         grid-template-columns: 1fr;
     }
 
-    .dashboard-triage {
+    .dashboard-triage,
+    .dashboard-guide {
         grid-template-columns: 1fr;
     }
 
@@ -2143,6 +2227,7 @@ h2 {
     .dashboard-next,
     .dashboard-checkin,
     .dashboard-triage,
+    .dashboard-guide,
     .dashboard-card {
         display: block !important;
         width: 100%;
@@ -2158,6 +2243,7 @@ h2 {
     .output-grid article,
     .dashboard-checkin,
     .dashboard-triage,
+    .dashboard-guide,
     .dashboard-card,
     .resource-card,
     #nextSteps li {

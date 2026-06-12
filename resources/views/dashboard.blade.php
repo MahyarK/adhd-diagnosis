@@ -31,13 +31,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('assessment.ui.dashboard') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     @include('partials.navbar')
 
-    <main class="tool-shell dashboard-shell" data-tool="dashboard" data-locale="{{ $locale }}" data-tools='@json($tools)' data-links='@json($checkInLinks)'>
+    <main class="tool-shell dashboard-shell" data-tool="dashboard" data-locale="{{ $locale }}" data-tools='@json($tools)' data-links='@json($checkInLinks)' data-guide-url="{{ route('dashboard.ai', ['lang' => $locale]) }}">
         <section class="tool-hero">
             <p class="eyebrow">{{ $tools['dashboard']['eyebrow'] }}</p>
             <h1>{{ $tools['dashboard']['title'] }}</h1>
@@ -86,6 +87,28 @@
                             <strong>{{ $item['action'] }}</strong>
                         </a>
                     @endforeach
+                </div>
+            </section>
+
+            <section class="dashboard-guide" aria-labelledby="dashboardGuideTitle">
+                <div>
+                    <p class="eyebrow">{{ $tools['dashboard']['guide']['eyebrow'] }}</p>
+                    <h2 id="dashboardGuideTitle">{{ $tools['dashboard']['guide']['title'] }}</h2>
+                    <p>{{ $tools['dashboard']['guide']['body'] }}</p>
+                    <label>
+                        <span>{{ $tools['dashboard']['guide']['field'] }}</span>
+                        <textarea id="dashboardGuideMessage" rows="3" placeholder="{{ $tools['dashboard']['guide']['placeholder'] }}"></textarea>
+                    </label>
+                    <div class="tool-actions">
+                        <button type="button" class="primary-button" id="dashboardGuideButton">{{ $tools['dashboard']['guide']['button'] }}</button>
+                    </div>
+                    <p class="map-note">{{ $tools['dashboard']['guide']['privacy'] }}</p>
+                </div>
+                <div class="dashboard-guide-output" aria-live="polite">
+                    <span id="dashboardGuideStatus">{{ $tools['dashboard']['guide']['idle'] }}</span>
+                    <strong id="dashboardGuideResponse">{{ $tools['dashboard']['guide']['empty_response'] }}</strong>
+                    <p id="dashboardGuideFirst">{{ $tools['dashboard']['guide']['empty_first'] }}</p>
+                    <a class="primary-link" id="dashboardGuideLink" href="{{ route('tools.navigator', ['lang' => $locale]) }}">{{ $tools['dashboard']['guide']['empty_link'] }}</a>
                 </div>
             </section>
 

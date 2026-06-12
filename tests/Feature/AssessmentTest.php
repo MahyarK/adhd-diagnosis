@@ -91,6 +91,8 @@ class AssessmentTest extends TestCase
             ->assertSee('Pick the closest problem.')
             ->assertSee('No check-in saved yet')
             ->assertSee('After you check in, this space will show one tiny action and a few matched tools.')
+            ->assertSee('Ask for one gentle next step.')
+            ->assertSee('Optional AI sends only this message and your saved check-in context when you press the button.')
             ->assertSee('Download readable kit')
             ->assertSee('Download data backup')
             ->assertSee('/tools/daily-check-in?lang=en', false)
@@ -305,6 +307,58 @@ class AssessmentTest extends TestCase
             ->assertJsonPath('available', true)
             ->assertJsonPath('response', 'That sounds heavy, so we will make it smaller and kinder.')
             ->assertJsonPath('first', 'Open the bill and look only for the due date.');
+
+        Http::assertSentCount(1);
+    }
+
+    public function test_dashboard_ai_falls_back_when_not_configured(): void
+    {
+        config(['services.openai.key' => null]);
+
+        $this->postJson('/dashboard/ai?lang=en', [
+            'message' => 'I avoided a bill and need help',
+            'checkin' => [
+                'feeling' => 'avoidant',
+                'energy' => 'medium',
+                'pressure' => 'money',
+            ],
+        ])
+            ->assertOk()
+            ->assertJsonPath('available', false)
+            ->assertJsonPath('tool', 'money')
+            ->assertJsonPath('response', 'AI is not configured yet, so here is the local guide: name the pressure, lower the task size, and choose one support route.');
+    }
+
+    public function test_dashboard_ai_returns_configured_guidance(): void
+    {
+        config([
+            'services.openai.key' => 'test-key',
+            'services.openai.model' => 'test-model',
+        ]);
+
+        Http::fake([
+            'https://api.openai.com/v1/responses' => Http::response([
+                'output_text' => json_encode([
+                    'response' => 'You are not behind as a person; this is one recoverable admin loop.',
+                    'first' => 'Open the bill and find the amount.',
+                    'tool' => 'money',
+                ]),
+            ]),
+        ]);
+
+        $this->postJson('/dashboard/ai?lang=en', [
+            'message' => 'I avoided a bill and need help',
+            'checkin' => [
+                'feeling' => 'avoidant',
+                'energy' => 'medium',
+                'pressure' => 'money',
+            ],
+        ])
+            ->assertOk()
+            ->assertJsonPath('available', true)
+            ->assertJsonPath('response', 'You are not behind as a person; this is one recoverable admin loop.')
+            ->assertJsonPath('first', 'Open the bill and find the amount.')
+            ->assertJsonPath('tool', 'money');
 
         Http::assertSentCount(1);
     }

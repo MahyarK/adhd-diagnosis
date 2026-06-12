@@ -3946,8 +3946,10 @@ function taskToText(tools, data) {
 function initDashboard(tools, locale, links = {}) {
     const copy = tools.dashboard;
     const saved = readSupportKit(locale);
+    const root = document.querySelector('[data-tool="dashboard"]');
 
     renderDashboard(copy, saved, tools, links);
+    initDashboardGuide(copy, links, root?.dataset.guideUrl);
 
     document.getElementById('dashboardExportButton').addEventListener('click', () => {
         downloadText('adhd-support-kit.txt', dashboardSupportKitText(copy, tools, readSupportKit(locale)));
@@ -3967,6 +3969,7 @@ function initDashboard(tools, locale, links = {}) {
             `adhdSupport.latestResult.${locale}`,
             'adhdSupport.navigator',
             'adhdSupport.checkin',
+            'adhdSupport.guide',
             'adhdSupport.goal',
             'adhdSupport.planner',
             'adhdSupport.time',
@@ -4016,6 +4019,7 @@ function readSupportKit(locale = 'en') {
         result: localizedSavedResult(locale),
         navigator: readJson('adhdSupport.navigator'),
         checkin: readJson('adhdSupport.checkin'),
+        guide: readJson('adhdSupport.guide'),
         goal: readJson('adhdSupport.goal'),
         planner: readJson('adhdSupport.planner'),
         time: readJson('adhdSupport.time'),
@@ -4130,6 +4134,7 @@ function dashboardSupportKitText(copy, tools, saved) {
         return `- ${copy.summaries[key].replace(':value', value)}`;
     });
     const checkInLines = dashboardCheckInExportLines(tools.checkin, saved.checkin);
+    const guideLines = dashboardGuideExportLines(copy, saved.guide);
 
     return [
         copy.export_text.title,
@@ -4142,6 +4147,7 @@ function dashboardSupportKitText(copy, tools, saved) {
         copy.saved_title,
         savedLines.length ? savedLines.join('\n') : copy.export_text.empty,
         ...checkInLines,
+        ...guideLines,
         '',
         copy.export_text.privacy,
     ].join('\n');
@@ -4188,6 +4194,7 @@ function renderDashboard(copy, saved, tools = {}, links = {}) {
     const nextLink = document.getElementById('dashboardNextLink');
 
     renderDashboardCheckIn(copy, tools.checkin, links, saved.checkin);
+    renderDashboardGuide(copy, links, saved.guide);
 
     if (! next) {
         nextTitle.textContent = copy.empty_title;
@@ -4202,6 +4209,126 @@ function renderDashboard(copy, saved, tools = {}, links = {}) {
     nextBody.textContent = copy.next[next.key];
     nextLink.href = document.querySelector(`[data-dashboard-card="${next.key}"] a`).href;
     nextLink.textContent = copy.cards[next.key].action;
+}
+
+function initDashboardGuide(copy, links, url) {
+    const message = document.getElementById('dashboardGuideMessage');
+    const button = document.getElementById('dashboardGuideButton');
+
+    if (! message || ! button || ! url) {
+        return;
+    }
+
+    button.addEventListener('click', async () => {
+        const text = message.value.trim();
+
+        if (text === '') {
+            renderDashboardGuide(copy, links, {
+                available: false,
+                response: copy.guide.empty_message,
+                first: copy.guide.empty_first,
+                tool: 'navigator',
+            });
+
+            return;
+        }
+
+        button.disabled = true;
+        document.getElementById('dashboardGuideStatus').textContent = copy.guide.loading;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+                body: JSON.stringify({
+                    message: text,
+                    checkin: guideCheckInContext(readJson('adhdSupport.checkin')),
+                }),
+            });
+            const payload = await response.json();
+            const guide = {
+                message: text,
+                available: Boolean(payload.available),
+                response: payload.response || copy.guide.error_response,
+                first: payload.first || copy.guide.error_first,
+                tool: payload.tool || 'navigator',
+            };
+
+            supportStorage.setItem('adhdSupport.guide', JSON.stringify(guide));
+            renderDashboardGuide(copy, links, guide);
+        } catch {
+            renderDashboardGuide(copy, links, {
+                message: text,
+                available: false,
+                response: copy.guide.error_response,
+                first: copy.guide.error_first,
+                tool: 'navigator',
+            });
+        } finally {
+            button.disabled = false;
+        }
+    });
+}
+
+function guideCheckInContext(checkin) {
+    if (! checkin) {
+        return null;
+    }
+
+    return {
+        feeling: checkin.feeling || '',
+        energy: checkin.energy || '',
+        pressure: checkin.pressure || '',
+        message: checkin.message || '',
+    };
+}
+
+function renderDashboardGuide(copy, links, guide) {
+    const status = document.getElementById('dashboardGuideStatus');
+    const response = document.getElementById('dashboardGuideResponse');
+    const first = document.getElementById('dashboardGuideFirst');
+    const link = document.getElementById('dashboardGuideLink');
+
+    if (! status || ! response || ! first || ! link) {
+        return;
+    }
+
+    if (! guide?.response) {
+        status.textContent = copy.guide.idle;
+        response.textContent = copy.guide.empty_response;
+        first.textContent = copy.guide.empty_first;
+        link.href = links.navigator || link.href;
+        link.textContent = copy.guide.empty_link;
+
+        return;
+    }
+
+    const tool = links[guide.tool] ? guide.tool : 'navigator';
+    status.textContent = guide.available ? copy.guide.ready : copy.guide.local_ready;
+    response.textContent = guide.response;
+    first.textContent = guide.first;
+    link.href = links[tool] || link.href;
+    link.textContent = copy.guide.open_tool.replace(':tool', copy.cards[tool]?.title || copy.cards.navigator.title);
+}
+
+function dashboardGuideExportLines(copy, guide) {
+    if (! guide?.response) {
+        return [];
+    }
+
+    return [
+        '',
+        copy.guide.export_title,
+        guide.message ? `${copy.guide.export_prompt}: ${guide.message}` : '',
+        copy.guide.export_response,
+        guide.response,
+        copy.guide.export_first,
+        guide.first,
+    ].filter((line) => line !== '');
 }
 
 function renderDashboardCheckIn(copy, checkInCopy, links, data) {

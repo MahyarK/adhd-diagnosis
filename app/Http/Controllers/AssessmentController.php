@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Support\AdhdAssessment;
 use App\Support\CheckInAiGuide;
+use App\Support\DashboardAiGuide;
 use Illuminate\Support\Facades\App;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,25 @@ class AssessmentController extends Controller
     public function dashboard(Request $request): View
     {
         return $this->toolView($request, 'dashboard');
+    }
+
+    public function dashboardAi(Request $request, DashboardAiGuide $guide): JsonResponse
+    {
+        $locale = $this->setLocale($request);
+
+        $validated = $request->validate([
+            'message' => ['required', 'string', 'max:800'],
+            'checkin' => ['nullable', 'array'],
+            'checkin.feeling' => ['nullable', 'string', 'max:40'],
+            'checkin.energy' => ['nullable', 'string', 'max:40'],
+            'checkin.pressure' => ['nullable', 'string', 'max:40'],
+            'checkin.message' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        return response()->json($guide->guide([
+            ...$validated,
+            'locale' => $locale,
+        ]));
     }
 
     public function resources(Request $request): View

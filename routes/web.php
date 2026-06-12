@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AssessmentController::class, 'show'])->name('assessment.show');
 Route::post('/assessment/score', [AssessmentController::class, 'score'])->name('assessment.score');
 Route::get('/dashboard', [AssessmentController::class, 'dashboard'])->name('dashboard');
+Route::post('/dashboard/ai', [AssessmentController::class, 'dashboardAi'])->name('dashboard.ai');
 Route::get('/resources', [AssessmentController::class, 'resources'])->name('resources');
 Route::get('/tools/support-navigator', [AssessmentController::class, 'supportNavigator'])->name('tools.navigator');
 Route::get('/tools/daily-check-in', [AssessmentController::class, 'dailyCheckIn'])->name('tools.checkin');
