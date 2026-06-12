@@ -73,7 +73,7 @@
 @endphp
 
 <header class="navbar" role="banner">
-    <a class="navbar-brand" href="{{ route('assessment.show', ['lang' => $locale]) }}">
+    <a class="navbar-brand" href="{{ route('dashboard', ['lang' => $locale]) }}">
         <span class="navbar-eyebrow">{{ __('assessment.meta.eyebrow') }}</span>
         <span class="navbar-title">{{ __('assessment.meta.heading') }}</span>
     </a>

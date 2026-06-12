@@ -3,9 +3,10 @@
 use App\Http\Controllers\AssessmentController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [AssessmentController::class, 'show'])->name('assessment.show');
+Route::get('/', [AssessmentController::class, 'dashboard'])->name('dashboard');
+Route::get('/dashboard', [AssessmentController::class, 'dashboard']);
+Route::get('/assessment', [AssessmentController::class, 'show'])->name('assessment.show');
 Route::post('/assessment/score', [AssessmentController::class, 'score'])->name('assessment.score');
-Route::get('/dashboard', [AssessmentController::class, 'dashboard'])->name('dashboard');
 Route::post('/dashboard/ai', [AssessmentController::class, 'dashboardAi'])->name('dashboard.ai');
 Route::get('/resources', [AssessmentController::class, 'resources'])->name('resources');
 Route::get('/tools/support-navigator', [AssessmentController::class, 'supportNavigator'])->name('tools.navigator');

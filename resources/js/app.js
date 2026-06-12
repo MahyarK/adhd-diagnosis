@@ -4199,7 +4199,7 @@ function renderDashboard(copy, saved, tools = {}, links = {}) {
     if (! next) {
         nextTitle.textContent = copy.empty_title;
         nextBody.textContent = copy.empty_body;
-        nextLink.href = document.querySelector('[data-dashboard-card="goal"] a').href;
+        nextLink.href = document.querySelector('[data-dashboard-card="checkin"] a').href;
         nextLink.textContent = copy.start_link;
 
         return;

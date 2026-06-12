@@ -7,9 +7,19 @@ use Tests\TestCase;
 
 class AssessmentTest extends TestCase
 {
-    public function test_home_page_loads_the_screening_app(): void
+    public function test_home_page_starts_with_today(): void
     {
         $this->get('/')
+            ->assertOk()
+            ->assertSee('How is your day feeling?')
+            ->assertSee('Start with today')
+            ->assertSee('Tell the app how today feels.')
+            ->assertSee('/tools/daily-check-in?lang=en', false);
+    }
+
+    public function test_assessment_page_loads_the_screening_app(): void
+    {
+        $this->get('/assessment?lang=en')
             ->assertOk()
             ->assertSee('Gentle ADHD screening')
             ->assertSee('Find clinicians near you')
@@ -22,7 +32,7 @@ class AssessmentTest extends TestCase
         $this->get('/?lang=fa')
             ->assertOk()
             ->assertSee('dir="rtl"', false)
-            ->assertSee('غربالگری آرام ADHD');
+            ->assertSee('امروزت چه حسی دارد؟');
     }
 
     public function test_combined_presentation_can_be_scored(): void
@@ -87,7 +97,8 @@ class AssessmentTest extends TestCase
     {
         $this->get('/dashboard?lang=en')
             ->assertOk()
-            ->assertSee('Your local ADHD support kit.')
+            ->assertSee('How is your day feeling?')
+            ->assertSee('Let’s find one kind next step.')
             ->assertSee('Pick the closest problem.')
             ->assertSee('No check-in saved yet')
             ->assertSee('After you check in, this space will show one tiny action and a few matched tools.')
