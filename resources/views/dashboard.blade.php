@@ -46,19 +46,6 @@
         </section>
 
         <section class="dashboard-grid">
-            <article class="dashboard-next printable-tool">
-                <p class="eyebrow">{{ $tools['dashboard']['next_eyebrow'] }}</p>
-                <h2 id="dashboardNextTitle">{{ $tools['dashboard']['empty_title'] }}</h2>
-                <p id="dashboardNextBody">{{ $tools['dashboard']['empty_body'] }}</p>
-                <div class="tool-actions">
-                    <a class="primary-link" id="dashboardNextLink" href="{{ route('tools.goal', ['lang' => $locale]) }}">{{ $tools['dashboard']['start_link'] }}</a>
-                    <button type="button" class="secondary-button" id="dashboardExportButton">{{ $tools['dashboard']['export'] }}</button>
-                    <button type="button" class="secondary-button" id="dashboardPrintButton">{{ $tools['dashboard']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="dashboardJsonButton">{{ $tools['dashboard']['json_export'] }}</button>
-                    <button type="button" class="secondary-button" id="dashboardClearButton">{{ $tools['dashboard']['clear'] }}</button>
-                </div>
-            </article>
-
             <section class="dashboard-checkin" aria-labelledby="dashboardCheckInTitle">
                 <div>
                     <p class="eyebrow">{{ $tools['dashboard']['checkin']['eyebrow'] }}</p>
@@ -71,22 +58,6 @@
                     <p id="dashboardCheckInFirst">{{ $tools['dashboard']['checkin']['today']['empty_first'] }}</p>
                     <div class="dashboard-checkin-tools" id="dashboardCheckInTools" aria-label="{{ $tools['dashboard']['checkin']['today']['tools'] }}"></div>
                     <a class="primary-link" id="dashboardCheckInLink" href="{{ route('tools.checkin', ['lang' => $locale]) }}">{{ $tools['dashboard']['checkin']['action'] }}</a>
-                </div>
-            </section>
-
-            <section class="dashboard-triage" aria-labelledby="dashboardTriageTitle">
-                <div>
-                    <p class="eyebrow">{{ $tools['dashboard']['triage']['eyebrow'] }}</p>
-                    <h2 id="dashboardTriageTitle">{{ $tools['dashboard']['triage']['title'] }}</h2>
-                    <p>{{ $tools['dashboard']['triage']['intro'] }}</p>
-                </div>
-                <div class="dashboard-triage-grid">
-                    @foreach ($tools['dashboard']['triage']['items'] as $item)
-                        <a href="{{ route($item['route'], ['lang' => $locale]) }}">
-                            <span>{{ $item['label'] }}</span>
-                            <strong>{{ $item['action'] }}</strong>
-                        </a>
-                    @endforeach
                 </div>
             </section>
 
@@ -112,16 +83,51 @@
                 </div>
             </section>
 
-            <section class="dashboard-cards" aria-label="{{ $tools['dashboard']['saved_title'] }}">
-                @foreach ($tools['dashboard']['cards'] as $key => $card)
-                    <article class="dashboard-card" data-dashboard-card="{{ $key }}">
-                        <span class="dashboard-status" data-dashboard-status="{{ $key }}">{{ $tools['dashboard']['not_saved'] }}</span>
-                        <h3>{{ $card['title'] }}</h3>
-                        <p data-dashboard-summary="{{ $key }}">{{ $card['empty'] }}</p>
-                        <a href="{{ route($card['route'], ['lang' => $locale]) }}">{{ $card['action'] }}</a>
-                    </article>
-                @endforeach
+            <article class="dashboard-next printable-tool">
+                <p class="eyebrow">{{ $tools['dashboard']['next_eyebrow'] }}</p>
+                <h2 id="dashboardNextTitle">{{ $tools['dashboard']['empty_title'] }}</h2>
+                <p id="dashboardNextBody">{{ $tools['dashboard']['empty_body'] }}</p>
+                <div class="tool-actions">
+                    <a class="primary-link" id="dashboardNextLink" href="{{ route('tools.checkin', ['lang' => $locale]) }}">{{ $tools['dashboard']['start_link'] }}</a>
+                    <button type="button" class="secondary-button" id="dashboardExportButton">{{ $tools['dashboard']['export'] }}</button>
+                    <button type="button" class="secondary-button" id="dashboardPrintButton">{{ $tools['dashboard']['print'] }}</button>
+                    <button type="button" class="secondary-button" id="dashboardJsonButton">{{ $tools['dashboard']['json_export'] }}</button>
+                    <button type="button" class="secondary-button" id="dashboardClearButton">{{ $tools['dashboard']['clear'] }}</button>
+                </div>
+            </article>
+
+            <section class="dashboard-triage" aria-labelledby="dashboardTriageTitle">
+                <div>
+                    <p class="eyebrow">{{ $tools['dashboard']['triage']['eyebrow'] }}</p>
+                    <h2 id="dashboardTriageTitle">{{ $tools['dashboard']['triage']['title'] }}</h2>
+                    <p>{{ $tools['dashboard']['triage']['intro'] }}</p>
+                </div>
+                <div class="dashboard-triage-grid">
+                    @foreach ($tools['dashboard']['triage']['items'] as $item)
+                        <a href="{{ route($item['route'], ['lang' => $locale]) }}">
+                            <span>{{ $item['label'] }}</span>
+                            <strong>{{ $item['action'] }}</strong>
+                        </a>
+                    @endforeach
+                </div>
             </section>
+
+            <details class="dashboard-saved">
+                <summary>
+                    <span>{{ $tools['dashboard']['saved_title'] }}</span>
+                    <strong>{{ $tools['dashboard']['saved_intro'] }}</strong>
+                </summary>
+                <section class="dashboard-cards" aria-label="{{ $tools['dashboard']['saved_title'] }}">
+                    @foreach ($tools['dashboard']['cards'] as $key => $card)
+                        <article class="dashboard-card" data-dashboard-card="{{ $key }}">
+                            <span class="dashboard-status" data-dashboard-status="{{ $key }}">{{ $tools['dashboard']['not_saved'] }}</span>
+                            <h3>{{ $card['title'] }}</h3>
+                            <p data-dashboard-summary="{{ $key }}">{{ $card['empty'] }}</p>
+                            <a href="{{ route($card['route'], ['lang' => $locale]) }}">{{ $card['action'] }}</a>
+                        </article>
+                    @endforeach
+                </section>
+            </details>
         </section>
 
         <p class="dashboard-note">{{ $tools['dashboard']['privacy'] }}</p>

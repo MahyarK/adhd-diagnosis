@@ -1105,6 +1105,7 @@ h2 {
 .dashboard-checkin,
 .dashboard-triage,
 .dashboard-guide,
+.dashboard-saved,
 .dashboard-card {
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -1343,6 +1344,47 @@ h2 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+}
+
+.dashboard-saved {
+    grid-column: 1 / -1;
+    padding: 0;
+    overflow: hidden;
+}
+
+.dashboard-saved summary {
+    display: grid;
+    gap: 3px;
+    padding: 14px 16px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.dashboard-saved summary::-webkit-details-marker {
+    display: none;
+}
+
+.dashboard-saved summary span {
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.dashboard-saved summary strong {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.dashboard-saved[open] summary {
+    border-bottom: 1px solid var(--border-light);
+}
+
+.dashboard-saved .dashboard-cards {
+    padding: 12px;
 }
 
 .dashboard-card {

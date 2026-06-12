@@ -14,6 +14,7 @@ class AssessmentTest extends TestCase
             ->assertSee('How is your day feeling?')
             ->assertSee('Start with today')
             ->assertSee('Tell the app how today feels.')
+            ->assertSee('Saved support')
             ->assertSee('/tools/daily-check-in?lang=en', false);
     }
 
@@ -104,7 +105,8 @@ class AssessmentTest extends TestCase
             ->assertSee('After you check in, this space will show one tiny action and a few matched tools.')
             ->assertSee('Ask for one gentle next step.')
             ->assertSee('Optional AI sends only this message and your saved check-in context when you press the button.')
-            ->assertSee('Download readable kit')
+            ->assertSee('Open this when you want your notes, exports, and the fuller support library.')
+            ->assertSee('Download notes')
             ->assertSee('Download data backup')
             ->assertSee('/tools/daily-check-in?lang=en', false)
             ->assertSee('/tools/money-admin?lang=en', false);
