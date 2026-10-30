@@ -1,3 +1,5 @@
+@extends('layouts.app')
+
 @php
     $navigatorLinks = [
         'planner' => route('tools.planner', ['lang' => $locale]),
@@ -32,20 +34,11 @@
     ];
 @endphp
 
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.support_navigator') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@section('title', __('assessment.ui.support_navigator'))
 
-    <main class="tool-shell" data-tool="navigator" data-locale="{{ $locale }}" data-tools='@json($tools)' data-links='@json($navigatorLinks)'>
+@section('content')
+    <main id="main" class="tool-shell" data-tool="navigator" data-locale="{{ $locale }}" data-tools='@json($tools)' data-links='@json($navigatorLinks)'>
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['navigator']['eyebrow'] }}</p>
             <h1>{{ $tools['navigator']['title'] }}</h1>
             <p>{{ $tools['navigator']['intro'] }}</p>
         </section>
@@ -82,10 +75,15 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['navigator']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="navigatorPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="navigatorDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="navigatorClearButton">{{ $tools['shared']['clear'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="navigatorPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="navigatorDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="navigatorClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
             </form>
 
             <section class="tool-output printable-tool" aria-live="polite">
@@ -112,5 +110,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection

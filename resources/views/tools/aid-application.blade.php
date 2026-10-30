@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.aid_application') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <main class="tool-shell" data-tool="aid" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+@section('title', __('assessment.ui.aid_application'))
+
+@section('content')
+    <main id="main" class="tool-shell" data-tool="aid" data-locale="{{ $locale }}" data-tools='@json($tools)'>
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['aid']['eyebrow'] }}</p>
             <h1>{{ $tools['aid']['title'] }}</h1>
             <p>{{ $tools['aid']['intro'] }}</p>
         </section>
@@ -56,10 +49,15 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['aid']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="aidPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="aidDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="aidClearButton">{{ $tools['shared']['clear'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="aidPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="aidDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="aidClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
             </form>
 
             <section class="tool-output printable-tool" aria-live="polite">
@@ -94,5 +92,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection

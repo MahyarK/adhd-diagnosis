@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.digital_clutter') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <main class="tool-shell" data-tool="digital" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+@section('title', __('assessment.ui.digital_clutter'))
+
+@section('content')
+    <main id="main" class="tool-shell" data-tool="digital" data-locale="{{ $locale }}" data-tools='@json($tools)'>
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['digital']['eyebrow'] }}</p>
             <h1>{{ $tools['digital']['title'] }}</h1>
             <p>{{ $tools['digital']['intro'] }}</p>
         </section>
@@ -56,10 +49,15 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['digital']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="digitalPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="digitalDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="digitalClearButton">{{ $tools['shared']['clear'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="digitalPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="digitalDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="digitalClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
             </form>
 
             <section class="tool-output printable-tool" aria-live="polite">
@@ -94,5 +92,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection

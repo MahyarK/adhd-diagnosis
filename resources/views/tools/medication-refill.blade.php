@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.medication_refill') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <main class="tool-shell" data-tool="meds" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+@section('title', __('assessment.ui.medication_refill'))
+
+@section('content')
+    <main id="main" class="tool-shell" data-tool="meds" data-locale="{{ $locale }}" data-tools='@json($tools)' data-ai-url="{{ route('tools.meds.ai', ['lang' => $locale]) }}">
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['meds']['eyebrow'] }}</p>
             <h1>{{ $tools['meds']['title'] }}</h1>
             <p>{{ $tools['meds']['intro'] }}</p>
         </section>
@@ -48,10 +41,17 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['meds']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="medsPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="medsDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="medsClearButton">{{ $tools['shared']['clear'] }}</button>
+                    <button type="button" class="secondary-button" id="medsAiButton">{{ $tools['meds']['buttons']['ai'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="medsPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="medsDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="medsClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
+                <p class="map-note" id="medsAiStatus">{{ $tools['meds']['ai_status']['idle'] }}</p>
             </form>
 
             <section class="tool-output printable-tool" aria-live="polite">
@@ -86,5 +86,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection

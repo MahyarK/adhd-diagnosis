@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.daily_planner') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <main class="tool-shell" data-tool="planner" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+@section('title', __('assessment.ui.daily_planner'))
+
+@section('content')
+    <main id="main" class="tool-shell" data-tool="planner" data-locale="{{ $locale }}" data-tools='@json($tools)' data-ai-url="{{ route('tools.planner.ai', ['lang' => $locale]) }}">
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['planner']['eyebrow'] }}</p>
             <h1>{{ $tools['planner']['title'] }}</h1>
             <p>{{ $tools['planner']['intro'] }}</p>
         </section>
@@ -40,10 +33,17 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['planner']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="plannerPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="plannerDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="plannerClearButton">{{ $tools['shared']['clear'] }}</button>
+                    <button type="button" class="secondary-button" id="plannerAiButton">{{ $tools['planner']['buttons']['ai'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="plannerPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="plannerDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="plannerClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
+                <p class="map-note" id="plannerAiStatus">{{ $tools['planner']['ai_status']['idle'] }}</p>
             </form>
 
             <section class="tool-output printable-tool" id="plannerOutput" aria-live="polite">
@@ -74,5 +74,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection

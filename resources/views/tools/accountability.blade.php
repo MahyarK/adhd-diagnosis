@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.accountability') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <main class="tool-shell" data-tool="accountability" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+@section('title', __('assessment.ui.accountability'))
+
+@section('content')
+    <main id="main" class="tool-shell" data-tool="accountability" data-locale="{{ $locale }}" data-tools='@json($tools)'>
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['accountability']['eyebrow'] }}</p>
             <h1>{{ $tools['accountability']['title'] }}</h1>
             <p>{{ $tools['accountability']['intro'] }}</p>
         </section>
@@ -48,10 +41,15 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['accountability']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="accountabilityPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="accountabilityDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="accountabilityClearButton">{{ $tools['shared']['clear'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="accountabilityPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="accountabilityDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="accountabilityClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
             </form>
 
             <section class="tool-output printable-tool" aria-live="polite">
@@ -82,5 +80,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection

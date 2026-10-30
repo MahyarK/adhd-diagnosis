@@ -1,119 +1,58 @@
 @php
-    $toolGroups = [
-        [
-            'label' => __('assessment.ui.tools_group_start'),
-            'links' => [
-                ['route' => 'dashboard', 'label' => __('assessment.ui.dashboard')],
-                ['route' => 'resources', 'label' => __('assessment.ui.resource_library')],
-                ['route' => 'tools.navigator', 'label' => __('assessment.ui.support_navigator')],
-                ['route' => 'tools.checkin', 'label' => __('assessment.ui.daily_checkin')],
-                ['route' => 'tools.goal', 'label' => __('assessment.ui.goal_builder')],
-                ['route' => 'tools.planner', 'label' => __('assessment.ui.daily_planner')],
-                ['route' => 'tools.time', 'label' => __('assessment.ui.time_block')],
-                ['route' => 'tools.body', 'label' => __('assessment.ui.body_needs')],
-                ['route' => 'tools.meds', 'label' => __('assessment.ui.medication_refill')],
-                ['route' => 'tools.food', 'label' => __('assessment.ui.food_rescue')],
-                ['route' => 'tools.sleep', 'label' => __('assessment.ui.sleep_wind_down')],
-                ['route' => 'tools.motivation', 'label' => __('assessment.ui.motivation_menu')],
-                ['route' => 'tools.wins', 'label' => __('assessment.ui.wins_log')],
-                ['route' => 'tools.accountability', 'label' => __('assessment.ui.accountability')],
-                ['route' => 'tools.routine', 'label' => __('assessment.ui.routine_builder')],
-                ['route' => 'tools.focus', 'label' => __('assessment.ui.focus_sprint')],
-            ],
-        ],
-        [
-            'label' => __('assessment.ui.tools_group_rescue'),
-            'links' => [
-                ['route' => 'tools.energy', 'label' => __('assessment.ui.energy_crash')],
-                ['route' => 'tools.decision', 'label' => __('assessment.ui.decision_priority')],
-                ['route' => 'tools.emotion', 'label' => __('assessment.ui.emotional_reset')],
-                ['route' => 'tools.safety', 'label' => __('assessment.ui.safety_pause')],
-                ['route' => 'tools.transition', 'label' => __('assessment.ui.transition_rescue')],
-                ['route' => 'tools.communication', 'label' => __('assessment.ui.communication_repair')],
-                ['route' => 'tools.home', 'label' => __('assessment.ui.home_reset')],
-                ['route' => 'tools.laundry', 'label' => __('assessment.ui.laundry_rescue')],
-                ['route' => 'tools.digital', 'label' => __('assessment.ui.digital_clutter')],
-                ['route' => 'tools.money', 'label' => __('assessment.ui.money_admin')],
-                ['route' => 'tools.lost', 'label' => __('assessment.ui.lost_item')],
-                ['route' => 'tools.errand', 'label' => __('assessment.ui.errand_launch')],
-            ],
-        ],
-        [
-            'label' => __('assessment.ui.tools_group_care'),
-            'links' => [
-                ['route' => 'tools.appointment', 'label' => __('assessment.ui.appointment_prep')],
-                ['route' => 'tools.care', 'label' => __('assessment.ui.care_notes')],
-                ['route' => 'tools.support', 'label' => __('assessment.ui.support_request')],
-                ['route' => 'tools.workschool', 'label' => __('assessment.ui.work_school_support')],
-                ['route' => 'tools.job', 'label' => __('assessment.ui.job_hunt')],
-                ['route' => 'tools.providers', 'label' => __('assessment.ui.provider_shortlist')],
-                ['route' => 'tools.access', 'label' => __('assessment.ui.access_plan')],
-                ['route' => 'tools.aid', 'label' => __('assessment.ui.aid_application')],
-                ['route' => 'tools.weekly', 'label' => __('assessment.ui.weekly_reset')],
-                ['route' => 'tools.task', 'label' => __('assessment.ui.task_breakdown')],
-                ['route' => 'tools.followup', 'label' => __('assessment.ui.follow_up_rescue')],
-                ['route' => 'tools.reminders', 'label' => __('assessment.ui.reminders')],
-                ['route' => 'tools.tracker', 'label' => __('assessment.ui.symptom_tracker')],
-            ],
-        ],
+    $navItems = [
+        ['route' => 'dashboard', 'label' => __('assessment.ui.dashboard'), 'active' => request()->routeIs('dashboard'), 'icon' => 'M12 3v2m0 14v2M5.6 5.6 7 7m10 10 1.4 1.4M3 12h2m14 0h2M5.6 18.4 7 17m10-10 1.4-1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z'],
+        ['route' => 'assessment.show', 'label' => __('assessment.tools.toolkit.nav.screening'), 'active' => request()->routeIs('assessment.*'), 'icon' => 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4'],
+        ['route' => 'toolkit', 'label' => __('assessment.ui.tools'), 'active' => request()->routeIs('toolkit', 'tools.*'), 'icon' => 'M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5Zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5ZM4 15a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4Z'],
+        ['route' => 'resources', 'label' => __('assessment.ui.resource_library'), 'active' => request()->routeIs('resources'), 'icon' => 'M12 6.5C10.5 5 8.3 4.5 4 4.5v13c4.3 0 6.5.5 8 2 1.5-1.5 3.7-2 8-2v-13c-4.3 0-6.5.5-8 2Zm0 0v13'],
     ];
-
-    $activeToolLabel = __('assessment.ui.tools');
-
-    if (request()->routeIs('tools.*')) {
-        foreach ($toolGroups as $group) {
-            foreach ($group['links'] as $link) {
-                if (request()->routeIs($link['route'])) {
-                    $activeToolLabel = $link['label'];
-                    break 2;
-                }
-            }
-        }
-    }
 @endphp
 
-<header class="navbar" role="banner">
-    <a class="navbar-brand" href="{{ route('dashboard', ['lang' => $locale]) }}">
-        <span class="navbar-eyebrow">{{ __('assessment.meta.eyebrow') }}</span>
-        <span class="navbar-title">{{ __('assessment.meta.heading') }}</span>
-    </a>
-    <nav class="primary-nav" aria-label="{{ __('assessment.ui.tools') }}">
-        <a href="{{ route('dashboard', ['lang' => $locale]) }}" @class(['active' => request()->routeIs('dashboard')])>{{ __('assessment.ui.dashboard') }}</a>
-        <a href="{{ route('resources', ['lang' => $locale]) }}" @class(['active' => request()->routeIs('resources')])>{{ __('assessment.ui.resource_library') }}</a>
-    </nav>
-    <nav class="tool-menu" aria-label="{{ __('assessment.ui.tools') }}">
-        <details>
-            <summary @class(['active' => request()->routeIs('tools.*')]) aria-label="{{ __('assessment.ui.tools') }}">
-                <span>{{ $activeToolLabel }}</span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </summary>
-            <div class="tool-menu-panel">
-                @foreach ($toolGroups as $group)
-                    <section class="tool-menu-group">
-                        <p>{{ $group['label'] }}</p>
-                        @foreach ($group['links'] as $link)
-                            <a href="{{ route($link['route'], ['lang' => $locale]) }}" @class(['active' => request()->routeIs($link['route'])])>{{ $link['label'] }}</a>
-                        @endforeach
-                    </section>
-                @endforeach
-            </div>
-        </details>
-    </nav>
-    <nav class="lang-dropdown" aria-label="{{ __('assessment.ui.language') }}">
-        <details>
-            <summary aria-label="{{ __('assessment.ui.language') }}">
-                <span>{{ $locales[$locale] }}</span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </summary>
-            <div class="lang-menu">
-                @foreach ($locales as $code => $label)
-                    <a href="{{ request()->url() }}?lang={{ $code }}" @class(['active' => $locale === $code])>{{ $label }}</a>
-                @endforeach
-            </div>
-        </details>
-    </nav>
+<header class="site-header">
+    <div class="nav-pill">
+        <a class="brand" href="{{ route('dashboard', ['lang' => $locale]) }}">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-name">{{ __('assessment.meta.title') }}</span>
+        </a>
+
+        <nav class="nav-links" aria-label="{{ __('assessment.tools.toolkit.nav.main') }}">
+            @foreach ($navItems as $item)
+                <a href="{{ route($item['route'], ['lang' => $locale]) }}" @if ($item['active']) aria-current="page" @endif>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $item['icon'] }}"/></svg>
+                    <span>{{ $item['label'] }}</span>
+                </a>
+            @endforeach
+        </nav>
+
+        <div class="nav-tools">
+            <details class="nav-menu lang-dropdown">
+                <summary aria-label="{{ __('assessment.ui.language') }}: {{ $locales[$locale] }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/></svg>
+                    <span>{{ strtoupper($locale) }}</span>
+                </summary>
+                <div class="menu-panel">
+                    @foreach ($locales as $code => $label)
+                        <a href="{{ request()->url() }}?lang={{ $code }}" lang="{{ $code }}" hreflang="{{ $code }}" @if ($locale === $code) aria-current="true" @endif>{{ $label }}</a>
+                    @endforeach
+                </div>
+            </details>
+
+            @auth
+                <details class="nav-menu account-nav">
+                    <summary aria-label="{{ $ui['account'] ?? __('assessment.ui.account') }}">
+                        <span class="avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                    </summary>
+                    <div class="menu-panel">
+                        <p class="menu-name">{{ auth()->user()->name }}</p>
+                        <a href="{{ route('dashboard', ['lang' => $locale]) }}#yourSpace">{{ __('assessment.ui.usage_dashboard') }}</a>
+                        <form method="POST" action="{{ route('logout', ['lang' => $locale]) }}">
+                            @csrf
+                            <button type="submit">{{ __('assessment.ui.sign_out') }}</button>
+                        </form>
+                    </div>
+                </details>
+            @else
+                <a class="nav-signin" href="{{ route('login', ['lang' => $locale]) }}" @if (request()->routeIs('login', 'register')) aria-current="page" @endif>{{ __('assessment.ui.sign_in') }}</a>
+            @endauth
+        </div>
+    </div>
 </header>

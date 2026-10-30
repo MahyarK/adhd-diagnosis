@@ -1,22 +1,34 @@
 <?php
 
 use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AssessmentController::class, 'dashboard'])->name('dashboard');
 Route::get('/dashboard', [AssessmentController::class, 'dashboard']);
+Route::get('/login', [AuthController::class, 'login'])->middleware('guest')->name('login');
+Route::post('/login', [AuthController::class, 'authenticate'])->middleware('guest')->name('login.authenticate');
+Route::get('/register', [AuthController::class, 'register'])->middleware('guest')->name('register');
+Route::post('/register', [AuthController::class, 'store'])->middleware('guest')->name('register.store');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 Route::get('/assessment', [AssessmentController::class, 'show'])->name('assessment.show');
 Route::post('/assessment/score', [AssessmentController::class, 'score'])->name('assessment.score');
 Route::post('/dashboard/ai', [AssessmentController::class, 'dashboardAi'])->name('dashboard.ai');
 Route::get('/resources', [AssessmentController::class, 'resources'])->name('resources');
+Route::get('/tools', [AssessmentController::class, 'toolkit'])->name('toolkit');
 Route::get('/tools/support-navigator', [AssessmentController::class, 'supportNavigator'])->name('tools.navigator');
 Route::get('/tools/daily-check-in', [AssessmentController::class, 'dailyCheckIn'])->name('tools.checkin');
 Route::post('/tools/daily-check-in/ai', [AssessmentController::class, 'dailyCheckInAi'])->name('tools.checkin.ai');
 Route::get('/tools/goal-builder', [AssessmentController::class, 'goalBuilder'])->name('tools.goal');
+Route::post('/tools/goal-builder/ai', [AssessmentController::class, 'goalBuilderAi'])->name('tools.goal.ai');
 Route::get('/tools/daily-planner', [AssessmentController::class, 'dailyPlanner'])->name('tools.planner');
+Route::post('/tools/daily-planner/ai', [AssessmentController::class, 'dailyPlannerAi'])->name('tools.planner.ai');
 Route::get('/tools/time-block', [AssessmentController::class, 'timeBlock'])->name('tools.time');
+Route::post('/tools/time-block/ai', [AssessmentController::class, 'timeBlockAi'])->name('tools.time.ai');
 Route::get('/tools/body-needs', [AssessmentController::class, 'bodyNeeds'])->name('tools.body');
+Route::post('/tools/body-needs/ai', [AssessmentController::class, 'bodyNeedsAi'])->name('tools.body.ai');
 Route::get('/tools/medication-refill', [AssessmentController::class, 'medicationRefill'])->name('tools.meds');
+Route::post('/tools/medication-refill/ai', [AssessmentController::class, 'medicationRefillAi'])->name('tools.meds.ai');
 Route::get('/tools/food-rescue', [AssessmentController::class, 'foodRescue'])->name('tools.food');
 Route::get('/tools/sleep-wind-down', [AssessmentController::class, 'sleepWindDown'])->name('tools.sleep');
 Route::get('/tools/motivation-menu', [AssessmentController::class, 'motivationMenu'])->name('tools.motivation');
@@ -26,9 +38,13 @@ Route::get('/tools/routine-builder', [AssessmentController::class, 'routineBuild
 Route::get('/tools/weekly-reset', [AssessmentController::class, 'weeklyReset'])->name('tools.weekly');
 Route::get('/tools/communication-repair', [AssessmentController::class, 'communicationRepair'])->name('tools.communication');
 Route::get('/tools/energy-crash', [AssessmentController::class, 'energyCrash'])->name('tools.energy');
+Route::post('/tools/energy-crash/ai', [AssessmentController::class, 'energyCrashAi'])->name('tools.energy.ai');
 Route::get('/tools/decision-priority', [AssessmentController::class, 'decisionPriority'])->name('tools.decision');
+Route::post('/tools/decision-priority/ai', [AssessmentController::class, 'decisionPriorityAi'])->name('tools.decision.ai');
 Route::get('/tools/focus-sprint', [AssessmentController::class, 'focusSprint'])->name('tools.focus');
+Route::post('/tools/focus-sprint/ai', [AssessmentController::class, 'focusSprintAi'])->name('tools.focus.ai');
 Route::get('/tools/emotional-reset', [AssessmentController::class, 'emotionalReset'])->name('tools.emotion');
+Route::post('/tools/emotional-reset/ai', [AssessmentController::class, 'emotionalResetAi'])->name('tools.emotion.ai');
 Route::get('/tools/safety-pause', [AssessmentController::class, 'safetyPause'])->name('tools.safety');
 Route::get('/tools/transition-rescue', [AssessmentController::class, 'transitionRescue'])->name('tools.transition');
 Route::get('/tools/appointment-prep', [AssessmentController::class, 'appointmentPrep'])->name('tools.appointment');
@@ -40,12 +56,14 @@ Route::get('/tools/home-reset', [AssessmentController::class, 'homeReset'])->nam
 Route::get('/tools/laundry-rescue', [AssessmentController::class, 'laundryRescue'])->name('tools.laundry');
 Route::get('/tools/digital-clutter', [AssessmentController::class, 'digitalClutter'])->name('tools.digital');
 Route::get('/tools/money-admin', [AssessmentController::class, 'moneyAdmin'])->name('tools.money');
+Route::post('/tools/money-admin/ai', [AssessmentController::class, 'moneyAdminAi'])->name('tools.money.ai');
 Route::get('/tools/aid-application', [AssessmentController::class, 'aidApplication'])->name('tools.aid');
 Route::get('/tools/lost-item', [AssessmentController::class, 'lostItem'])->name('tools.lost');
 Route::get('/tools/errand-launch', [AssessmentController::class, 'errandLaunch'])->name('tools.errand');
 Route::get('/tools/provider-shortlist', [AssessmentController::class, 'providerShortlist'])->name('tools.providers');
 Route::get('/tools/access-plan', [AssessmentController::class, 'accessPlan'])->name('tools.access');
 Route::get('/tools/task-breakdown', [AssessmentController::class, 'taskBreakdown'])->name('tools.task');
+Route::post('/tools/task-breakdown/ai', [AssessmentController::class, 'taskBreakdownAi'])->name('tools.task.ai');
 Route::get('/tools/follow-up-rescue', [AssessmentController::class, 'followUpRescue'])->name('tools.followup');
 Route::get('/tools/reminders', [AssessmentController::class, 'reminders'])->name('tools.reminders');
 Route::get('/tools/symptom-tracker', [AssessmentController::class, 'symptomTracker'])->name('tools.tracker');

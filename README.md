@@ -7,9 +7,8 @@ This is a screening and preparation tool, not a medical diagnosis.
 ## Features
 
 - One-question-at-a-time wizard flow
-- Compact no-scroll layout for desktop and mobile
-- Small answer buttons with auto-advance
-- Gamified progress with focus points and checkpoints
+- Calm intro screen, one question at a time, with auto-advance, number-key answers and a saved result you can reopen
+- Four calm destinations (Today, Screening, Tools, Resources) with a searchable toolkit grouped by need, light and dark themes, and a mobile tab bar
 - Questions for inattentive symptoms, hyperactive/impulsive symptoms, childhood onset, duration, multiple settings, impairment, masking, family pattern, and possible overlapping causes
 - Server-side scoring for inattentive, hyperactive/impulsive, combined, lower-signal, and needs-more-context results
 - Clear next steps for clinician follow-up

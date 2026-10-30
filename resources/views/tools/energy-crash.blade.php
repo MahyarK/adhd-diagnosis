@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.energy_crash') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <main class="tool-shell" data-tool="energy" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+@section('title', __('assessment.ui.energy_crash'))
+
+@section('content')
+    <main id="main" class="tool-shell" data-tool="energy" data-locale="{{ $locale }}" data-tools='@json($tools)' data-ai-url="{{ route('tools.energy.ai', ['lang' => $locale]) }}">
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['energy']['eyebrow'] }}</p>
             <h1>{{ $tools['energy']['title'] }}</h1>
             <p>{{ $tools['energy']['intro'] }}</p>
         </section>
@@ -56,10 +49,17 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['energy']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="energyPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="energyDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="energyClearButton">{{ $tools['shared']['clear'] }}</button>
+                    <button type="button" class="secondary-button" id="energyAiButton">{{ $tools['energy']['buttons']['ai'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="energyPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="energyDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="energyClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
+                <p class="map-note" id="energyAiStatus">{{ $tools['energy']['ai_status']['idle'] }}</p>
             </form>
 
             <section class="tool-output printable-tool" aria-live="polite">
@@ -94,5 +94,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection

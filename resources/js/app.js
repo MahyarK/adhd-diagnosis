@@ -19,20 +19,20 @@ const supportStorage = (() => {
 
 // Keep header dropdowns from staying open over the page.
 document.addEventListener('click', (e) => {
-    document.querySelectorAll('.lang-dropdown details, .tool-menu details').forEach((details) => {
+    document.querySelectorAll('details.nav-menu').forEach((details) => {
         if (details.open && !details.contains(e.target)) {
             details.open = false;
         }
     });
 });
 
-document.querySelectorAll('.lang-dropdown details, .tool-menu details').forEach((details) => {
+document.querySelectorAll('details.nav-menu').forEach((details) => {
     details.addEventListener('toggle', () => {
         if (! details.open) {
             return;
         }
 
-        document.querySelectorAll('.lang-dropdown details, .tool-menu details').forEach((other) => {
+        document.querySelectorAll('details.nav-menu').forEach((other) => {
             if (other !== details) {
                 other.open = false;
             }
@@ -62,7 +62,6 @@ if (root) {
 
     const progressLabel = document.getElementById('progressLabel');
     const progressBar = document.getElementById('progressBar');
-    const sectionLabel = document.getElementById('sectionLabel');
     const sectionIntro = document.getElementById('sectionIntro');
     const questionText = document.getElementById('questionText');
     const answerGrid = document.getElementById('answerGrid');
@@ -70,8 +69,8 @@ if (root) {
     const backButton = document.getElementById('backButton');
     const resultsPanel = document.getElementById('resultsPanel');
     const sectionRail = document.getElementById('sectionRail');
-    const pointsLabel = document.getElementById('pointsLabel');
-    const streakLabel = document.getElementById('streakLabel');
+    const intro = document.getElementById('screeningIntro');
+    const layout = document.querySelector('.assessment-layout');
     const motivationLabel = document.getElementById('motivationLabel');
     const findCliniciansButton = document.getElementById('findCliniciansButton');
     const printResultButton = document.getElementById('printResultButton');
@@ -109,24 +108,21 @@ if (root) {
         const options = question.kind === 'choice'
             ? Object.entries(question.options).map(([value, label]) => [value, label, ''])
             : frequencyOptions;
-        const answeredCount = Object.keys(answers).length;
-
-        progressLabel.textContent = `${index + 1} / ${questions.length}`;
+        progressLabel.textContent = ui.screening.question_of
+            .replace(':current', index + 1)
+            .replace(':total', questions.length);
         progressBar.style.width = `${((index + 1) / questions.length) * 100}%`;
-        sectionLabel.textContent = question.section.label;
-        pointsLabel.textContent = answeredCount * 10;
-        streakLabel.textContent = answeredCount > 0 ? ui.answered.replace(':count', answeredCount) : ui.ready;
         motivationLabel.textContent = ui.encouragement[index % ui.encouragement.length];
         sectionIntro.textContent = question.section.intro;
         questionText.textContent = question.text;
         backButton.disabled = index === 0;
         nextButton.textContent = index === questions.length - 1 ? ui.see_results : ui.skip;
 
-        answerGrid.innerHTML = options.map(([value, label, detail]) => {
-            const selected = String(answers[question.id] ?? '') === value ? 'selected' : '';
+        answerGrid.innerHTML = options.map(([value, label, detail], optionIndex) => {
+            const selected = String(answers[question.id] ?? '') === value;
 
             return `
-                <button type="button" class="answer-option ${selected}" data-value="${value}">
+                <button type="button" class="answer-option ${selected ? 'selected' : ''}" data-value="${value}" data-key="${optionIndex + 1}" aria-pressed="${selected}">
                     <strong>${label}</strong>
                     ${detail ? `<span>${detail}</span>` : ''}
                 </button>
@@ -134,14 +130,24 @@ if (root) {
         }).join('');
 
         answerGrid.querySelectorAll('button').forEach((button) => {
-            button.addEventListener('click', () => {
-                answers[question.id] = button.dataset.value;
-                renderQuestion();
-                autoAdvanceTimer = setTimeout(() => advance(), 180);
-            });
+            button.addEventListener('click', () => choose(button.dataset.value));
         });
 
         renderRail();
+    }
+
+    function choose(value) {
+        answers[questions[index].id] = value;
+        renderQuestion();
+        autoAdvanceTimer = setTimeout(() => advance(), 220);
+    }
+
+    function startQuestions() {
+        intro.hidden = true;
+        resultsPanel.hidden = true;
+        layout.hidden = false;
+        renderQuestion();
+        questionText.focus();
     }
 
     function advance() {
@@ -163,6 +169,7 @@ if (root) {
 
         index += 1;
         renderQuestion();
+        questionText.focus({ preventScroll: true });
     }
 
     async function submitAnswers() {
@@ -193,8 +200,10 @@ if (root) {
         currentResult = result;
         supportStorage.setItem('adhdSupport.latestResult', JSON.stringify(result));
         supportStorage.setItem(`adhdSupport.latestResult.${activeLocale}`, JSON.stringify(result));
-        document.querySelector('.assessment-layout').hidden = true;
+        layout.hidden = true;
+        intro.hidden = true;
         resultsPanel.hidden = false;
+        window.scrollTo({ top: 0 });
         document.getElementById('resultTitle').textContent = result.title;
         document.getElementById('resultSummary').textContent = result.summary;
         document.getElementById('resultDisclaimer').textContent = result.disclaimer;
@@ -229,6 +238,7 @@ if (root) {
         document.getElementById('nextSteps').innerHTML = result.next_steps
             .map((step) => `<li>${step}</li>`)
             .join('');
+        document.getElementById('resultTitle').focus({ preventScroll: true });
     }
 
     function renderProfile(profile) {
@@ -268,7 +278,28 @@ if (root) {
     });
 
     document.getElementById('restartButton').addEventListener('click', () => {
-        window.location.reload();
+        window.location.href = window.location.pathname + window.location.search;
+    });
+
+    const savedResult = localizedSavedResult(activeLocale);
+    const resumeButton = document.getElementById('resumeScreening');
+
+    document.getElementById('beginScreening').addEventListener('click', startQuestions);
+    resumeButton.hidden = ! savedResult;
+    resumeButton.addEventListener('click', () => showResults(savedResult));
+
+    // Number keys pick an answer, so the whole screening works from the keyboard.
+    document.addEventListener('keydown', (event) => {
+        if (layout.hidden || event.altKey || event.ctrlKey || event.metaKey || event.target.closest?.('input, textarea, select')) {
+            return;
+        }
+
+        const option = answerGrid.querySelector(`[data-key="${event.key}"]`);
+
+        if (option) {
+            event.preventDefault();
+            choose(option.dataset.value);
+        }
     });
 
     findCliniciansButton.addEventListener('click', () => {
@@ -287,7 +318,9 @@ if (root) {
         downloadText('adhd-screening-result.txt', resultToText(currentResult));
     });
 
-    renderQuestion();
+    if (savedResult && window.location.hash === '#result') {
+        showResults(savedResult);
+    }
 
     async function showClinicianMap() {
         clinicianMapPanel.hidden = false;
@@ -471,6 +504,54 @@ if (root) {
     }
 }
 
+document.querySelectorAll('[data-tips]').forEach((carousel) => {
+    const slides = Array.from(carousel.querySelectorAll('.tip'));
+    const count = carousel.querySelector('#tipCount');
+    let current = 0;
+
+    carousel.querySelectorAll('[data-tip-step]').forEach((button) => {
+        button.addEventListener('click', () => {
+            current = (current + Number(button.dataset.tipStep) + slides.length) % slides.length;
+            slides.forEach((slide, slideIndex) => {
+                slide.hidden = slideIndex !== current;
+            });
+            count.textContent = count.dataset.template
+                .replace(':current', current + 1)
+                .replace(':total', slides.length);
+        });
+    });
+});
+
+const toolkitSearch = document.getElementById('toolSearch');
+
+if (toolkitSearch) {
+    const groups = Array.from(document.querySelectorAll('[data-toolkit-group]'));
+    const empty = document.getElementById('toolSearchEmpty');
+
+    document.querySelectorAll('[data-tool-key]').forEach((tile) => {
+        tile.querySelector('.saved-badge').hidden = ! readJson(`adhdSupport.${tile.dataset.toolKey}`);
+    });
+
+    toolkitSearch.addEventListener('input', () => {
+        const words = toolkitSearch.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+        let visible = 0;
+
+        groups.forEach((group) => {
+            let groupVisible = 0;
+
+            group.querySelectorAll('[data-search]').forEach((item) => {
+                item.hidden = ! words.every((word) => item.dataset.search.includes(word));
+                groupVisible += item.hidden ? 0 : 1;
+            });
+
+            group.hidden = groupVisible === 0;
+            visible += groupVisible;
+        });
+
+        empty.hidden = visible > 0;
+    });
+}
+
 const toolRoot = document.querySelector('.tool-shell');
 
 if (toolRoot) {
@@ -642,6 +723,7 @@ if (toolRoot) {
 function initGoalBuilder(tools) {
     const form = document.getElementById('goalForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.goal') ?? '{}');
+    const root = document.querySelector('[data-tool="goal"]');
     const fields = {
         goal: document.getElementById('goalText'),
         why: document.getElementById('goalWhy'),
@@ -655,19 +737,59 @@ function initGoalBuilder(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.goal', JSON.stringify(data));
         renderGoal(tools, data);
     });
 
+    document.getElementById('goalAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('goalAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.goal?.trim()) {
+            status.textContent = tools.goal.ai_status.needs_goal;
+            fields.goal.focus();
+
+            return;
+        }
+
+        status.textContent = tools.goal.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Goal AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, goal: plan.title || data.goal, aiPlan: plan };
+            fields.goal.value = nextData.goal;
+            supportStorage.setItem('adhdSupport.goal', JSON.stringify(nextData));
+            renderGoal(tools, nextData);
+            status.textContent = plan.available ? tools.goal.ai_status.ready : tools.goal.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.goal.ai_status.error;
+        }
+    });
+
     document.getElementById('goalPrintButton').addEventListener('click', () => window.print());
     document.getElementById('goalDownloadButton').addEventListener('click', () => {
-        const data = collectFields(fields);
+        const data = readJson('adhdSupport.goal') || collectFields(fields);
         downloadText('adhd-goal-card.txt', goalToText(tools, data));
     });
     document.getElementById('goalClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.goal');
         hydrateFields(fields, {});
         renderGoal(tools, {});
+        document.getElementById('goalAiStatus').textContent = tools.goal.ai_status.idle;
     });
 }
 
@@ -677,19 +799,28 @@ function renderGoal(tools, data) {
     const blocker = data.blocker?.trim();
     const why = data.why?.trim();
     const energy = data.energy || 'low';
-    const microsteps = buildMicrosteps(goal, energy);
+    const aiPlan = validGoalAiPlan(data.aiPlan) ? data.aiPlan : null;
+    const microsteps = aiPlan?.microsteps || buildMicrosteps(goal, energy);
 
-    document.getElementById('goalOutputTitle').textContent = goal || copy.empty_title;
-    document.getElementById('goalFirstStep').textContent = goal ? microsteps[0] : copy.empty_copy;
+    document.getElementById('goalOutputTitle').textContent = aiPlan?.title || goal || copy.empty_title;
+    document.getElementById('goalFirstStep').textContent = aiPlan?.first || (goal ? microsteps[0] : copy.empty_copy);
     document.getElementById('goalMicrosteps').innerHTML = goal
         ? microsteps.map((step) => `<li>${step}</li>`).join('')
         : '';
-    document.getElementById('goalSupport').textContent = blocker
+    document.getElementById('goalSupport').textContent = aiPlan?.support || (blocker
         ? `${copy.defaults.support} ${copy.labels.blocker}: ${blocker}.`
-        : copy.defaults.support;
-    document.getElementById('goalDone').textContent = why
+        : copy.defaults.support);
+    document.getElementById('goalDone').textContent = aiPlan?.done || (why
         ? `${copy.defaults.done} ${copy.labels.why}: ${why}.`
-        : copy.defaults.done;
+        : copy.defaults.done);
+}
+
+function validGoalAiPlan(plan) {
+    return plan
+        && typeof plan.first === 'string'
+        && Array.isArray(plan.microsteps)
+        && typeof plan.support === 'string'
+        && typeof plan.done === 'string';
 }
 
 function buildMicrosteps(goal, energy) {
@@ -718,30 +849,32 @@ function buildMicrosteps(goal, energy) {
 
 function goalToText(tools, data) {
     const copy = tools.goal;
-    const goal = data.goal?.trim() || copy.empty_title;
-    const steps = buildMicrosteps(goal, data.energy || 'low');
+    const aiPlan = validGoalAiPlan(data.aiPlan) ? data.aiPlan : null;
+    const goal = aiPlan?.title || data.goal?.trim() || copy.empty_title;
+    const steps = aiPlan?.microsteps || buildMicrosteps(goal, data.energy || 'low');
 
     return [
         copy.output_eyebrow,
         goal,
         '',
         copy.sections.first_step,
-        steps[0] ?? copy.defaults.first_step,
+        aiPlan?.first || steps[0] || copy.defaults.first_step,
         '',
         copy.sections.microsteps,
         ...steps.map((step) => `- ${step}`),
         '',
         copy.sections.support,
-        data.blocker ? `${copy.defaults.support} ${copy.labels.blocker}: ${data.blocker}` : copy.defaults.support,
+        aiPlan?.support || (data.blocker ? `${copy.defaults.support} ${copy.labels.blocker}: ${data.blocker}` : copy.defaults.support),
         '',
         copy.sections.done,
-        data.why ? `${copy.defaults.done} ${copy.labels.why}: ${data.why}` : copy.defaults.done,
+        aiPlan?.done || (data.why ? `${copy.defaults.done} ${copy.labels.why}: ${data.why}` : copy.defaults.done),
     ].join('\n');
 }
 
 function initDailyPlanner(tools) {
     const form = document.getElementById('plannerForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.planner') ?? '{}');
+    const root = document.querySelector('[data-tool="planner"]');
     const fields = {
         must: document.getElementById('planMust'),
         should: document.getElementById('planShould'),
@@ -756,52 +889,103 @@ function initDailyPlanner(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.planner', JSON.stringify(data));
         renderPlanner(tools, data);
     });
 
+    document.getElementById('plannerAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('plannerAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.must?.trim() && ! data.scary?.trim() && ! data.body?.trim()) {
+            status.textContent = tools.planner.ai_status.needs_input;
+            fields.must.focus();
+
+            return;
+        }
+
+        status.textContent = tools.planner.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Planner AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.planner', JSON.stringify(nextData));
+            renderPlanner(tools, nextData);
+            status.textContent = plan.available ? tools.planner.ai_status.ready : tools.planner.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.planner.ai_status.error;
+        }
+    });
+
     document.getElementById('plannerPrintButton').addEventListener('click', () => window.print());
     document.getElementById('plannerDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-daily-plan.txt', plannerToText(tools, collectFields(fields)));
+        downloadText('adhd-daily-plan.txt', plannerToText(tools, readJson('adhdSupport.planner') || collectFields(fields)));
     });
     document.getElementById('plannerClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.planner');
         hydrateFields(fields, {});
         renderPlanner(tools, {});
+        document.getElementById('plannerAiStatus').textContent = tools.planner.ai_status.idle;
     });
 }
 
 function renderPlanner(tools, data) {
     const copy = tools.planner;
+    const aiPlan = validPlannerAiPlan(data.aiPlan) ? data.aiPlan : null;
 
-    renderList('plannerMustList', lines(data.must), copy.defaults.must);
-    renderList('plannerShouldList', lines(data.should), copy.defaults.should);
-    document.getElementById('plannerBodyText').textContent = data.body || copy.defaults.body;
-    document.getElementById('plannerScaryText').textContent = data.scary || copy.defaults.scary;
-    document.getElementById('plannerRecoveryText').textContent = data.recovery || copy.defaults.recovery;
+    renderList('plannerMustList', aiPlan?.must || lines(data.must), copy.defaults.must);
+    renderList('plannerShouldList', aiPlan?.should || lines(data.should), copy.defaults.should);
+    document.getElementById('plannerBodyText').textContent = aiPlan?.body || data.body || copy.defaults.body;
+    document.getElementById('plannerScaryText').textContent = aiPlan?.scary || data.scary || copy.defaults.scary;
+    document.getElementById('plannerRecoveryText').textContent = aiPlan?.recovery || data.recovery || copy.defaults.recovery;
+}
+
+function validPlannerAiPlan(plan) {
+    return plan
+        && Array.isArray(plan.must)
+        && Array.isArray(plan.should)
+        && typeof plan.body === 'string'
+        && typeof plan.scary === 'string'
+        && typeof plan.recovery === 'string';
 }
 
 function plannerToText(tools, data) {
     const copy = tools.planner;
+    const aiPlan = validPlannerAiPlan(data.aiPlan) ? data.aiPlan : null;
 
     return [
         copy.output_title,
         '',
         copy.sections.must,
-        ...withDefault(lines(data.must), copy.defaults.must).map((item) => `- ${item}`),
+        ...withDefault(aiPlan?.must || lines(data.must), copy.defaults.must).map((item) => `- ${item}`),
         '',
         copy.sections.should,
-        ...withDefault(lines(data.should), copy.defaults.should).map((item) => `- ${item}`),
+        ...withDefault(aiPlan?.should || lines(data.should), copy.defaults.should).map((item) => `- ${item}`),
         '',
-        `${copy.sections.body}: ${data.body || copy.defaults.body}`,
-        `${copy.sections.scary}: ${data.scary || copy.defaults.scary}`,
-        `${copy.sections.recovery}: ${data.recovery || copy.defaults.recovery}`,
+        `${copy.sections.body}: ${aiPlan?.body || data.body || copy.defaults.body}`,
+        `${copy.sections.scary}: ${aiPlan?.scary || data.scary || copy.defaults.scary}`,
+        `${copy.sections.recovery}: ${aiPlan?.recovery || data.recovery || copy.defaults.recovery}`,
     ].join('\n');
 }
 
 function initTimeBlock(tools) {
     const form = document.getElementById('timeForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.time') ?? '{}');
+    const root = document.querySelector('[data-tool="time"]');
     const defaults = tools.time.defaults;
     const fields = {
         start: document.getElementById('timeStart'),
@@ -825,23 +1009,62 @@ function initTimeBlock(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.time', JSON.stringify(data));
         renderTimeBlock(tools, data);
     });
 
+    document.getElementById('timeAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('timeAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.must?.trim() && ! data.fixed?.trim() && ! data.recovery?.trim()) {
+            status.textContent = tools.time.ai_status.needs_input;
+            fields.must.focus();
+
+            return;
+        }
+
+        status.textContent = tools.time.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Time block AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.time', JSON.stringify(nextData));
+            renderTimeBlock(tools, nextData);
+            status.textContent = plan.available ? tools.time.ai_status.ready : tools.time.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.time.ai_status.error;
+        }
+    });
+
     document.getElementById('timePrintButton').addEventListener('click', () => window.print());
     document.getElementById('timeDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-time-block-plan.txt', timeBlockToText(tools, collectFields(fields)));
+        downloadText('adhd-time-block-plan.txt', timeBlockToText(tools, readJson('adhdSupport.time') || collectFields(fields)));
     });
     document.getElementById('timeClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.time');
         hydrateFields(fields, defaults);
         renderTimeBlock(tools, collectFields(fields));
+        document.getElementById('timeAiStatus').textContent = tools.time.ai_status.idle;
     });
 }
 
 function renderTimeBlock(tools, data) {
-    const plan = timeBlockPlan(tools.time, data);
+    const plan = validTimeAiPlan(data.aiPlan) ? data.aiPlan : timeBlockPlan(tools.time, data);
 
     document.getElementById('timeOutputTitle').textContent = plan.title;
     document.getElementById('timeBlocksList').innerHTML = plan.blocks.map((item) => `<li>${item}</li>`).join('');
@@ -895,7 +1118,7 @@ function timeBlockPlan(copy, data) {
 
 function timeBlockToText(tools, data) {
     const copy = tools.time;
-    const plan = timeBlockPlan(copy, data);
+    const plan = validTimeAiPlan(data.aiPlan) ? data.aiPlan : timeBlockPlan(copy, data);
 
     return [
         plan.title,
@@ -917,9 +1140,22 @@ function timeBlockToText(tools, data) {
     ].join('\n');
 }
 
+function validTimeAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && Array.isArray(plan.blocks)
+        && Array.isArray(plan.fixed)
+        && Array.isArray(plan.buffers)
+        && typeof plan.recovery === 'string'
+        && typeof plan.fallback === 'string',
+    );
+}
+
 function initBodyNeeds(tools) {
     const form = document.getElementById('bodyForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.body') ?? '{}');
+    const root = document.querySelector('[data-tool="body"]');
     const fields = {
         food: document.getElementById('bodyFood'),
         water: document.getElementById('bodyWater'),
@@ -942,13 +1178,44 @@ function initBodyNeeds(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.body', JSON.stringify(data));
         renderBodyNeeds(tools, data);
     });
 
+    document.getElementById('bodyAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('bodyAiStatus');
+        const data = collectFields(fields);
+
+        status.textContent = tools.body.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Body needs AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.body', JSON.stringify(nextData));
+            renderBodyNeeds(tools, nextData);
+            status.textContent = plan.available ? tools.body.ai_status.ready : tools.body.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.body.ai_status.error;
+        }
+    });
+
     document.getElementById('bodyPrintButton').addEventListener('click', () => window.print());
     document.getElementById('bodyDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-body-needs-checkin.txt', bodyNeedsToText(tools, collectFields(fields)));
+        downloadText('adhd-body-needs-checkin.txt', bodyNeedsToText(tools, readJson('adhdSupport.body') || collectFields(fields)));
     });
     document.getElementById('bodyClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.body');
@@ -960,13 +1227,14 @@ function initBodyNeeds(tools) {
             signal: 'unknown',
         });
         renderBodyNeeds(tools, collectFields(fields));
+        document.getElementById('bodyAiStatus').textContent = tools.body.ai_status.idle;
     });
 }
 
 function renderBodyNeeds(tools, data) {
-    const plan = bodyNeedsPlan(tools.body, data);
+    const plan = validBodyAiPlan(data.aiPlan) ? data.aiPlan : bodyNeedsPlan(tools.body, data);
 
-    document.getElementById('bodyOutputTitle').textContent = tools.body.output_title;
+    document.getElementById('bodyOutputTitle').textContent = plan.title || tools.body.output_title;
     document.getElementById('bodyFirstText').textContent = plan.first;
     document.getElementById('bodyStepsList').innerHTML = plan.steps.map((item) => `<li>${item}</li>`).join('');
     document.getElementById('bodyChecksList').innerHTML = plan.checks.map((item) => `<li>${item}</li>`).join('');
@@ -983,6 +1251,7 @@ function bodyNeedsPlan(copy, data) {
     const task = data.task?.trim() || copy.defaults.task;
 
     return {
+        title: copy.output_title,
         first: copy.first_actions[food] || copy.first_actions.unknown,
         steps: [
             copy.water_steps[water] || copy.water_steps.unknown,
@@ -998,10 +1267,10 @@ function bodyNeedsPlan(copy, data) {
 
 function bodyNeedsToText(tools, data) {
     const copy = tools.body;
-    const plan = bodyNeedsPlan(copy, data);
+    const plan = validBodyAiPlan(data.aiPlan) ? data.aiPlan : bodyNeedsPlan(copy, data);
 
     return [
-        copy.output_title,
+        plan.title || copy.output_title,
         '',
         copy.sections.first,
         plan.first,
@@ -1020,9 +1289,22 @@ function bodyNeedsToText(tools, data) {
     ].join('\n');
 }
 
+function validBodyAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && typeof plan.first === 'string'
+        && Array.isArray(plan.steps)
+        && Array.isArray(plan.checks)
+        && typeof plan.task === 'string'
+        && typeof plan.stop === 'string',
+    );
+}
+
 function initMedicationRefill(tools) {
     const form = document.getElementById('medsForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.meds') ?? '{}');
+    const root = document.querySelector('[data-tool="meds"]');
     const fields = {
         mode: document.getElementById('medsMode'),
         medicine: document.getElementById('medsMedicine'),
@@ -1033,39 +1315,78 @@ function initMedicationRefill(tools) {
     };
 
     hydrateFields(fields, { mode: 'running_low', ...saved });
-    renderMedicationRefill(tools, collectFields(fields));
+    renderMedicationRefill(tools, saved?.aiPlan ? saved : collectFields(fields));
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.meds', JSON.stringify(data));
         renderMedicationRefill(tools, data);
     });
 
+    document.getElementById('medsAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('medsAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.medicine?.trim() && ! data.supply?.trim() && ! data.blocker?.trim()) {
+            status.textContent = tools.meds.ai_status.needs_input;
+            fields.medicine.focus();
+
+            return;
+        }
+
+        status.textContent = tools.meds.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Medication refill AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.meds', JSON.stringify(nextData));
+            renderMedicationRefill(tools, nextData);
+            status.textContent = plan.available ? tools.meds.ai_status.ready : tools.meds.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.meds.ai_status.error;
+        }
+    });
+
     document.getElementById('medsPrintButton').addEventListener('click', () => window.print());
     document.getElementById('medsDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-medication-refill-rescue.txt', medicationRefillToText(tools, collectFields(fields)));
+        downloadText('adhd-medication-refill-rescue.txt', medicationRefillToText(tools, readJson('adhdSupport.meds') || collectFields(fields)));
     });
     document.getElementById('medsClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.meds');
         hydrateFields(fields, { mode: 'running_low' });
         renderMedicationRefill(tools, collectFields(fields));
+        document.getElementById('medsAiStatus').textContent = tools.meds.ai_status.idle;
     });
 }
 
 function renderMedicationRefill(tools, data) {
     const copy = tools.meds;
-    const plan = medicationRefillPlan(copy, data);
+    const plan = validMedicationAiPlan(data.aiPlan) ? data.aiPlan : medicationRefillPlan(copy, data);
 
-    document.getElementById('medsOutputTitle').textContent = copy.output_title;
+    document.getElementById('medsOutputTitle').textContent = plan.title;
     document.getElementById('medsFirstText').textContent = plan.first;
     document.getElementById('medsStepsList').innerHTML = plan.steps
         .map((step) => `<li>${step}</li>`)
         .join('');
     document.getElementById('medsScriptText').textContent = plan.script;
     renderList('medsQuestionsList', plan.questions, copy.questions[0]);
-    document.getElementById('medsSafetyText').textContent = copy.safety_note;
-    document.getElementById('medsStopText').textContent = copy.stop_rule;
+    document.getElementById('medsSafetyText').textContent = plan.safety;
+    document.getElementById('medsStopText').textContent = plan.stop;
 }
 
 function medicationRefillPlan(copy, data) {
@@ -1082,6 +1403,7 @@ function medicationRefillPlan(copy, data) {
     }
 
     return {
+        title: copy.output_title,
         first: copy.first_action
             .replace(':medicine', medicine)
             .replace(':supply', supply),
@@ -1091,15 +1413,17 @@ function medicationRefillPlan(copy, data) {
             .replace(':supply', supply)
             .replace(':contact', contact),
         questions: copy.questions.map((question) => question.replace(':deadline', deadline)),
+        safety: copy.safety_note,
+        stop: copy.stop_rule,
     };
 }
 
 function medicationRefillToText(tools, data) {
     const copy = tools.meds;
-    const plan = medicationRefillPlan(copy, data);
+    const plan = validMedicationAiPlan(data.aiPlan) ? data.aiPlan : medicationRefillPlan(copy, data);
 
     return [
-        copy.output_title,
+        plan.title,
         '',
         copy.sections.first,
         plan.first,
@@ -1114,11 +1438,24 @@ function medicationRefillToText(tools, data) {
         ...plan.questions.map((item) => `- ${item}`),
         '',
         copy.sections.safety,
-        copy.safety_note,
+        plan.safety,
         '',
         copy.sections.stop,
-        copy.stop_rule,
+        plan.stop,
     ].join('\n');
+}
+
+function validMedicationAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && typeof plan.first === 'string'
+        && Array.isArray(plan.steps)
+        && typeof plan.script === 'string'
+        && Array.isArray(plan.questions)
+        && typeof plan.safety === 'string'
+        && typeof plan.stop === 'string',
+    );
 }
 
 function initFoodRescue(tools) {
@@ -2046,6 +2383,7 @@ function digitalClutterToText(tools, data) {
 function initMoneyAdmin(tools) {
     const form = document.getElementById('moneyForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.money') ?? '{}');
+    const root = document.querySelector('[data-tool="money"]');
     const fields = {
         task: document.getElementById('moneyTask'),
         category: document.getElementById('moneyCategory'),
@@ -2056,40 +2394,92 @@ function initMoneyAdmin(tools) {
     };
 
     hydrateFields(fields, saved);
-    renderMoneyAdmin(tools, collectFields(fields));
+    renderMoneyAdmin(tools, saved?.aiPlan ? saved : collectFields(fields));
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.money', JSON.stringify(data));
         renderMoneyAdmin(tools, data);
     });
 
+    document.getElementById('moneyAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('moneyAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.task?.trim() && ! data.blocker?.trim() && ! data.outcome?.trim()) {
+            status.textContent = tools.money.ai_status.needs_input;
+            fields.task.focus();
+
+            return;
+        }
+
+        status.textContent = tools.money.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Money admin AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.money', JSON.stringify(nextData));
+            renderMoneyAdmin(tools, nextData);
+            status.textContent = plan.available ? tools.money.ai_status.ready : tools.money.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.money.ai_status.error;
+        }
+    });
+
     document.getElementById('moneyPrintButton').addEventListener('click', () => window.print());
     document.getElementById('moneyDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-money-admin-rescue.txt', moneyToText(tools, collectFields(fields)));
+        downloadText('adhd-money-admin-rescue.txt', moneyToText(tools, readJson('adhdSupport.money') || collectFields(fields)));
     });
     document.getElementById('moneyClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.money');
         hydrateFields(fields, {});
         renderMoneyAdmin(tools, {});
+        document.getElementById('moneyAiStatus').textContent = tools.money.ai_status.idle;
     });
 }
 
 function renderMoneyAdmin(tools, data) {
     const copy = tools.money;
+    const plan = validMoneyAiPlan(data.aiPlan) ? data.aiPlan : moneyPlan(copy, data);
+
+    document.getElementById('moneyOutputTitle').textContent = plan.title;
+    document.getElementById('moneyFirstText').textContent = plan.first;
+    document.getElementById('moneyStepList').innerHTML = plan.steps
+        .map((step) => `<li>${step}</li>`)
+        .join('');
+    document.getElementById('moneyScriptText').textContent = plan.script;
+    renderList('moneyQuestionList', plan.questions, copy.questions.shared[0]);
+    document.getElementById('moneyStopText').textContent = plan.stop;
+}
+
+function moneyPlan(copy, data) {
     const category = data.category || 'overdue';
     const task = data.task?.trim() || copy.defaults.task[category] || copy.defaults.task.overdue;
     const outcome = data.outcome?.trim() || copy.defaults.outcome;
 
-    document.getElementById('moneyOutputTitle').textContent = copy.output_title.replace(':task', task);
-    document.getElementById('moneyFirstText').textContent = moneyFirstAction(copy, task, category, data.urgency, data.blocker);
-    document.getElementById('moneyStepList').innerHTML = moneySteps(copy, category)
-        .map((step) => `<li>${step}</li>`)
-        .join('');
-    document.getElementById('moneyScriptText').textContent = moneyScript(copy, category, data.contact, task);
-    renderList('moneyQuestionList', moneyQuestions(copy, category, outcome), copy.questions.shared[0]);
-    document.getElementById('moneyStopText').textContent = copy.stop_rule.replace(':outcome', outcome);
+    return {
+        title: copy.output_title.replace(':task', task),
+        first: moneyFirstAction(copy, task, category, data.urgency, data.blocker),
+        steps: moneySteps(copy, category),
+        script: moneyScript(copy, category, data.contact, task),
+        questions: moneyQuestions(copy, category, outcome),
+        stop: copy.stop_rule.replace(':outcome', outcome),
+    };
 }
 
 function moneyFirstAction(copy, task, category, urgency, blocker) {
@@ -2124,28 +2514,38 @@ function moneyQuestions(copy, category, outcome) {
 
 function moneyToText(tools, data) {
     const copy = tools.money;
-    const category = data.category || 'overdue';
-    const task = data.task?.trim() || copy.defaults.task[category] || copy.defaults.task.overdue;
-    const outcome = data.outcome?.trim() || copy.defaults.outcome;
+    const plan = validMoneyAiPlan(data.aiPlan) ? data.aiPlan : moneyPlan(copy, data);
 
     return [
-        copy.output_title.replace(':task', task),
+        plan.title,
         '',
         copy.sections.first,
-        moneyFirstAction(copy, task, category, data.urgency, data.blocker),
+        plan.first,
         '',
         copy.sections.steps,
-        ...moneySteps(copy, category).map((item) => `- ${item}`),
+        ...plan.steps.map((item) => `- ${item}`),
         '',
         copy.sections.script,
-        moneyScript(copy, category, data.contact, task),
+        plan.script,
         '',
         copy.sections.questions,
-        ...moneyQuestions(copy, category, outcome).map((item) => `- ${item}`),
+        ...plan.questions.map((item) => `- ${item}`),
         '',
         copy.sections.stop,
-        copy.stop_rule.replace(':outcome', outcome),
+        plan.stop,
     ].join('\n');
+}
+
+function validMoneyAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && typeof plan.first === 'string'
+        && Array.isArray(plan.steps)
+        && typeof plan.script === 'string'
+        && Array.isArray(plan.questions)
+        && typeof plan.stop === 'string',
+    );
 }
 
 function initAidApplication(tools) {
@@ -2626,6 +3026,7 @@ function communicationToText(tools, data) {
 function initEnergyCrash(tools) {
     const form = document.getElementById('energyForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.energy') ?? '{}');
+    const root = document.querySelector('[data-tool="energy"]');
     const fields = {
         state: document.getElementById('energyState'),
         must: document.getElementById('energyMust'),
@@ -2641,23 +3042,62 @@ function initEnergyCrash(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.energy', JSON.stringify(data));
         renderEnergyCrash(tools, data);
     });
 
+    document.getElementById('energyAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('energyAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.must?.trim() && ! data.drop?.trim() && ! data.support?.trim()) {
+            status.textContent = tools.energy.ai_status.needs_input;
+            fields.must.focus();
+
+            return;
+        }
+
+        status.textContent = tools.energy.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Energy crash AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.energy', JSON.stringify(nextData));
+            renderEnergyCrash(tools, nextData);
+            status.textContent = plan.available ? tools.energy.ai_status.ready : tools.energy.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.energy.ai_status.error;
+        }
+    });
+
     document.getElementById('energyPrintButton').addEventListener('click', () => window.print());
     document.getElementById('energyDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-energy-crash-plan.txt', energyToText(tools, collectFields(fields)));
+        downloadText('adhd-energy-crash-plan.txt', energyToText(tools, readJson('adhdSupport.energy') || collectFields(fields)));
     });
     document.getElementById('energyClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.energy');
         hydrateFields(fields, {});
         renderEnergyCrash(tools, {});
+        document.getElementById('energyAiStatus').textContent = tools.energy.ai_status.idle;
     });
 }
 
 function renderEnergyCrash(tools, data) {
-    const plan = energyPlan(tools.energy, data);
+    const plan = validEnergyAiPlan(data.aiPlan) ? data.aiPlan : energyPlan(tools.energy, data);
 
     document.getElementById('energyOutputTitle').textContent = plan.title;
     document.getElementById('energyFirstText').textContent = plan.first;
@@ -2696,7 +3136,7 @@ function energyPlan(copy, data) {
 
 function energyToText(tools, data) {
     const copy = tools.energy;
-    const plan = energyPlan(copy, data);
+    const plan = validEnergyAiPlan(data.aiPlan) ? data.aiPlan : energyPlan(copy, data);
 
     return [
         plan.title,
@@ -2721,9 +3161,23 @@ function energyToText(tools, data) {
     ].join('\n');
 }
 
+function validEnergyAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && typeof plan.first === 'string'
+        && typeof plan.body === 'string'
+        && Array.isArray(plan.steps)
+        && typeof plan.drop === 'string'
+        && typeof plan.script === 'string'
+        && typeof plan.stop === 'string',
+    );
+}
+
 function initDecisionPriority(tools) {
     const form = document.getElementById('decisionForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.decision') ?? '{}');
+    const root = document.querySelector('[data-tool="decision"]');
     const fields = {
         options: document.getElementById('decisionOptions'),
         urgency: document.getElementById('decisionUrgency'),
@@ -2734,28 +3188,67 @@ function initDecisionPriority(tools) {
     };
 
     hydrateFields(fields, saved);
-    renderDecisionPriority(tools, collectFields(fields));
+    renderDecisionPriority(tools, saved?.aiPlan ? saved : collectFields(fields));
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.decision', JSON.stringify(data));
         renderDecisionPriority(tools, data);
     });
 
+    document.getElementById('decisionAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('decisionAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.options?.trim() && ! data.relief?.trim()) {
+            status.textContent = tools.decision.ai_status.needs_options;
+            fields.options.focus();
+
+            return;
+        }
+
+        status.textContent = tools.decision.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Decision priority AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.decision', JSON.stringify(nextData));
+            renderDecisionPriority(tools, nextData);
+            status.textContent = plan.available ? tools.decision.ai_status.ready : tools.decision.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.decision.ai_status.error;
+        }
+    });
+
     document.getElementById('decisionPrintButton').addEventListener('click', () => window.print());
     document.getElementById('decisionDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-decision-priority-card.txt', decisionToText(tools, collectFields(fields)));
+        downloadText('adhd-decision-priority-card.txt', decisionToText(tools, readJson('adhdSupport.decision') || collectFields(fields)));
     });
     document.getElementById('decisionClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.decision');
         hydrateFields(fields, {});
         renderDecisionPriority(tools, {});
+        document.getElementById('decisionAiStatus').textContent = tools.decision.ai_status.idle;
     });
 }
 
 function renderDecisionPriority(tools, data) {
-    const plan = decisionPlan(tools.decision, data);
+    const plan = validDecisionAiPlan(data.aiPlan) ? data.aiPlan : decisionPlan(tools.decision, data);
 
     document.getElementById('decisionOutputTitle').textContent = plan.title;
     document.getElementById('decisionChosenText').textContent = plan.chosen;
@@ -2794,7 +3287,7 @@ function decisionPlan(copy, data) {
 
 function decisionToText(tools, data) {
     const copy = tools.decision;
-    const plan = decisionPlan(copy, data);
+    const plan = validDecisionAiPlan(data.aiPlan) ? data.aiPlan : decisionPlan(copy, data);
 
     return [
         plan.title,
@@ -2819,9 +3312,24 @@ function decisionToText(tools, data) {
     ].join('\n');
 }
 
+function validDecisionAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && typeof plan.chosen === 'string'
+        && typeof plan.why === 'string'
+        && typeof plan.first === 'string'
+        && Array.isArray(plan.steps)
+        && Array.isArray(plan.parked)
+        && typeof plan.script === 'string'
+        && typeof plan.stop === 'string',
+    );
+}
+
 function initFocusSprint(tools) {
     const form = document.getElementById('focusForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.focus') ?? '{}');
+    const root = document.querySelector('[data-tool="focus"]');
     const fields = {
         task: document.getElementById('focusTask'),
         mode: document.getElementById('focusMode'),
@@ -2837,23 +3345,62 @@ function initFocusSprint(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.focus', JSON.stringify(data));
         renderFocusSprint(tools, data);
     });
 
+    document.getElementById('focusAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('focusAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.task?.trim()) {
+            status.textContent = tools.focus.ai_status.needs_task;
+            fields.task.focus();
+
+            return;
+        }
+
+        status.textContent = tools.focus.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Focus sprint AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.focus', JSON.stringify(nextData));
+            renderFocusSprint(tools, nextData);
+            status.textContent = plan.available ? tools.focus.ai_status.ready : tools.focus.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.focus.ai_status.error;
+        }
+    });
+
     document.getElementById('focusPrintButton').addEventListener('click', () => window.print());
     document.getElementById('focusDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-focus-sprint-card.txt', focusToText(tools, collectFields(fields)));
+        downloadText('adhd-focus-sprint-card.txt', focusToText(tools, readJson('adhdSupport.focus') || collectFields(fields)));
     });
     document.getElementById('focusClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.focus');
         hydrateFields(fields, {});
         renderFocusSprint(tools, {});
+        document.getElementById('focusAiStatus').textContent = tools.focus.ai_status.idle;
     });
 }
 
 function renderFocusSprint(tools, data) {
-    const plan = focusPlan(tools.focus, data);
+    const plan = validFocusAiPlan(data.aiPlan) ? data.aiPlan : focusPlan(tools.focus, data);
 
     document.getElementById('focusOutputTitle').textContent = plan.title;
     document.getElementById('focusStartText').textContent = plan.start;
@@ -2889,7 +3436,7 @@ function focusPlan(copy, data) {
 
 function focusToText(tools, data) {
     const copy = tools.focus;
-    const plan = focusPlan(copy, data);
+    const plan = validFocusAiPlan(data.aiPlan) ? data.aiPlan : focusPlan(copy, data);
 
     return [
         plan.title,
@@ -2914,9 +3461,23 @@ function focusToText(tools, data) {
     ].join('\n');
 }
 
+function validFocusAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && typeof plan.start === 'string'
+        && Array.isArray(plan.steps)
+        && typeof plan.distraction === 'string'
+        && typeof plan.support === 'string'
+        && typeof plan.reward === 'string'
+        && typeof plan.stop === 'string',
+    );
+}
+
 function initEmotionalReset(tools) {
     const form = document.getElementById('emotionForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.emotion') ?? '{}');
+    const root = document.querySelector('[data-tool="emotion"]');
     const fields = {
         trigger: document.getElementById('emotionTrigger'),
         intensity: document.getElementById('emotionIntensity'),
@@ -2932,23 +3493,62 @@ function initEmotionalReset(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.emotion', JSON.stringify(data));
         renderEmotionalReset(tools, data);
     });
 
+    document.getElementById('emotionAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('emotionAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.trigger?.trim() && ! data.story?.trim() && ! data.next?.trim()) {
+            status.textContent = tools.emotion.ai_status.needs_input;
+            fields.trigger.focus();
+
+            return;
+        }
+
+        status.textContent = tools.emotion.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Emotional reset AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, aiPlan: plan };
+            supportStorage.setItem('adhdSupport.emotion', JSON.stringify(nextData));
+            renderEmotionalReset(tools, nextData);
+            status.textContent = plan.available ? tools.emotion.ai_status.ready : tools.emotion.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.emotion.ai_status.error;
+        }
+    });
+
     document.getElementById('emotionPrintButton').addEventListener('click', () => window.print());
     document.getElementById('emotionDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-emotional-reset-card.txt', emotionToText(tools, collectFields(fields)));
+        downloadText('adhd-emotional-reset-card.txt', emotionToText(tools, readJson('adhdSupport.emotion') || collectFields(fields)));
     });
     document.getElementById('emotionClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.emotion');
         hydrateFields(fields, {});
         renderEmotionalReset(tools, {});
+        document.getElementById('emotionAiStatus').textContent = tools.emotion.ai_status.idle;
     });
 }
 
 function renderEmotionalReset(tools, data) {
-    const plan = emotionPlan(tools.emotion, data);
+    const plan = validEmotionAiPlan(data.aiPlan) ? data.aiPlan : emotionPlan(tools.emotion, data);
 
     document.getElementById('emotionOutputTitle').textContent = plan.title;
     document.getElementById('emotionFirstText').textContent = plan.first;
@@ -2985,7 +3585,7 @@ function emotionPlan(copy, data) {
 
 function emotionToText(tools, data) {
     const copy = tools.emotion;
-    const plan = emotionPlan(copy, data);
+    const plan = validEmotionAiPlan(data.aiPlan) ? data.aiPlan : emotionPlan(copy, data);
 
     return [
         plan.title,
@@ -3008,6 +3608,19 @@ function emotionToText(tools, data) {
         copy.sections.stop,
         plan.stop,
     ].join('\n');
+}
+
+function validEmotionAiPlan(plan) {
+    return Boolean(
+        plan
+        && typeof plan.title === 'string'
+        && typeof plan.first === 'string'
+        && Array.isArray(plan.ground)
+        && typeof plan.reframe === 'string'
+        && typeof plan.next === 'string'
+        && typeof plan.script === 'string'
+        && typeof plan.stop === 'string',
+    );
 }
 
 function initSafetyPause(tools) {
@@ -3848,6 +4461,7 @@ function accessToText(tools, data) {
 function initTaskBreakdown(tools) {
     const form = document.getElementById('taskForm');
     const saved = JSON.parse(supportStorage.getItem('adhdSupport.task') ?? '{}');
+    const root = document.querySelector('[data-tool="task"]');
     const fields = {
         dump: document.getElementById('taskDump'),
         focus: document.getElementById('taskFocus'),
@@ -3861,37 +4475,86 @@ function initTaskBreakdown(tools) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const data = collectFields(fields);
+        delete data.aiPlan;
         supportStorage.setItem('adhdSupport.task', JSON.stringify(data));
         renderTaskBreakdown(tools, data);
     });
 
+    document.getElementById('taskAiButton').addEventListener('click', async () => {
+        const status = document.getElementById('taskAiStatus');
+        const data = collectFields(fields);
+
+        if (! data.focus?.trim()) {
+            status.textContent = tools.task.ai_status.needs_task;
+            fields.focus.focus();
+
+            return;
+        }
+
+        status.textContent = tools.task.ai_status.loading;
+
+        try {
+            const response = await fetch(root?.dataset.aiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (! response.ok) {
+                throw new Error('Task AI request failed');
+            }
+
+            const plan = await response.json();
+            const nextData = { ...data, focus: plan.title || data.focus, aiPlan: plan };
+            fields.focus.value = nextData.focus;
+            fields.done.value = plan.done || data.done || '';
+            supportStorage.setItem('adhdSupport.task', JSON.stringify(nextData));
+            renderTaskBreakdown(tools, nextData);
+            status.textContent = plan.available ? tools.task.ai_status.ready : tools.task.ai_status.local;
+        } catch (error) {
+            status.textContent = tools.task.ai_status.error;
+        }
+    });
+
     document.getElementById('taskPrintButton').addEventListener('click', () => window.print());
     document.getElementById('taskDownloadButton').addEventListener('click', () => {
-        downloadText('adhd-task-breakdown.txt', taskToText(tools, collectFields(fields)));
+        downloadText('adhd-task-breakdown.txt', taskToText(tools, readJson('adhdSupport.task') || collectFields(fields)));
     });
     document.getElementById('taskClearButton').addEventListener('click', () => {
         supportStorage.removeItem('adhdSupport.task');
         hydrateFields(fields, {});
         renderTaskBreakdown(tools, {});
+        document.getElementById('taskAiStatus').textContent = tools.task.ai_status.idle;
     });
 }
 
 function renderTaskBreakdown(tools, data) {
     const copy = tools.task;
     const task = data.focus?.trim();
+    const aiPlan = validTaskAiPlan(data.aiPlan) ? data.aiPlan : null;
     const stuck = data.stuck || 'unclear';
-    const steps = taskMicrosteps(copy, task, stuck);
-    const nowItems = task ? copy.defaults.now : [copy.empty_copy];
-    const hidden = taskHiddenSteps(copy, data.dump);
+    const steps = aiPlan?.microsteps || taskMicrosteps(copy, task, stuck);
+    const nowItems = aiPlan?.now || (task ? copy.defaults.now : [copy.empty_copy]);
+    const hidden = aiPlan?.hidden || taskHiddenSteps(copy, data.dump);
 
-    document.getElementById('taskOutputTitle').textContent = task || copy.empty_title;
+    document.getElementById('taskOutputTitle').textContent = aiPlan?.title || task || copy.empty_title;
     renderList('taskNowList', nowItems, copy.empty_copy);
     document.getElementById('taskMicrosteps').innerHTML = task
         ? steps.map((step) => `<li>${step}</li>`).join('')
         : '';
     renderList('taskHiddenList', hidden, copy.defaults.hidden[0]);
-    document.getElementById('taskDoneText').textContent = data.done?.trim() || copy.defaults.done;
-    document.getElementById('taskResetText').textContent = copy.defaults.reset;
+    document.getElementById('taskDoneText').textContent = aiPlan?.done || data.done?.trim() || copy.defaults.done;
+    document.getElementById('taskResetText').textContent = aiPlan?.reset || copy.defaults.reset;
+}
+
+function validTaskAiPlan(plan) {
+    return plan
+        && Array.isArray(plan.now)
+        && Array.isArray(plan.microsteps)
+        && Array.isArray(plan.hidden);
 }
 
 function taskHiddenSteps(copy, dump) {
@@ -3920,26 +4583,27 @@ function taskMicrosteps(copy, task, stuck) {
 
 function taskToText(tools, data) {
     const copy = tools.task;
-    const task = data.focus?.trim() || copy.empty_title;
-    const hidden = taskHiddenSteps(copy, data.dump);
+    const aiPlan = validTaskAiPlan(data.aiPlan) ? data.aiPlan : null;
+    const task = aiPlan?.title || data.focus?.trim() || copy.empty_title;
+    const hidden = aiPlan?.hidden || taskHiddenSteps(copy, data.dump);
 
     return [
         task,
         '',
         copy.sections.now,
-        ...copy.defaults.now.map((item) => `- ${item}`),
+        ...(aiPlan?.now || copy.defaults.now).map((item) => `- ${item}`),
         '',
         copy.sections.microsteps,
-        ...taskMicrosteps(copy, data.focus, data.stuck || 'unclear').map((item) => `- ${item}`),
+        ...(aiPlan?.microsteps || taskMicrosteps(copy, data.focus, data.stuck || 'unclear')).map((item) => `- ${item}`),
         '',
         copy.sections.hidden,
         ...hidden.map((item) => `- ${item}`),
         '',
         copy.sections.done,
-        data.done?.trim() || copy.defaults.done,
+        aiPlan?.done || data.done?.trim() || copy.defaults.done,
         '',
         copy.sections.reset,
-        copy.defaults.reset,
+        aiPlan?.reset || copy.defaults.reset,
     ].join('\n');
 }
 
@@ -3949,7 +4613,10 @@ function initDashboard(tools, locale, links = {}) {
     const root = document.querySelector('[data-tool="dashboard"]');
 
     renderDashboard(copy, saved, tools, links);
+    renderDashboardScreening(saved.result);
     initDashboardGuide(copy, links, root?.dataset.guideUrl);
+
+    document.getElementById('todayDate').textContent = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
     document.getElementById('dashboardExportButton').addEventListener('click', () => {
         downloadText('adhd-support-kit.txt', dashboardSupportKitText(copy, tools, readSupportKit(locale)));
@@ -4010,8 +4677,35 @@ function initDashboard(tools, locale, links = {}) {
         ].forEach((key) => supportStorage.removeItem(key));
 
         renderDashboard(copy, readSupportKit(locale), tools, links);
+        renderDashboardScreening(null);
         document.getElementById('dashboardNextBody').textContent = copy.cleared;
     });
+}
+
+function renderDashboardScreening(result) {
+    const title = document.getElementById('dashboardScreeningResult');
+    const body = document.getElementById('dashboardScreeningBody');
+    const link = document.getElementById('dashboardScreeningLink');
+    const heroLink = document.getElementById('heroScreeningLink');
+
+    if (! title || ! body || ! link) {
+        return;
+    }
+
+    body.dataset.empty ??= body.textContent;
+    link.dataset.startLabel ??= link.textContent;
+    link.dataset.startHref ??= link.href;
+    title.hidden = ! result?.title;
+    title.textContent = result?.title || '';
+    body.textContent = result?.title ? body.dataset.saved : body.dataset.empty;
+    link.textContent = result?.title ? link.dataset.resultLabel : link.dataset.startLabel;
+    link.href = result?.title ? `${link.dataset.startHref}#result` : link.dataset.startHref;
+
+    // Once screened, the hero's second action becomes revisiting the result.
+    if (heroLink) {
+        heroLink.textContent = link.textContent;
+        heroLink.href = link.href;
+    }
 }
 
 function readSupportKit(locale = 'en') {
@@ -4858,6 +5552,11 @@ function trackerToText(tools, data) {
 function hydrateFields(fields, data) {
     Object.entries(fields).forEach(([key, field]) => {
         field.value = data[key] ?? '';
+
+        // A select given an unknown value renders blank; fall back to its first option.
+        if (field.tagName === 'SELECT' && field.selectedIndex === -1) {
+            field.selectedIndex = 0;
+        }
     });
 }
 

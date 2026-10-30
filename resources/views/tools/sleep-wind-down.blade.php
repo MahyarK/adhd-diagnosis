@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('assessment.ui.sleep_wind_down') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <main class="tool-shell" data-tool="sleep" data-locale="{{ $locale }}" data-tools='@json($tools)'>
+@section('title', __('assessment.ui.sleep_wind_down'))
+
+@section('content')
+    <main id="main" class="tool-shell" data-tool="sleep" data-locale="{{ $locale }}" data-tools='@json($tools)'>
         <section class="tool-hero">
-            <p class="eyebrow">{{ $tools['sleep']['eyebrow'] }}</p>
             <h1>{{ $tools['sleep']['title'] }}</h1>
             <p>{{ $tools['sleep']['intro'] }}</p>
         </section>
@@ -48,10 +41,15 @@
                 </label>
                 <div class="tool-actions">
                     <button type="submit" class="primary-button">{{ $tools['sleep']['buttons']['build'] }}</button>
-                    <button type="button" class="secondary-button" id="sleepPrintButton">{{ $tools['shared']['print'] }}</button>
-                    <button type="button" class="secondary-button" id="sleepDownloadButton">{{ $tools['shared']['download'] }}</button>
-                    <button type="button" class="secondary-button" id="sleepClearButton">{{ $tools['shared']['clear'] }}</button>
                 </div>
+                <details class="tool-extra-actions">
+                    <summary>{{ $tools['shared']['extra_actions'] }}</summary>
+                    <div>
+                            <button type="button" class="secondary-button" id="sleepPrintButton">{{ $tools['shared']['print'] }}</button>
+                            <button type="button" class="secondary-button" id="sleepDownloadButton">{{ $tools['shared']['download'] }}</button>
+                            <button type="button" class="secondary-button" id="sleepClearButton">{{ $tools['shared']['clear'] }}</button>
+                    </div>
+                </details>
             </form>
 
             <section class="tool-output printable-tool" aria-live="polite">
@@ -86,5 +84,4 @@
             </section>
         </section>
     </main>
-</body>
-</html>
+@endsection
